@@ -214,6 +214,38 @@
     #char-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
+  /* ── OPPONENT SELECT ── */
+  #screen-opponents {
+    width: 100%;
+    max-width: 980px;
+    padding: 12px 16px 20px;
+  }
+  #screen-opponents h2 {
+    font-size: clamp(16px, 3vw, 28px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #fff;
+    text-shadow: 0 0 20px #ff4422;
+    margin-bottom: 6px;
+  }
+  #opp-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 600px) {
+    #opp-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .opp-card.selected-opp {
+    transform: translateY(-3px);
+  }
+  .opp-card.disabled-opp {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
   /* ── ARENA SELECT ── */
   #screen-arena {
     width: 100%;
@@ -421,6 +453,65 @@
     letter-spacing: 1px;
     margin-top: 2px;
   }
+
+  .nav-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-back {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid #334;
+    color: #445;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-back:hover { border-color: #556; color: #778; }
+
+  .btn-secondary {
+    padding: 12px 32px;
+    background: transparent;
+    border: 2px solid #334;
+    color: #556;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-secondary:hover { border-color: #00d4ff; color: #00d4ff; }
+
+  .affinity-row {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .affinity-pos { color: #00ff88; }
+  .affinity-neg { color: #ff4422; }
+
+  .card-affinity {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
 </style>
 </head>
 <body>
@@ -453,6 +544,17 @@
     <button class="btn" id="btn-fight">CHOOSE ARENA →</button>
   </div>
 
+  <div class="screen" id="screen-opponents">
+    <h2>PICK YOUR OPPONENTS</h2>
+    <div class="subtitle" id="opp-count-label">SELECT 3 OPPONENTS</div>
+    <div id="opp-grid"></div>
+    <div class="nav-row">
+      <button class="btn-back" id="btn-opp-back">← BACK</button>
+      <button class="btn-secondary" id="btn-randomize">RANDOMIZE</button>
+      <button class="btn" id="btn-opponents">LET IT RIP →</button>
+    </div>
+  </div>
+
   <div class="screen" id="screen-arena">
     <h2>CHOOSE YOUR ARENA</h2>
     <div id="arena-grid"></div>
@@ -460,9 +562,13 @@
       <div>
         <div id="arena-detail-name"></div>
         <div id="arena-detail-desc"></div>
+        <div id="arena-affinity-row" class="affinity-row"></div>
       </div>
     </div>
-    <button class="btn" id="btn-battle">LET IT RIP</button>
+    <div class="nav-row">
+      <button class="btn-back" id="btn-arena-back">← BACK</button>
+      <button class="btn" id="btn-arena-next">PICK OPPONENTS →</button>
+    </div>
   </div>
 
   <div class="screen" id="screen-end">
@@ -592,18 +698,35 @@ const EDGE_START        = 0.82;   // fraction of arenaR where edge drain begins
 const EDGE_DRAIN        = 0.18;
 const HIT_DRAIN_BASE    = 7;
 const AI_INTERVAL       = 0.55;
+const BOOST_COOLDOWN = 3.5;
+const BOOST_POWER    = 9;
 
 // atkR/defR/staR/spdR/bstR: display ratings 1-10 shown on select screen
 const CONFIGS = [
-  { name:'IMPACT DRAKE',  type:'ATTACK',  color:'#cc2211', glow:'#ff4422', blades:4, shape:'drake',
+  { name:'IMPACT DRAKE',   type:'ATTACK',  color:'#cc2211', glow:'#ff4422', blades:4, shape:'drake',
     maxStamina:100, mass:1.40, defense:0.80, attackMult:1.20, burstResist:0.60, personality:'aggressive',
-    desc:'Balanced powerhouse with heavy rubber contacts.',
+    desc:'Heavy rubber contact delivers crushing smash attacks. The balanced powerhouse of Beyblade X.',
     atkR:7, defR:5, staR:6, spdR:7, bstR:6 },
 
-  { name:'DRAN SWORD',    type:'ATTACK',  color:'#ff6600', glow:'#ff3300', blades:3, shape:'dran',
+  { name:'DRAN SWORD',     type:'ATTACK',  color:'#ff6600', glow:'#ff3300', blades:3, shape:'dran',
     maxStamina:75,  mass:0.85, defense:0.75, attackMult:1.55, burstResist:0.28, personality:'aggressive',
-    desc:'Glass cannon. Hits hardest but bursts in seconds.',
+    desc:'Three sword blades hit like a typhoon. Highest attack in the game — zero safety margin.',
     atkR:10, defR:3, staR:3, spdR:9, bstR:2 },
+
+  { name:'COBALT DRAGOON', type:'ATTACK',  color:'#1166cc', glow:'#2288ff', blades:4, shape:'dragoon',
+    maxStamina:90,  mass:1.30, defense:0.72, attackMult:1.35, burstResist:0.50, personality:'aggressive',
+    desc:'Left-spin dragon blade disrupts right-spin opponents. Cobalt blue attack force.',
+    atkR:8, defR:4, staR:5, spdR:8, bstR:5 },
+
+  { name:'CRIMSON GARUDA', type:'BALANCE', color:'#cc1100', glow:'#ff2200', blades:4, shape:'garuda',
+    maxStamina:115, mass:1.45, defense:0.62, attackMult:1.10, burstResist:0.68, personality:'aggressive',
+    desc:'Wide feather blades adapt to any opponent. The scarlet bird of balance.',
+    atkR:6, defR:7, staR:7, spdR:5, bstR:7 },
+
+  { name:'SAMURAI SABER',  type:'ATTACK',  color:'#2244aa', glow:'#3366cc', blades:2, shape:'saber',
+    maxStamina:72,  mass:0.90, defense:0.65, attackMult:1.45, burstResist:0.35, personality:'aggressive',
+    desc:'Dual retracting blades deliver devastating one-hit strikes. Samurai precision.',
+    atkR:8, defR:3, staR:4, spdR:9, bstR:3 },
 
   { name:'HELLS CHAIN',   type:'DEFENSE', color:'#9933ff', glow:'#6600cc', blades:4, shape:'hells',
     maxStamina:145, mass:1.75, defense:0.38, attackMult:0.72, burstResist:0.92, personality:'defensive',
@@ -625,11 +748,6 @@ const CONFIGS = [
     desc:'Fearless attacker with lion-claw contact points.',
     atkR:9, defR:4, staR:5, spdR:7, bstR:4 },
 
-  { name:'COBALT DRAKE',  type:'BALANCE', color:'#00aaff', glow:'#0066cc', blades:4, shape:'fang',
-    maxStamina:108, mass:1.30, defense:0.68, attackMult:1.25, burstResist:0.55, personality:'aggressive',
-    desc:'Versatile all-rounder with dragon fang blades.',
-    atkR:7, defR:6, staR:7, spdR:6, bstR:6 },
-
   { name:'WYVERN GALE',   type:'STAMINA', color:'#00ff66', glow:'#00aa44', blades:4, shape:'horn',
     maxStamina:148, mass:1.32, defense:0.50, attackMult:0.88, burstResist:0.80, personality:'defensive',
     desc:'High endurance wind-type. Outlasts everyone.',
@@ -650,16 +768,6 @@ const CONFIGS = [
     desc:'Dinosaur-type. Relentless crusher, but fragile under pressure.',
     atkR:9, defR:4, staR:4, spdR:8, bstR:3 },
 
-  { name:'PHOENIX WING',  type:'STAMINA', color:'#ff8800', glow:'#cc5500', blades:3, shape:'wing',
-    maxStamina:155, mass:1.25, defense:0.52, attackMult:0.85, burstResist:0.76, personality:'defensive',
-    desc:'Fire-bird stamina type. Burns long and bright.',
-    atkR:5, defR:7, staR:9, spdR:6, bstR:8 },
-
-  { name:'GALACTIC STAR', type:'BALANCE', color:'#ffdd00', glow:'#cc9900', blades:5, shape:'claw',
-    maxStamina:112, mass:1.35, defense:0.65, attackMult:1.15, burstResist:0.58, personality:'aggressive',
-    desc:'5-blade star formation. Well-rounded cosmic balance.',
-    atkR:6, defR:7, staR:7, spdR:6, bstR:6 },
-
   { name:'VIPER TAIL',    type:'ATTACK',  color:'#44ff44', glow:'#22cc22', blades:3, shape:'fang',
     maxStamina:70,  mass:0.80, defense:0.80, attackMult:1.62, burstResist:0.20, personality:'aggressive',
     desc:'Snake-strike speed. Fastest in the game — zero margin for error.',
@@ -677,27 +785,56 @@ const ARENAS = [
     rim:'#00aaff', glow:'#0066ff', bg:['#162230','#0a111c','#050a12'],
     grid:'rgba(0,160,255,0.03)', atm:'rgba(0,160,255,0.04)',
     friction:0.994, edgeDrain:0.18, wallDamp:0.72,
-    desc:'Standard balanced arena. Fair ground for all types.' },
+    desc:'Standard balanced arena. Fair ground for all types.',
+    favors: null, penalizes: null, typeModifiers: null },
   { name:'VOLCANO CRATER', sub:'Lava Rim Burns All',
     rim:'#ff4400', glow:'#ff2200', bg:['#2a0800','#180400','#080100'],
     grid:'rgba(255,60,0,0.04)',  atm:'rgba(255,50,0,0.06)',
     friction:0.992, edgeDrain:0.36, wallDamp:0.68,
-    desc:'Edges drain stamina 2× faster. Stay near center or die.' },
+    desc:'Edges drain stamina 2× faster. Stay near center or die.',
+    favors:'ATTACK', penalizes:'STAMINA',
+    typeModifiers: {
+      ATTACK:  { attackMult: 1.22 },
+      STAMINA: { maxStamina: 0.72 },
+      DEFENSE: { defense: 0.88 },
+      BALANCE: {}
+    }},
   { name:'CYBER GRID',     sub:'Zero-Friction Data Zone',
     rim:'#00ff88', glow:'#00cc55', bg:['#001510','#000e08','#000604'],
     grid:'rgba(0,255,120,0.055)', atm:'rgba(0,200,100,0.04)',
     friction:0.9986, edgeDrain:0.09, wallDamp:0.92,
-    desc:'Near-zero friction. Blades maintain speed indefinitely.' },
+    desc:'Near-zero friction. Blades maintain speed indefinitely.',
+    favors:'STAMINA', penalizes:'DEFENSE',
+    typeModifiers: {
+      ATTACK:  { attackMult: 1.18, burstResist: 0.88 },
+      STAMINA: { maxStamina: 1.28 },
+      DEFENSE: { defense: 1.22 },
+      BALANCE: { maxStamina: 1.10 }
+    }},
   { name:'FROZEN TUNDRA',  sub:'The Ice Slick',
     rim:'#88ddff', glow:'#44aaee', bg:['#0a1828','#061018','#030810'],
     grid:'rgba(150,220,255,0.04)', atm:'rgba(100,180,255,0.04)',
     friction:0.9993, edgeDrain:0.07, wallDamp:0.96,
-    desc:'Extreme slipperiness. Walls barely hurt. Pure momentum wars.' },
+    desc:'Extreme slipperiness. Walls barely hurt. Pure momentum wars.',
+    favors:'STAMINA', penalizes:'ATTACK',
+    typeModifiers: {
+      ATTACK:  { attackMult: 0.78 },
+      STAMINA: { maxStamina: 1.35 },
+      DEFENSE: { defense: 0.85, burstResist: 1.12 },
+      BALANCE: { maxStamina: 1.12 }
+    }},
   { name:'SHADOW VOID',    sub:'The Dark Dimension',
     rim:'#cc44ff', glow:'#8800bb', bg:['#100518','#080210','#040108'],
     grid:'rgba(180,50,255,0.04)', atm:'rgba(150,40,255,0.04)',
     friction:0.994, edgeDrain:0.06, wallDamp:0.74,
-    desc:'Weakest edge drain. Long brutal stamina battles in the dark.' },
+    desc:'Weakest edge drain. Long brutal stamina battles in the dark.',
+    favors:'STAMINA · DEFENSE', penalizes: null,
+    typeModifiers: {
+      ATTACK:  { attackMult: 1.14 },
+      STAMINA: { maxStamina: 1.22 },
+      DEFENSE: { burstResist: 1.18, defense: 0.88 },
+      BALANCE: { maxStamina: 1.10, attackMult: 1.08 }
+    }},
 ];
 
 // ═══════════════════════════════════════════════════════════
@@ -776,9 +913,11 @@ const G = {
   clashX:         0,
   clashY:         0,
   clashAlpha:     0,
-  selectedChar:   0,
-  selectedArena:  0,
+  selectedChar:      0,
+  selectedOpponents: [1, 2, 3],
+  selectedArena:     0,
   activeTime:     0,
+  boostCooldown:  0,
 };
 
 const stars = Array.from({ length: 90 }, () => ({
@@ -829,10 +968,7 @@ function startRound() {
   player.launched = false;
   G.blades.push(player);
 
-  const pool  = CONFIGS.map((_, i) => i).filter(i => i !== G.selectedChar);
-  const picks = pool.sort(() => Math.random() - 0.5).slice(0, 3);
-
-  picks.forEach((cfgIdx, i) => {
+  G.selectedOpponents.forEach((cfgIdx, i) => {
     const cfg = { ...CONFIGS[cfgIdx], isPlayer: false };
     const b   = new Beyblade(cfg,
       ax + Math.cos(rimAngles[i + 1]) * startR,
@@ -840,6 +976,20 @@ function startRound() {
     b.launched = false;   // held until GO
     G.blades.push(b);
   });
+
+  // Apply arena type modifiers to blade stats
+  const arenaMods = ARENAS[G.selectedArena].typeModifiers;
+  if (arenaMods) {
+    G.blades.forEach(b => {
+      const mod = arenaMods[b.type];
+      if (!mod) return;
+      if (mod.attackMult)  b.attackMult  *= mod.attackMult;
+      if (mod.maxStamina)  { b.maxStamina *= mod.maxStamina; b.stamina = b.maxStamina; }
+      if (mod.defense)     b.defense     *= mod.defense;
+      if (mod.burstResist) b.burstResist  = Math.min(0.99, b.burstResist * mod.burstResist);
+    });
+  }
+  G.boostCooldown = 0;
 
   buildHUD();
   document.getElementById('hud').style.display = 'flex';
@@ -1003,9 +1153,11 @@ function bladeCollide(a, b) {
   a.stamina -= baseDmg * b.attackMult * a.defense;
   b.stamina -= baseDmg * a.attackMult * b.defense;
 
-  // Burst meter damage
-  const burstDmgA = impactForce * b.attackMult * (1 - a.burstResist) * 12;
-  const burstDmgB = impactForce * a.attackMult * (1 - b.burstResist) * 12;
+  // Burst meter damage — scales with stamina loss so you can't be one-shot burst at full health
+  const wornA = 0.15 + 0.85 * (1 - Math.max(0, Math.min(1, a.stamina / a.maxStamina)));
+  const wornB = 0.15 + 0.85 * (1 - Math.max(0, Math.min(1, b.stamina / b.maxStamina)));
+  const burstDmgA = impactForce * b.attackMult * (1 - a.burstResist) * wornA * 14;
+  const burstDmgB = impactForce * a.attackMult * (1 - b.burstResist) * wornB * 14;
   a.burstHealth -= burstDmgA;
   b.burstHealth -= burstDmgB;
 
@@ -1163,6 +1315,8 @@ function update(dt) {
     const shrinkSpeed  = G.arenaR * 0.012 * dt;
     G.arenaRCurrent = Math.max(shrinkTarget, G.arenaRCurrent - shrinkSpeed);
   }
+
+  if (G.boostCooldown > 0) G.boostCooldown = Math.max(0, G.boostCooldown - dt);
 
   // Power clash slow-mo
   if (G.clashTimer > 0) {
@@ -1392,19 +1546,25 @@ function drawBlade(b) {
   for (let i = 0; i < b.blades; i++) {
     ctx.save();
     ctx.rotate((i / b.blades) * Math.PI * 2);
-    if      (b.shape === 'drake')  drawDrakeBlade(R);
-    else if (b.shape === 'dran')   drawDranBlade(R);
-    else if (b.shape === 'hells')  drawHellsBlade(R);
-    else if (b.shape === 'knight') drawKnightBlade(R);
+    if      (b.shape === 'drake')   drawDrakeBlade(R);
+    else if (b.shape === 'dran')    drawDranBlade(R);
+    else if (b.shape === 'dragoon') drawDragoonBlade(R);
+    else if (b.shape === 'garuda')  drawGarudaBlade(R);
+    else if (b.shape === 'saber')   drawSaberBlade(R);
+    else if (b.shape === 'hells')   drawHellsBlade(R);
+    else if (b.shape === 'knight')  drawKnightBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
 
   // Hub
-  if      (b.shape === 'drake')  { drawDrakeHub(R); }
-  else if (b.shape === 'dran')   { drawDranHub(R); }
-  else if (b.shape === 'hells')  { drawHellsHub(R); }
-  else if (b.shape === 'knight') { drawKnightHub(R); }
+  if      (b.shape === 'drake')   { drawDrakeHub(R); }
+  else if (b.shape === 'dran')    { drawDranHub(R); }
+  else if (b.shape === 'dragoon') { drawDragoonHub(R); }
+  else if (b.shape === 'garuda')  { drawGarudaHub(R); }
+  else if (b.shape === 'saber')   { drawSaberHub(R); }
+  else if (b.shape === 'hells')   { drawHellsHub(R); }
+  else if (b.shape === 'knight')  { drawKnightHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -1614,6 +1774,164 @@ function drawDranHub(R) {
 
   ctx.fillStyle = '#ffffff'; ctx.shadowBlur = 8; ctx.shadowColor = '#ffcc88';
   ctx.beginPath(); ctx.arc(0, 0, R * 0.10, 0, Math.PI * 2); ctx.fill();
+}
+
+// ── COBALT DRAGOON: cobalt blue attack blade, left-spin ──
+function drawDragoonBlade(R) {
+  ctx.beginPath();
+  ctx.moveTo(R * 0.12, -R * 0.20);
+  ctx.bezierCurveTo(R * 0.30, -R * 0.66, R * 0.82, -R * 0.90, R * 1.22, -R * 0.62);
+  ctx.bezierCurveTo(R * 1.50, -R * 0.38, R * 1.54, R * 0.04,  R * 1.34, R * 0.22);
+  ctx.bezierCurveTo(R * 1.10, R * 0.40,  R * 0.68, R * 0.40,  R * 0.36, R * 0.26);
+  ctx.bezierCurveTo(R * 0.18, R * 0.16,  R * 0.06, R * 0.06,  R * 0.12, -R * 0.20);
+  const sg = ctx.createLinearGradient(-R * 0.1, -R * 0.4, R * 1.4, R * 0.25);
+  sg.addColorStop(0,    '#0d2a6e'); sg.addColorStop(0.25, '#1a4daa');
+  sg.addColorStop(0.5,  '#2266cc'); sg.addColorStop(0.75, '#153d99'); sg.addColorStop(1, '#071840');
+  ctx.fillStyle = sg; ctx.shadowBlur = 8; ctx.shadowColor = '#1144cc'; ctx.fill();
+  ctx.strokeStyle = 'rgba(80,160,255,0.5)'; ctx.lineWidth = 0.7; ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(R * 0.40, -R * 0.30);
+  ctx.bezierCurveTo(R * 0.52, -R * 0.58, R * 0.86, -R * 0.64, R * 1.05, -R * 0.45);
+  ctx.bezierCurveTo(R * 1.18, -R * 0.30, R * 1.12, -R * 0.10, R * 0.92, R * 0.00);
+  ctx.bezierCurveTo(R * 0.72, R * 0.10,  R * 0.44, R * 0.08,  R * 0.32, -R * 0.05);
+  ctx.bezierCurveTo(R * 0.22, -R * 0.15, R * 0.30, -R * 0.20, R * 0.40, -R * 0.30);
+  ctx.fillStyle = 'rgba(0,0,20,0.25)'; ctx.shadowBlur = 0; ctx.fill();
+
+  // Cyan contact edge
+  ctx.beginPath();
+  ctx.moveTo(R * 0.60, -R * 0.80);
+  ctx.bezierCurveTo(R * 0.82, -R * 0.98, R * 1.14, -R * 0.84, R * 1.26, -R * 0.58);
+  ctx.bezierCurveTo(R * 1.18, -R * 0.38, R * 0.90, -R * 0.40, R * 0.72, -R * 0.56);
+  ctx.closePath();
+  const cg = ctx.createLinearGradient(R * 0.65, -R * 0.85, R * 1.2, -R * 0.45);
+  cg.addColorStop(0, '#33bbff'); cg.addColorStop(0.5, '#0088cc'); cg.addColorStop(1, '#004477');
+  ctx.fillStyle = cg; ctx.shadowBlur = 12; ctx.shadowColor = '#00aaff'; ctx.fill();
+  ctx.strokeStyle = 'rgba(80,200,255,0.45)'; ctx.lineWidth = 0.7; ctx.stroke();
+
+  ctx.beginPath();
+  ctx.ellipse(R * 1.40, R * 0.10, R * 0.11, R * 0.07, -0.4, 0, Math.PI * 2);
+  ctx.fillStyle = '#88ccff'; ctx.shadowBlur = 8; ctx.shadowColor = '#44aaff'; ctx.fill();
+}
+function drawDragoonHub(R) {
+  const hg = ctx.createRadialGradient(-R*0.14, -R*0.14, 0, 0, 0, R*0.60);
+  hg.addColorStop(0, '#1a3a88'); hg.addColorStop(0.5, '#0a1840'); hg.addColorStop(1, '#030a20');
+  ctx.beginPath(); ctx.arc(0, 0, R*0.60, 0, Math.PI*2);
+  ctx.fillStyle = hg; ctx.shadowBlur = 10; ctx.shadowColor = '#0a2266'; ctx.fill();
+  ctx.save();
+  ctx.shadowBlur = 5; ctx.shadowColor = '#44aaff'; ctx.fillStyle = '#3388ee';
+  ctx.beginPath();
+  ctx.moveTo(-R*0.32, -R*0.06);
+  ctx.bezierCurveTo(-R*0.22, -R*0.30, R*0.00, -R*0.36, R*0.20, -R*0.26);
+  ctx.bezierCurveTo(R*0.40, -R*0.16, R*0.42, -R*0.02, R*0.34, R*0.06);
+  ctx.bezierCurveTo(R*0.20, R*0.14, -R*0.08, R*0.18, -R*0.32, R*0.06);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#88ccff'; ctx.shadowBlur = 6; ctx.shadowColor = '#44aaff';
+  ctx.beginPath(); ctx.arc(0, 0, R*0.10, 0, Math.PI*2); ctx.fill();
+}
+
+// ── CRIMSON GARUDA: wide feather blades, balance type ──
+function drawGarudaBlade(R) {
+  ctx.beginPath();
+  ctx.moveTo(R*0.08, -R*0.18);
+  ctx.bezierCurveTo(R*0.22, -R*0.56, R*0.72, -R*0.80, R*1.32, -R*0.56);
+  ctx.bezierCurveTo(R*1.62, -R*0.36, R*1.62, R*0.36, R*1.32, R*0.56);
+  ctx.bezierCurveTo(R*0.72, R*0.80, R*0.22, R*0.56, R*0.08, R*0.18);
+  ctx.closePath();
+  const rg = ctx.createLinearGradient(-R*0.1, -R*0.5, R*1.4, R*0.5);
+  rg.addColorStop(0, '#6a0000'); rg.addColorStop(0.3, '#bb0f00');
+  rg.addColorStop(0.65, '#dd2200'); rg.addColorStop(1, '#6a0000');
+  ctx.fillStyle = rg; ctx.shadowBlur = 12; ctx.shadowColor = '#cc2200'; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,70,30,0.45)'; ctx.lineWidth = 0.8; ctx.stroke();
+
+  // Feather vein lines
+  ctx.shadowBlur = 0;
+  for (let f = 0; f < 3; f++) {
+    const fy = (f - 1) * R * 0.24;
+    ctx.beginPath();
+    ctx.moveTo(R*0.26, fy);
+    ctx.bezierCurveTo(R*0.70, fy - R*0.04, R*1.10, fy - R*0.02, R*1.50, fy);
+    ctx.strokeStyle = `rgba(255,180,60,${0.38 - Math.abs(f-1)*0.10})`;
+    ctx.lineWidth = 0.9; ctx.stroke();
+  }
+  // Gold leading edge
+  ctx.beginPath();
+  ctx.moveTo(R*1.32, -R*0.56);
+  ctx.bezierCurveTo(R*1.62, -R*0.36, R*1.62, R*0.36, R*1.32, R*0.56);
+  ctx.strokeStyle = 'rgba(255,195,40,0.80)'; ctx.lineWidth = 2;
+  ctx.shadowBlur = 8; ctx.shadowColor = '#ffcc33'; ctx.stroke();
+}
+function drawGarudaHub(R) {
+  const hg = ctx.createRadialGradient(-R*0.14, -R*0.14, 0, 0, 0, R*0.58);
+  hg.addColorStop(0, '#cc2200'); hg.addColorStop(0.5, '#770000'); hg.addColorStop(1, '#280000');
+  ctx.beginPath(); ctx.arc(0, 0, R*0.58, 0, Math.PI*2);
+  ctx.fillStyle = hg; ctx.shadowBlur = 10; ctx.shadowColor = '#aa1100'; ctx.fill();
+  ctx.save();
+  ctx.fillStyle = '#ffcc44'; ctx.shadowBlur = 6; ctx.shadowColor = '#ffaa00';
+  ctx.beginPath();
+  ctx.moveTo(0, -R*0.30);
+  ctx.bezierCurveTo(R*0.22, -R*0.20, R*0.30, -R*0.04, R*0.26, R*0.10);
+  ctx.bezierCurveTo(R*0.14, R*0.18, 0, R*0.22, 0, R*0.22);
+  ctx.bezierCurveTo(0, R*0.22, -R*0.14, R*0.18, -R*0.26, R*0.10);
+  ctx.bezierCurveTo(-R*0.30, -R*0.04, -R*0.22, -R*0.20, 0, -R*0.30);
+  ctx.fill(); ctx.restore();
+  ctx.fillStyle = '#ffeeaa'; ctx.shadowBlur = 5;
+  ctx.beginPath(); ctx.arc(0, 0, R*0.09, 0, Math.PI*2); ctx.fill();
+}
+
+// ── SAMURAI SABER: dark navy dual-blade, attack type ──
+function drawSaberBlade(R) {
+  ctx.beginPath();
+  ctx.moveTo(R*0.10, -R*0.24);
+  ctx.bezierCurveTo(R*0.24, -R*0.52, R*0.68, -R*0.64, R*1.55, -R*0.22);
+  ctx.bezierCurveTo(R*1.55, R*0.22, R*0.68, R*0.64, R*0.24, R*0.52);
+  ctx.bezierCurveTo(R*0.10, R*0.24, R*0.04, R*0.04, R*0.10, -R*0.24);
+  ctx.closePath();
+  const dg = ctx.createLinearGradient(0, -R*0.4, R*1.5, 0);
+  dg.addColorStop(0, '#0f1530'); dg.addColorStop(0.25, '#182050');
+  dg.addColorStop(0.5, '#1e2a6a'); dg.addColorStop(0.75, '#182050'); dg.addColorStop(1, '#080e24');
+  ctx.fillStyle = dg; ctx.shadowBlur = 8; ctx.shadowColor = '#2233aa'; ctx.fill();
+
+  // Metallic katana edge
+  ctx.beginPath();
+  ctx.moveTo(R*0.20, -R*0.14);
+  ctx.bezierCurveTo(R*0.38, -R*0.38, R*0.80, -R*0.46, R*1.52, -R*0.10);
+  ctx.bezierCurveTo(R*1.52, R*0.10, R*0.80, R*0.46, R*0.38, R*0.38);
+  ctx.bezierCurveTo(R*0.20, R*0.14, R*0.14, R*0.04, R*0.20, -R*0.14);
+  ctx.closePath();
+  const sg = ctx.createLinearGradient(R*0.2, -R*0.2, R*1.4, 0);
+  sg.addColorStop(0, '#7788bb'); sg.addColorStop(0.4, '#c8d4f0'); sg.addColorStop(1, '#445588');
+  ctx.fillStyle = sg; ctx.shadowBlur = 6; ctx.shadowColor = '#9aaae0'; ctx.fill();
+  ctx.strokeStyle = 'rgba(190,210,255,0.55)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+  // Purple translucent spine
+  ctx.beginPath();
+  ctx.moveTo(R*0.22, -R*0.04);
+  ctx.bezierCurveTo(R*0.55, -R*0.14, R*1.05, -R*0.07, R*1.50, -R*0.01);
+  ctx.bezierCurveTo(R*1.05, R*0.07, R*0.55, R*0.14, R*0.22, R*0.04);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(130,90,255,0.28)'; ctx.shadowBlur = 0; ctx.fill();
+}
+function drawSaberHub(R) {
+  const hg = ctx.createRadialGradient(-R*0.14, -R*0.14, 0, 0, 0, R*0.58);
+  hg.addColorStop(0, '#1c1c50'); hg.addColorStop(0.5, '#0c0c28'); hg.addColorStop(1, '#040410');
+  ctx.beginPath(); ctx.arc(0, 0, R*0.58, 0, Math.PI*2);
+  ctx.fillStyle = hg; ctx.shadowBlur = 10; ctx.shadowColor = '#2030aa'; ctx.fill();
+  ctx.save();
+  ctx.fillStyle = '#7788cc'; ctx.shadowBlur = 4; ctx.shadowColor = '#99aaff';
+  ctx.beginPath();
+  ctx.moveTo(0, -R*0.30);
+  ctx.bezierCurveTo(R*0.26, -R*0.22, R*0.28, R*0.06, R*0.16, R*0.18);
+  ctx.bezierCurveTo(0, R*0.24, -R*0.16, R*0.18, -R*0.28, R*0.06);
+  ctx.bezierCurveTo(-R*0.28, -R*0.22, 0, -R*0.30, 0, -R*0.30);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(130,150,255,0.75)';
+  ctx.beginPath(); ctx.ellipse(-R*0.11, -R*0.01, R*0.07, R*0.025, -0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(R*0.11, -R*0.01, R*0.07, R*0.025, 0.2, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#aabbee'; ctx.shadowBlur = 5; ctx.shadowColor = '#8899cc';
+  ctx.beginPath(); ctx.arc(0, 0, R*0.09, 0, Math.PI*2); ctx.fill();
 }
 
 // ── HELLS CHAIN: heavy dark blade, defense tank ──
@@ -1922,6 +2240,43 @@ function drawShrinkWarning() {
   ctx.restore();
 }
 
+function drawBoostIndicator() {
+  if (G.state !== 'active') return;
+  const player = G.blades.find(b => b.isPlayer && b.alive);
+  if (!player) return;
+  const R     = player.radius + 9;
+  const ready = G.boostCooldown <= 0;
+  const pct   = ready ? 1 : 1 - (G.boostCooldown / BOOST_COOLDOWN);
+  ctx.save();
+  // Dim track ring
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, R, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // Charging arc
+  if (pct > 0) {
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, R, -Math.PI / 2, -Math.PI / 2 + pct * Math.PI * 2);
+    ctx.strokeStyle = ready ? player.color : '#4488aa';
+    ctx.lineWidth   = 2.5;
+    ctx.shadowBlur  = ready ? 10 : 0;
+    ctx.shadowColor = player.color;
+    ctx.stroke();
+  }
+  // "BOOST" label when ready
+  if (ready) {
+    ctx.font        = `bold 7px 'Share Tech Mono', monospace`;
+    ctx.textAlign   = 'center';
+    ctx.fillStyle   = player.color;
+    ctx.shadowBlur  = 6;
+    ctx.shadowColor = player.color;
+    ctx.globalAlpha = 0.85;
+    ctx.fillText('BOOST', player.x, player.y + R + 10);
+  }
+  ctx.restore();
+}
+
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
@@ -1935,6 +2290,7 @@ function render() {
   G.blades.forEach(b => drawBlade(b));
   drawLaunchPad(G.blades[0]);
   drawAimGuide();
+  drawBoostIndicator();
   drawCountdown();
 
   // ── POWER CLASH overlay ──
@@ -2004,13 +2360,31 @@ function pos(e) {
 }
 
 function onDown(e) {
-  if (G.state !== 'ready') return;
-  const player = G.blades[0];
-  if (!player) return;
-  const p = pos(e);
-  if (Math.hypot(p.x - player.x, p.y - player.y) < player.radius * 4) {
-    G.aiming = true;
-    G.aimX   = p.x; G.aimY = p.y;
+  if (G.state === 'ready') {
+    const player = G.blades[0];
+    if (!player) return;
+    const p = pos(e);
+    if (Math.hypot(p.x - player.x, p.y - player.y) < player.radius * 4) {
+      G.aiming = true;
+      G.aimX   = p.x; G.aimY = p.y;
+    }
+  } else if (G.state === 'active') {
+    const player = G.blades.find(b => b.isPlayer && b.alive);
+    if (!player || G.boostCooldown > 0) return;
+    const p  = pos(e);
+    const dx = p.x - player.x, dy = p.y - player.y;
+    const d  = Math.hypot(dx, dy) || 1;
+    player.vx += (dx / d) * BOOST_POWER;
+    player.vy += (dy / d) * BOOST_POWER;
+    const sp = Math.hypot(player.vx, player.vy);
+    if (sp > MAX_SPEED) { player.vx *= MAX_SPEED / sp; player.vy *= MAX_SPEED / sp; }
+    G.boostCooldown = BOOST_COOLDOWN;
+    for (let i = 0; i < 12; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = 70 + Math.random() * 110;
+      G.parts.push(new Particle(player.x, player.y, player.color,
+        Math.cos(a)*s, Math.sin(a)*s, 1.8, 0.18 + Math.random()*0.22));
+    }
   }
 }
 function onMove(e) {
@@ -2078,18 +2452,24 @@ function drawBladeToCanvas(cfg, previewCanvas) {
     ctx.rotate((i / cfg.blades) * Math.PI * 2);
     ctx.shadowBlur  = 10;
     ctx.shadowColor = cfg.glow;
-    if      (cfg.shape === 'drake')  drawDrakeBlade(R);
-    else if (cfg.shape === 'dran')   drawDranBlade(R);
-    else if (cfg.shape === 'hells')  drawHellsBlade(R);
-    else if (cfg.shape === 'knight') drawKnightBlade(R);
+    if      (cfg.shape === 'drake')   drawDrakeBlade(R);
+    else if (cfg.shape === 'dran')    drawDranBlade(R);
+    else if (cfg.shape === 'dragoon') drawDragoonBlade(R);
+    else if (cfg.shape === 'garuda')  drawGarudaBlade(R);
+    else if (cfg.shape === 'saber')   drawSaberBlade(R);
+    else if (cfg.shape === 'hells')   drawHellsBlade(R);
+    else if (cfg.shape === 'knight')  drawKnightBlade(R);
     else drawBladeShape(cfg.shape, R, cfg.color);
     ctx.restore();
   }
 
-  if      (cfg.shape === 'drake')  drawDrakeHub(R);
-  else if (cfg.shape === 'dran')   drawDranHub(R);
-  else if (cfg.shape === 'hells')  drawHellsHub(R);
-  else if (cfg.shape === 'knight') drawKnightHub(R);
+  if      (cfg.shape === 'drake')   drawDrakeHub(R);
+  else if (cfg.shape === 'dran')    drawDranHub(R);
+  else if (cfg.shape === 'dragoon') drawDragoonHub(R);
+  else if (cfg.shape === 'garuda')  drawGarudaHub(R);
+  else if (cfg.shape === 'saber')   drawSaberHub(R);
+  else if (cfg.shape === 'hells')   drawHellsHub(R);
+  else if (cfg.shape === 'knight')  drawKnightHub(R);
   else {
     const hub = ctx.createRadialGradient(-R*0.18, -R*0.18, 0, 0, 0, R*0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -2218,6 +2598,110 @@ function selectArena(i, rebuild = true) {
   document.getElementById('arena-detail-name').textContent = ar.name;
   document.getElementById('arena-detail-name').style.color = ar.rim;
   document.getElementById('arena-detail-desc').textContent = ar.desc;
+  const aff = document.getElementById('arena-affinity-row');
+  if (aff) {
+    const parts = [];
+    if (ar.favors)    parts.push(`<span class="affinity-pos">▲ FAVORS ${ar.favors}</span>`);
+    if (ar.penalizes) parts.push(`<span class="affinity-neg">▼ PENALIZES ${ar.penalizes}</span>`);
+    aff.innerHTML = parts.join('<span style="color:#223"> · </span>');
+  }
+}
+
+// ── OPPONENT SELECT ──
+function buildOpponentsScreen() {
+  // Remove player from opponents if they changed their own blade to one that's in opponents
+  G.selectedOpponents = G.selectedOpponents.filter(i => i !== G.selectedChar);
+
+  const grid = document.getElementById('opp-grid');
+  grid.innerHTML = '';
+  const previewCanvases = [];
+
+  CONFIGS.forEach((cfg, i) => {
+    if (i === G.selectedChar) return; // can't pick yourself
+
+    const tc   = TYPE_COLORS[cfg.type] || '#fff';
+    const sel  = G.selectedOpponents.includes(i);
+    const card = document.createElement('div');
+    card.className = 'char-card opp-card' + (sel ? ' selected-opp' : '');
+    card.style.setProperty('--c', sel ? cfg.color : '#333');
+    if (sel) {
+      card.style.borderColor = cfg.color;
+      card.style.boxShadow   = `0 0 14px ${cfg.color}55`;
+    } else {
+      card.style.borderColor = '#1a1f2e';
+    }
+
+    const statBars = STAT_KEYS.map((k, si) => `
+      <div class="stat-row">
+        <div class="stat-label">${STAT_LABELS[si]}</div>
+        <div class="stat-track">
+          <div class="stat-fill" style="width:${cfg[k]*10}%;background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88"></div>
+        </div>
+      </div>`).join('');
+
+    card.innerHTML = `
+      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
+      <div class="char-card-name" style="color:${sel ? cfg.color : '#445'}">${cfg.name}</div>
+      <div class="char-type-badge" style="background:${tc}22;color:${tc}">${cfg.type}</div>
+      ${statBars}`;
+
+    // Arena affinity indicator dot
+    const arMods = ARENAS[G.selectedArena].typeModifiers;
+    const mod = arMods && arMods[cfg.type];
+    if (mod && Object.keys(mod).length > 0) {
+      let score = 0;
+      if (mod.attackMult)  score += mod.attackMult  > 1 ? 1 : -1;
+      if (mod.maxStamina)  score += mod.maxStamina  > 1 ? 1 : -1;
+      if (mod.defense)     score += mod.defense     < 1 ? 1 : -1; // lower defense = better
+      if (mod.burstResist) score += mod.burstResist > 1 ? 1 : -1;
+      if (score !== 0) {
+        const dot = document.createElement('div');
+        dot.className = 'card-affinity';
+        dot.title = score > 0 ? 'BUFFED in this arena' : 'PENALIZED in this arena';
+        const c = score > 0 ? '#00ff88' : '#ff4422';
+        dot.style.background = c;
+        dot.style.boxShadow  = `0 0 6px ${c}`;
+        card.appendChild(dot);
+      }
+    }
+
+    card.addEventListener('click', () => {
+      if (G.selectedOpponents.includes(i)) {
+        G.selectedOpponents = G.selectedOpponents.filter(x => x !== i);
+      } else if (G.selectedOpponents.length < 3) {
+        G.selectedOpponents.push(i);
+      }
+      buildOpponentsScreen();
+    });
+
+    grid.appendChild(card);
+    previewCanvases.push({ canvas: card.querySelector('.blade-preview'), cfg });
+  });
+
+  requestAnimationFrame(() => {
+    previewCanvases.forEach(({ canvas: pc, cfg }) => drawBladeToCanvas(cfg, pc));
+  });
+
+  const count = G.selectedOpponents.length;
+  const label = document.getElementById('opp-count-label');
+  label.textContent = count === 3 ? '3 / 3 SELECTED — READY!' : `${count} / 3 SELECTED`;
+  label.style.color = count === 3 ? '#00ff88' : '#445';
+
+  const btn = document.getElementById('btn-opponents');
+  btn.disabled = count !== 3;
+  btn.style.opacity = count === 3 ? '1' : '0.35';
+  btn.style.pointerEvents = count === 3 ? '' : 'none';
+}
+
+// ── randomize opponents ──
+function randomizeOpponents() {
+  const pool = CONFIGS.map((_, i) => i).filter(i => i !== G.selectedChar);
+  G.selectedOpponents = [];
+  while (G.selectedOpponents.length < 3 && pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    G.selectedOpponents.push(pool.splice(idx, 1)[0]);
+  }
+  buildOpponentsScreen();
 }
 
 document.getElementById('btn-fight').addEventListener('click', () => {
@@ -2225,14 +2709,32 @@ document.getElementById('btn-fight').addEventListener('click', () => {
   showScreen('screen-arena');
 });
 
-document.getElementById('btn-battle').addEventListener('click', () => {
+document.getElementById('btn-arena-back').addEventListener('click', () => {
+  buildSelectScreen();
+  showScreen('screen-select');
+});
+
+document.getElementById('btn-arena-next').addEventListener('click', () => {
+  buildOpponentsScreen();
+  showScreen('screen-opponents');
+});
+
+document.getElementById('btn-opp-back').addEventListener('click', () => {
+  buildArenaScreen();
+  showScreen('screen-arena');
+});
+
+document.getElementById('btn-randomize').addEventListener('click', randomizeOpponents);
+
+document.getElementById('btn-opponents').addEventListener('click', () => {
+  if (G.selectedOpponents.length !== 3) return;
   showScreen(null);
   startRound();
 });
 
 document.getElementById('btn-restart').addEventListener('click', () => {
-  buildArenaScreen();
-  showScreen('screen-arena');
+  buildSelectScreen();
+  showScreen('screen-select');
 });
 
 // ═══════════════════════════════════════════════════════════
