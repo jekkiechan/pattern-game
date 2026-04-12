@@ -17,6 +17,10 @@
     cursor: default;
   }
 
+  @media (max-width: 600px) {
+    body { overflow-y: auto; }
+  }
+
   canvas { display: block; cursor: crosshair; }
 
   /* ── HUD ── */
@@ -71,6 +75,15 @@
     justify-content: center;
     pointer-events: none;
     z-index: 20;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 600px) {
+    #overlay {
+      align-items: flex-start;
+      padding: 16px 0;
+    }
   }
 
   .screen {
@@ -86,7 +99,7 @@
   .screen.active { display: flex; }
 
   h1 {
-    font-size: clamp(52px, 9vw, 110px);
+    font-size: clamp(32px, 9vw, 110px);
     font-weight: 900;
     color: #fff;
     text-transform: uppercase;
@@ -197,6 +210,10 @@
     margin-bottom: 14px;
   }
 
+  @media (max-width: 600px) {
+    #char-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
   /* ── ARENA SELECT ── */
   #screen-arena {
     width: 100%;
@@ -217,6 +234,10 @@
     gap: 10px;
     width: 100%;
     margin-bottom: 14px;
+  }
+
+  @media (max-width: 600px) {
+    #arena-grid { grid-template-columns: repeat(3, 1fr); }
   }
   .arena-card {
     background: #05080f;
