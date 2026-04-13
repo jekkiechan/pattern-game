@@ -704,19 +704,19 @@ const BOOST_POWER    = 9;
 // atkR/defR/staR/spdR/bstR: display ratings 1-10 shown on select screen
 const CONFIGS = [
   { name:'IMPACT DRAKE',   type:'ATTACK',  color:'#cc2211', glow:'#ff4422', blades:4, shape:'drake',
-    maxStamina:100, mass:1.40, defense:0.80, attackMult:1.20, burstResist:0.60, personality:'aggressive',
+    maxStamina:100, mass:1.40, defense:0.80, attackMult:1.40, burstResist:0.60, personality:'aggressive',
     desc:'Heavy rubber contact delivers crushing smash attacks. The balanced powerhouse of Beyblade X.',
-    atkR:7, defR:5, staR:6, spdR:7, bstR:6 },
+    atkR:8, defR:5, staR:6, spdR:7, bstR:6 },
 
   { name:'DRAN SWORD',     type:'ATTACK',  color:'#ff6600', glow:'#ff3300', blades:3, shape:'dran',
-    maxStamina:75,  mass:0.85, defense:0.75, attackMult:1.55, burstResist:0.28, personality:'aggressive',
+    maxStamina:75,  mass:0.85, defense:0.75, attackMult:1.72, burstResist:0.28, personality:'aggressive',
     desc:'Three sword blades hit like a typhoon. Highest attack in the game — zero safety margin.',
     atkR:10, defR:3, staR:3, spdR:9, bstR:2 },
 
   { name:'COBALT DRAGOON', type:'ATTACK',  color:'#1166cc', glow:'#2288ff', blades:4, shape:'dragoon',
-    maxStamina:90,  mass:1.30, defense:0.72, attackMult:1.35, burstResist:0.50, personality:'aggressive',
+    maxStamina:90,  mass:1.30, defense:0.72, attackMult:1.50, burstResist:0.50, personality:'aggressive',
     desc:'Left-spin dragon blade disrupts right-spin opponents. Cobalt blue attack force.',
-    atkR:8, defR:4, staR:5, spdR:8, bstR:5 },
+    atkR:9, defR:4, staR:5, spdR:8, bstR:5 },
 
   { name:'CRIMSON GARUDA', type:'BALANCE', color:'#cc1100', glow:'#ff2200', blades:4, shape:'garuda',
     maxStamina:115, mass:1.45, defense:0.62, attackMult:1.10, burstResist:0.68, personality:'aggressive',
@@ -724,27 +724,27 @@ const CONFIGS = [
     atkR:6, defR:7, staR:7, spdR:5, bstR:7 },
 
   { name:'SAMURAI SABER',  type:'ATTACK',  color:'#2244aa', glow:'#3366cc', blades:2, shape:'saber',
-    maxStamina:72,  mass:0.90, defense:0.65, attackMult:1.45, burstResist:0.35, personality:'aggressive',
+    maxStamina:72,  mass:0.90, defense:0.65, attackMult:1.62, burstResist:0.35, personality:'aggressive',
     desc:'Dual retracting blades deliver devastating one-hit strikes. Samurai precision.',
-    atkR:8, defR:3, staR:4, spdR:9, bstR:3 },
+    atkR:9, defR:3, staR:4, spdR:9, bstR:3 },
 
   { name:'HELLS CHAIN',   type:'DEFENSE', color:'#9933ff', glow:'#6600cc', blades:4, shape:'hells',
-    maxStamina:145, mass:1.75, defense:0.38, attackMult:0.72, burstResist:0.92, personality:'defensive',
+    maxStamina:145, mass:1.75, defense:0.52, attackMult:0.72, burstResist:0.92, personality:'defensive',
     desc:'Near-indestructible tank. Absorbs everything.',
-    atkR:3, defR:9, staR:9, spdR:4, bstR:9 },
+    atkR:3, defR:8, staR:9, spdR:4, bstR:9 },
 
   { name:'KNIGHT SHIELD', type:'DEFENSE', color:'#4488ff', glow:'#2255cc', blades:3, shape:'knight',
-    maxStamina:130, mass:1.60, defense:0.30, attackMult:0.60, burstResist:0.96, personality:'passive',
+    maxStamina:130, mass:1.60, defense:0.44, attackMult:0.60, burstResist:0.96, personality:'passive',
     desc:'Ultimate defense. Nearly impossible to burst.',
-    atkR:2, defR:10, staR:8, spdR:2, bstR:10 },
+    atkR:2, defR:9, staR:8, spdR:2, bstR:10 },
 
   { name:'SHARK EDGE',    type:'ATTACK',  color:'#00ffcc', glow:'#00aa88', blades:5, shape:'claw',
-    maxStamina:68,  mass:0.78, defense:0.82, attackMult:1.65, burstResist:0.18, personality:'aggressive',
+    maxStamina:68,  mass:0.78, defense:0.82, attackMult:1.82, burstResist:0.18, personality:'aggressive',
     desc:'Fastest blade alive. One wrong hit and it\'s gone.',
     atkR:10, defR:2, staR:2, spdR:10, bstR:1 },
 
   { name:'LEON CLAW',     type:'ATTACK',  color:'#ffdd00', glow:'#cc9900', blades:4, shape:'claw',
-    maxStamina:88,  mass:1.05, defense:0.72, attackMult:1.45, burstResist:0.42, personality:'aggressive',
+    maxStamina:88,  mass:1.05, defense:0.72, attackMult:1.62, burstResist:0.42, personality:'aggressive',
     desc:'Fearless attacker with lion-claw contact points.',
     atkR:9, defR:4, staR:5, spdR:7, bstR:4 },
 
@@ -764,19 +764,19 @@ const CONFIGS = [
     atkR:4, defR:7, staR:8, spdR:5, bstR:7 },
 
   { name:'TYRANNO BEAT',  type:'ATTACK',  color:'#ff4400', glow:'#cc2200', blades:4, shape:'horn',
-    maxStamina:80,  mass:1.10, defense:0.72, attackMult:1.50, burstResist:0.32, personality:'aggressive',
+    maxStamina:80,  mass:1.10, defense:0.72, attackMult:1.68, burstResist:0.32, personality:'aggressive',
     desc:'Dinosaur-type. Relentless crusher, but fragile under pressure.',
     atkR:9, defR:4, staR:4, spdR:8, bstR:3 },
 
   { name:'VIPER TAIL',    type:'ATTACK',  color:'#44ff44', glow:'#22cc22', blades:3, shape:'fang',
-    maxStamina:70,  mass:0.80, defense:0.80, attackMult:1.62, burstResist:0.20, personality:'aggressive',
+    maxStamina:70,  mass:0.80, defense:0.80, attackMult:1.78, burstResist:0.20, personality:'aggressive',
     desc:'Snake-strike speed. Fastest in the game — zero margin for error.',
     atkR:9, defR:2, staR:3, spdR:10, bstR:2 },
 
   { name:'ROCK BISON',    type:'DEFENSE', color:'#bb7733', glow:'#884411', blades:4, shape:'hells',
-    maxStamina:158, mass:1.92, defense:0.28, attackMult:0.62, burstResist:0.95, personality:'passive',
+    maxStamina:158, mass:1.92, defense:0.40, attackMult:0.62, burstResist:0.95, personality:'passive',
     desc:'Heaviest blade ever forged. Unmovable wall of earth.',
-    atkR:2, defR:10, staR:10, spdR:1, bstR:9 },
+    atkR:2, defR:9, staR:10, spdR:1, bstR:9 },
 ];
 
 // ── ARENAS ──
