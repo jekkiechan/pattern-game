@@ -825,12 +825,12 @@ const CONFIGS = [
     desc:'Icy-blue fang blades with silver metallic finish. The wolf endures everything the arena throws at it.',
     atkR:5, defR:8, staR:8, spdR:4, bstR:9, tier:'CHAMPION' },
 
-  { name:'HELL KERBECS',  type:'BALANCE', color:'#bb00ff', glow:'#ee44ff', blades:4, shape:'drake',
+  { name:'HELL KERBECS',  type:'BALANCE', color:'#cc8800', glow:'#ff6600', blades:4, shape:'nemesis',
     maxStamina:160, mass:1.88, defense:0.58, attackMult:1.38, burstResist:0.82, personality:'aggressive',
     desc:'Tri-pronged shadow blades in deep violet and gold. Three heads of Cerberus forged into one unstoppable force.',
     atkR:9, defR:9, staR:9, spdR:8, bstR:8, tier:'MYTHICAL' },
 
-  { name:'DIABLO NEMESIS', type:'BALANCE', color:'#660011', glow:'#ff0033', blades:4, shape:'hells',
+  { name:'DIABLO NEMESIS', type:'BALANCE', color:'#555566', glow:'#9900cc', blades:4, shape:'kerbecs',
     maxStamina:180, mass:2.00, defense:0.28, attackMult:2.00, burstResist:0.99, personality:'aggressive',
     desc:'The God of Destruction. Forged from the power of every Beyblade ever created — unmatched attack, impenetrable defense, infinite endurance. It cannot be burst.',
     atkR:10, defR:10, staR:10, spdR:10, bstR:10, tier:'MYTHICAL' },
@@ -1610,6 +1610,8 @@ function drawBlade(b) {
     else if (b.shape === 'saber')   drawSaberBlade(R);
     else if (b.shape === 'hells')   drawHellsBlade(R);
     else if (b.shape === 'knight')  drawKnightBlade(R);
+    else if (b.shape === 'kerbecs') drawKerbecsBlade(R);
+    else if (b.shape === 'nemesis') drawNemesisBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -1622,6 +1624,8 @@ function drawBlade(b) {
   else if (b.shape === 'saber')   { drawSaberHub(R); }
   else if (b.shape === 'hells')   { drawHellsHub(R); }
   else if (b.shape === 'knight')  { drawKnightHub(R); }
+  else if (b.shape === 'kerbecs') { drawKerbecsHub(R); }
+  else if (b.shape === 'nemesis') { drawNemesisHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -1992,6 +1996,322 @@ function drawSaberHub(R) {
 }
 
 // ── HELLS CHAIN: heavy dark blade, defense tank ──
+// ── HELL KERBECS: heavy dark gunmetal armour, 3-headed wolf, purple glow ──
+function drawKerbecsBlade(R) {
+  // Outer heavy armour plate body
+  ctx.beginPath();
+  ctx.moveTo(R * 0.08, -R * 0.26);
+  ctx.bezierCurveTo(R * 0.18, -R * 0.64, R * 0.58, -R * 0.90, R * 1.00, -R * 0.80);
+  ctx.bezierCurveTo(R * 1.32, -R * 0.72, R * 1.62, -R * 0.40, R * 1.64, -R * 0.02);
+  ctx.bezierCurveTo(R * 1.64,  R * 0.36, R * 1.46,  R * 0.66, R * 1.14,  R * 0.76);
+  ctx.bezierCurveTo(R * 0.72,  R * 0.86, R * 0.22,  R * 0.60, R * 0.08,  R * 0.26);
+  ctx.closePath();
+  const kg = ctx.createLinearGradient(-R * 0.1, -R * 0.7, R * 1.6, R * 0.6);
+  kg.addColorStop(0,    '#222230');
+  kg.addColorStop(0.18, '#484858');
+  kg.addColorStop(0.45, '#72727f');
+  kg.addColorStop(0.72, '#484858');
+  kg.addColorStop(1,    '#18181f');
+  ctx.fillStyle   = kg;
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#770099';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(190,80,255,0.38)';
+  ctx.lineWidth   = 1.0;
+  ctx.stroke();
+
+  // Horizontal armour-plate ridges
+  ctx.save();
+  ctx.shadowBlur = 0;
+  for (let r = 0; r < 3; r++) {
+    const yo = -R * 0.26 + r * R * 0.26;
+    ctx.beginPath();
+    ctx.moveTo(R * 0.14, yo);
+    ctx.bezierCurveTo(R * 0.55, yo - R * 0.05, R * 1.10, yo - R * 0.03, R * 1.52, yo + R * 0.05);
+    ctx.strokeStyle = r === 1 ? 'rgba(150,80,255,0.40)' : 'rgba(255,255,255,0.11)';
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Wolf-claw accent at outer tip (dark purple claw)
+  ctx.save();
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#8800bb';
+  ctx.fillStyle   = '#4a0077';
+  ctx.beginPath();
+  ctx.moveTo(R * 0.88, -R * 0.80);
+  ctx.bezierCurveTo(R * 1.08, -R * 0.96, R * 1.36, -R * 0.80, R * 1.40, -R * 0.56);
+  ctx.bezierCurveTo(R * 1.28, -R * 0.50, R * 1.06, -R * 0.60, R * 0.88, -R * 0.80);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // Silver highlight ridge across top face
+  ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth   = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(R * 0.12, -R * 0.22);
+  ctx.bezierCurveTo(R * 0.50, -R * 0.40, R * 1.00, -R * 0.38, R * 1.50, -R * 0.14);
+  ctx.stroke();
+  ctx.restore();
+
+  // Purple outer edge glow
+  ctx.beginPath();
+  ctx.moveTo(R * 1.00, -R * 0.80);
+  ctx.bezierCurveTo(R * 1.32, -R * 0.72, R * 1.62, -R * 0.40, R * 1.64, -R * 0.02);
+  ctx.bezierCurveTo(R * 1.64,  R * 0.36, R * 1.46,  R * 0.66, R * 1.14,  R * 0.76);
+  ctx.strokeStyle = 'rgba(170,50,255,0.78)';
+  ctx.lineWidth   = 2.2;
+  ctx.shadowBlur  = 16;
+  ctx.shadowColor = '#8800ff';
+  ctx.stroke();
+}
+
+function drawKerbecsHub(R) {
+  // Deep dark disc
+  const hg = ctx.createRadialGradient(-R * 0.10, -R * 0.10, 0, 0, 0, R * 0.60);
+  hg.addColorStop(0,   '#200035');
+  hg.addColorStop(0.5, '#0d0016');
+  hg.addColorStop(1,   '#050008');
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.60, 0, Math.PI * 2);
+  ctx.fillStyle = hg; ctx.shadowBlur = 16; ctx.shadowColor = '#6600aa'; ctx.fill();
+
+  // Purple hub ring
+  ctx.strokeStyle = '#5500aa';
+  ctx.lineWidth   = 1.8;
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#9900ff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.57, 0, Math.PI * 2); ctx.stroke();
+
+  // Cerberus — three wolf heads
+  ctx.save();
+  ctx.shadowBlur  = 6;
+  ctx.shadowColor = '#bb44ff';
+
+  // Left wolf head
+  ctx.fillStyle = '#8a8a9a';
+  ctx.beginPath();
+  ctx.ellipse(-R * 0.28, R * 0.06, R * 0.15, R * 0.13, -0.30, 0, Math.PI * 2);
+  ctx.fill();
+  // Left snout
+  ctx.fillStyle = '#707080';
+  ctx.beginPath();
+  ctx.ellipse(-R * 0.34, R * 0.14, R * 0.08, R * 0.06, -0.20, 0, Math.PI * 2);
+  ctx.fill();
+  // Left eye
+  ctx.fillStyle = '#cc00ff';
+  ctx.shadowBlur = 5; ctx.shadowColor = '#ff44ff';
+  ctx.beginPath(); ctx.arc(-R * 0.22, R * 0.00, R * 0.036, 0, Math.PI * 2); ctx.fill();
+
+  // Center (main) wolf head — larger
+  ctx.shadowBlur = 7; ctx.shadowColor = '#cc44ff';
+  ctx.fillStyle = '#aaaabc';
+  ctx.beginPath();
+  ctx.ellipse(0, -R * 0.06, R * 0.22, R * 0.19, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Center snout
+  ctx.fillStyle = '#888898';
+  ctx.beginPath();
+  ctx.ellipse(0, R * 0.10, R * 0.12, R * 0.09, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Center eyes
+  ctx.fillStyle = '#cc00ff';
+  ctx.shadowBlur = 6; ctx.shadowColor = '#ff44ff';
+  ctx.beginPath(); ctx.arc(-R * 0.09, -R * 0.09, R * 0.048, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc( R * 0.09, -R * 0.09, R * 0.048, 0, Math.PI * 2); ctx.fill();
+  // Center fangs
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.07, R * 0.16); ctx.lineTo(-R * 0.04, R * 0.24); ctx.lineTo(-R * 0.01, R * 0.16);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo( R * 0.01, R * 0.16); ctx.lineTo( R * 0.04, R * 0.24); ctx.lineTo( R * 0.07, R * 0.16);
+  ctx.closePath(); ctx.fill();
+
+  // Right wolf head
+  ctx.fillStyle = '#8a8a9a';
+  ctx.shadowBlur = 6; ctx.shadowColor = '#bb44ff';
+  ctx.beginPath();
+  ctx.ellipse(R * 0.28, R * 0.06, R * 0.15, R * 0.13, 0.30, 0, Math.PI * 2);
+  ctx.fill();
+  // Right snout
+  ctx.fillStyle = '#707080';
+  ctx.beginPath();
+  ctx.ellipse(R * 0.34, R * 0.14, R * 0.08, R * 0.06, 0.20, 0, Math.PI * 2);
+  ctx.fill();
+  // Right eye
+  ctx.fillStyle = '#cc00ff';
+  ctx.shadowBlur = 5; ctx.shadowColor = '#ff44ff';
+  ctx.beginPath(); ctx.arc(R * 0.22, R * 0.00, R * 0.036, 0, Math.PI * 2); ctx.fill();
+
+  ctx.restore();
+
+  // Center pin — purple glow
+  ctx.fillStyle = '#8800cc';
+  ctx.shadowBlur = 10; ctx.shadowColor = '#cc44ff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.08, 0, Math.PI * 2); ctx.fill();
+}
+
+// ── DIABLO NEMESIS: wide golden winged disc, flame accents, dark beast hub ──
+function drawNemesisBlade(R) {
+  // Wide sweeping golden wing
+  ctx.beginPath();
+  ctx.moveTo(R * 0.10, -R * 0.18);
+  ctx.bezierCurveTo(R * 0.24, -R * 0.50, R * 0.66, -R * 0.76, R * 1.12, -R * 0.66);
+  ctx.bezierCurveTo(R * 1.50, -R * 0.56, R * 1.76, -R * 0.24, R * 1.76, R * 0.04);
+  ctx.bezierCurveTo(R * 1.76,  R * 0.30, R * 1.52,  R * 0.52, R * 1.22,  R * 0.52);
+  ctx.bezierCurveTo(R * 0.88,  R * 0.52, R * 0.56,  R * 0.38, R * 0.28,  R * 0.18);
+  ctx.bezierCurveTo(R * 0.14,  R * 0.08, R * 0.08, -R * 0.02, R * 0.10, -R * 0.18);
+  ctx.closePath();
+  const gg = ctx.createLinearGradient(-R * 0.1, -R * 0.65, R * 1.7, R * 0.45);
+  gg.addColorStop(0,    '#a86000');
+  gg.addColorStop(0.20, '#e09a18');
+  gg.addColorStop(0.45, '#ffc830');
+  gg.addColorStop(0.70, '#d08010');
+  gg.addColorStop(1,    '#804000');
+  ctx.fillStyle   = gg;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#ff7700';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,210,60,0.65)';
+  ctx.lineWidth   = 1.0;
+  ctx.stroke();
+
+  // Orange-red flame teardrops
+  ctx.save();
+  ctx.shadowBlur  = 12;
+  ctx.shadowColor = '#ff3300';
+  const fg = ctx.createLinearGradient(R * 0.6, -R * 0.65, R * 1.5, R * 0.0);
+  fg.addColorStop(0,   '#ff5500');
+  fg.addColorStop(0.5, '#ff2200');
+  fg.addColorStop(1,   '#cc1800');
+  ctx.fillStyle = fg;
+
+  // Flame 1
+  ctx.beginPath();
+  ctx.moveTo(R * 0.68, -R * 0.56);
+  ctx.bezierCurveTo(R * 0.78, -R * 0.72, R * 0.98, -R * 0.70, R * 1.02, -R * 0.54);
+  ctx.bezierCurveTo(R * 1.02, -R * 0.40, R * 0.86, -R * 0.36, R * 0.76, -R * 0.42);
+  ctx.bezierCurveTo(R * 0.66, -R * 0.46, R * 0.64, -R * 0.52, R * 0.68, -R * 0.56);
+  ctx.closePath(); ctx.fill();
+
+  // Flame 2
+  ctx.beginPath();
+  ctx.moveTo(R * 1.12, -R * 0.42);
+  ctx.bezierCurveTo(R * 1.22, -R * 0.56, R * 1.44, -R * 0.48, R * 1.46, -R * 0.28);
+  ctx.bezierCurveTo(R * 1.44, -R * 0.14, R * 1.26, -R * 0.12, R * 1.18, -R * 0.18);
+  ctx.bezierCurveTo(R * 1.08, -R * 0.26, R * 1.06, -R * 0.36, R * 1.12, -R * 0.42);
+  ctx.closePath(); ctx.fill();
+
+  // Flame 3 (lower)
+  ctx.beginPath();
+  ctx.moveTo(R * 0.90, R * 0.24);
+  ctx.bezierCurveTo(R * 1.04, R * 0.14, R * 1.26, R * 0.20, R * 1.28, R * 0.38);
+  ctx.bezierCurveTo(R * 1.26, R * 0.50, R * 1.06, R * 0.52, R * 0.98, R * 0.44);
+  ctx.bezierCurveTo(R * 0.88, R * 0.36, R * 0.86, R * 0.28, R * 0.90, R * 0.24);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // Black ornamental filigree lines
+  ctx.save();
+  ctx.shadowBlur  = 0;
+  ctx.strokeStyle = 'rgba(0,0,0,0.50)';
+  ctx.lineWidth   = 1.0;
+  ctx.beginPath();
+  ctx.moveTo(R * 0.20, -R * 0.08);
+  ctx.bezierCurveTo(R * 0.52, -R * 0.22, R * 1.05, -R * 0.18, R * 1.48, R * 0.12);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(R * 0.26, R * 0.18);
+  ctx.bezierCurveTo(R * 0.58, R * 0.30, R * 1.04, R * 0.28, R * 1.38, R * 0.22);
+  ctx.stroke();
+  ctx.restore();
+
+  // Bright gold outer edge highlight
+  ctx.beginPath();
+  ctx.moveTo(R * 1.12, -R * 0.66);
+  ctx.bezierCurveTo(R * 1.50, -R * 0.56, R * 1.76, -R * 0.24, R * 1.76, R * 0.04);
+  ctx.bezierCurveTo(R * 1.76,  R * 0.30, R * 1.52,  R * 0.52, R * 1.22,  R * 0.52);
+  ctx.strokeStyle = 'rgba(255,235,90,0.82)';
+  ctx.lineWidth   = 2.2;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#ffa000';
+  ctx.stroke();
+}
+
+function drawNemesisHub(R) {
+  // Outer gold ring
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.60, 0, Math.PI * 2);
+  const or = ctx.createLinearGradient(-R * 0.5, -R * 0.5, R * 0.5, R * 0.5);
+  or.addColorStop(0,   '#ffc030');
+  or.addColorStop(0.3, '#c06800');
+  or.addColorStop(0.7, '#e08a18');
+  or.addColorStop(1,   '#885000');
+  ctx.fillStyle = or;
+  ctx.shadowBlur = 16; ctx.shadowColor = '#ff8800';
+  ctx.fill();
+
+  // Thin gold ring border
+  ctx.strokeStyle = 'rgba(255,240,100,0.70)';
+  ctx.lineWidth   = 1.2;
+  ctx.shadowBlur  = 8; ctx.shadowColor = '#ffcc00';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.58, 0, Math.PI * 2); ctx.stroke();
+
+  // Dark beast inner disc
+  const ig = ctx.createRadialGradient(-R * 0.10, -R * 0.10, 0, 0, 0, R * 0.44);
+  ig.addColorStop(0,   '#2a1000');
+  ig.addColorStop(0.6, '#110500');
+  ig.addColorStop(1,   '#060200');
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.44, 0, Math.PI * 2);
+  ctx.fillStyle = ig; ctx.shadowBlur = 0; ctx.fill();
+
+  // Beast silhouette — horned dark head
+  ctx.save();
+  ctx.fillStyle = '#1a0a00';
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.ellipse(0, R * 0.06, R * 0.26, R * 0.20, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // Left horn
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.10, -R * 0.06);
+  ctx.lineTo(-R * 0.24, -R * 0.32);
+  ctx.lineTo(-R * 0.06, -R * 0.10);
+  ctx.closePath(); ctx.fill();
+  // Right horn
+  ctx.beginPath();
+  ctx.moveTo( R * 0.10, -R * 0.06);
+  ctx.lineTo( R * 0.24, -R * 0.32);
+  ctx.lineTo( R * 0.06, -R * 0.10);
+  ctx.closePath(); ctx.fill();
+
+  // Glowing red-orange eyes
+  ctx.fillStyle   = '#ff2200';
+  ctx.shadowBlur  = 10; ctx.shadowColor = '#ff5500';
+  ctx.beginPath(); ctx.ellipse(-R * 0.10, R * 0.02, R * 0.055, R * 0.038, -0.25, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( R * 0.10, R * 0.02, R * 0.055, R * 0.038,  0.25, 0, Math.PI * 2); ctx.fill();
+
+  // Fire glow beneath eyes
+  ctx.fillStyle   = '#ff4400';
+  ctx.shadowBlur  = 6; ctx.shadowColor = '#ff8800';
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.16, R * 0.14);
+  ctx.lineTo(-R * 0.00, R * 0.22);
+  ctx.lineTo( R * 0.16, R * 0.14);
+  ctx.bezierCurveTo(R * 0.10, R * 0.10, -R * 0.10, R * 0.10, -R * 0.16, R * 0.14);
+  ctx.fill();
+  ctx.restore();
+
+  // Gold center pip
+  ctx.fillStyle   = '#ffc830';
+  ctx.shadowBlur  = 12; ctx.shadowColor = '#ffaa00';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.09, 0, Math.PI * 2); ctx.fill();
+}
+
 function drawHellsBlade(R) {
   // Dark purple-black rounded heavy blade
   ctx.beginPath();
