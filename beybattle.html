@@ -366,6 +366,28 @@
     display: inline-block;
   }
 
+  .char-tier-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 2px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  @keyframes mythicalShimmer {
+    0%   { color: #ff88ff; text-shadow: 0 0 8px #ff88ff88; }
+    20%  { color: #ff4488; text-shadow: 0 0 8px #ff448888; }
+    40%  { color: #ffcc00; text-shadow: 0 0 8px #ffcc0088; }
+    60%  { color: #44ffcc; text-shadow: 0 0 8px #44ffcc88; }
+    80%  { color: #8844ff; text-shadow: 0 0 8px #8844ff88; }
+    100% { color: #ff88ff; text-shadow: 0 0 8px #ff88ff88; }
+  }
+
+  .tier-mythical {
+    animation: mythicalShimmer 2.4s linear infinite;
+  }
+
   .stat-row {
     display: flex;
     align-items: center;
@@ -536,7 +558,10 @@
     <div id="char-detail">
       <div>
         <div id="detail-name"></div>
-        <div id="detail-type"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+          <div id="detail-type"></div>
+          <div id="detail-tier" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px"></div>
+        </div>
         <div id="detail-desc"></div>
       </div>
       <div id="detail-stats"></div>
@@ -702,81 +727,108 @@ const BOOST_COOLDOWN = 3.5;
 const BOOST_POWER    = 9;
 
 // atkR/defR/staR/spdR/bstR: display ratings 1-10 shown on select screen
+// tier: NOVICE | APPRENTICE | ADVANCED | ELITE | CHAMPION | LEGENDARY | MYTHICAL
 const CONFIGS = [
   { name:'IMPACT DRAKE',   type:'ATTACK',  color:'#cc2211', glow:'#ff4422', blades:4, shape:'drake',
     maxStamina:100, mass:1.40, defense:0.80, attackMult:1.40, burstResist:0.60, personality:'aggressive',
     desc:'Heavy rubber contact delivers crushing smash attacks. The balanced powerhouse of Beyblade X.',
-    atkR:8, defR:5, staR:6, spdR:7, bstR:6 },
+    atkR:8, defR:5, staR:6, spdR:7, bstR:6, tier:'CHAMPION' },
 
   { name:'DRAN SWORD',     type:'ATTACK',  color:'#ff6600', glow:'#ff3300', blades:3, shape:'dran',
     maxStamina:75,  mass:0.85, defense:0.75, attackMult:1.72, burstResist:0.28, personality:'aggressive',
     desc:'Three sword blades hit like a typhoon. Highest attack in the game — zero safety margin.',
-    atkR:10, defR:3, staR:3, spdR:9, bstR:2 },
+    atkR:10, defR:3, staR:3, spdR:9, bstR:2, tier:'ELITE' },
 
   { name:'COBALT DRAGOON', type:'ATTACK',  color:'#1166cc', glow:'#2288ff', blades:4, shape:'dragoon',
     maxStamina:90,  mass:1.30, defense:0.72, attackMult:1.50, burstResist:0.50, personality:'aggressive',
     desc:'Left-spin dragon blade disrupts right-spin opponents. Cobalt blue attack force.',
-    atkR:9, defR:4, staR:5, spdR:8, bstR:5 },
+    atkR:9, defR:4, staR:5, spdR:8, bstR:5, tier:'ELITE' },
 
   { name:'CRIMSON GARUDA', type:'BALANCE', color:'#cc1100', glow:'#ff2200', blades:4, shape:'garuda',
     maxStamina:115, mass:1.45, defense:0.62, attackMult:1.10, burstResist:0.68, personality:'aggressive',
     desc:'Wide feather blades adapt to any opponent. The scarlet bird of balance.',
-    atkR:6, defR:7, staR:7, spdR:5, bstR:7 },
+    atkR:6, defR:7, staR:7, spdR:5, bstR:7, tier:'CHAMPION' },
 
   { name:'SAMURAI SABER',  type:'ATTACK',  color:'#2244aa', glow:'#3366cc', blades:2, shape:'saber',
     maxStamina:72,  mass:0.90, defense:0.65, attackMult:1.62, burstResist:0.35, personality:'aggressive',
     desc:'Dual retracting blades deliver devastating one-hit strikes. Samurai precision.',
-    atkR:9, defR:3, staR:4, spdR:9, bstR:3 },
+    atkR:9, defR:3, staR:4, spdR:9, bstR:3, tier:'ADVANCED' },
 
   { name:'HELLS CHAIN',   type:'DEFENSE', color:'#9933ff', glow:'#6600cc', blades:4, shape:'hells',
     maxStamina:145, mass:1.75, defense:0.52, attackMult:0.72, burstResist:0.92, personality:'defensive',
     desc:'Near-indestructible tank. Absorbs everything.',
-    atkR:3, defR:8, staR:9, spdR:4, bstR:9 },
+    atkR:3, defR:8, staR:9, spdR:4, bstR:9, tier:'CHAMPION' },
 
   { name:'KNIGHT SHIELD', type:'DEFENSE', color:'#4488ff', glow:'#2255cc', blades:3, shape:'knight',
     maxStamina:130, mass:1.60, defense:0.44, attackMult:0.60, burstResist:0.96, personality:'passive',
     desc:'Ultimate defense. Nearly impossible to burst.',
-    atkR:2, defR:9, staR:8, spdR:2, bstR:10 },
+    atkR:2, defR:9, staR:8, spdR:2, bstR:10, tier:'ELITE' },
 
   { name:'SHARK EDGE',    type:'ATTACK',  color:'#00ffcc', glow:'#00aa88', blades:5, shape:'claw',
     maxStamina:68,  mass:0.78, defense:0.82, attackMult:1.82, burstResist:0.18, personality:'aggressive',
     desc:'Fastest blade alive. One wrong hit and it\'s gone.',
-    atkR:10, defR:2, staR:2, spdR:10, bstR:1 },
+    atkR:10, defR:2, staR:2, spdR:10, bstR:1, tier:'ADVANCED' },
 
   { name:'LEON CLAW',     type:'ATTACK',  color:'#ffdd00', glow:'#cc9900', blades:4, shape:'claw',
     maxStamina:88,  mass:1.05, defense:0.72, attackMult:1.62, burstResist:0.42, personality:'aggressive',
     desc:'Fearless attacker with lion-claw contact points.',
-    atkR:9, defR:4, staR:5, spdR:7, bstR:4 },
+    atkR:9, defR:4, staR:5, spdR:7, bstR:4, tier:'ELITE' },
 
   { name:'WYVERN GALE',   type:'STAMINA', color:'#00ff66', glow:'#00aa44', blades:4, shape:'horn',
     maxStamina:148, mass:1.32, defense:0.50, attackMult:0.88, burstResist:0.80, personality:'defensive',
     desc:'High endurance wind-type. Outlasts everyone.',
-    atkR:5, defR:6, staR:9, spdR:6, bstR:8 },
+    atkR:5, defR:6, staR:9, spdR:6, bstR:8, tier:'CHAMPION' },
 
   { name:'UNICORN STING', type:'STAMINA', color:'#eeeeff', glow:'#aabbff', blades:3, shape:'wing',
     maxStamina:162, mass:1.15, defense:0.55, attackMult:0.82, burstResist:0.74, personality:'passive',
     desc:'Longest stamina in the arena. Wins by attrition.',
-    atkR:4, defR:6, staR:10, spdR:5, bstR:7 },
+    atkR:4, defR:6, staR:10, spdR:5, bstR:7, tier:'ELITE' },
 
   { name:'WIZARD ARROW',  type:'STAMINA', color:'#ff44cc', glow:'#cc0099', blades:3, shape:'wing',
     maxStamina:138, mass:1.20, defense:0.60, attackMult:0.80, burstResist:0.70, personality:'defensive',
     desc:'Magic-type stamina blade with unpredictable spin.',
-    atkR:4, defR:7, staR:8, spdR:5, bstR:7 },
+    atkR:4, defR:7, staR:8, spdR:5, bstR:7, tier:'ADVANCED' },
 
   { name:'TYRANNO BEAT',  type:'ATTACK',  color:'#ff4400', glow:'#cc2200', blades:4, shape:'horn',
     maxStamina:80,  mass:1.10, defense:0.72, attackMult:1.68, burstResist:0.32, personality:'aggressive',
     desc:'Dinosaur-type. Relentless crusher, but fragile under pressure.',
-    atkR:9, defR:4, staR:4, spdR:8, bstR:3 },
+    atkR:9, defR:4, staR:4, spdR:8, bstR:3, tier:'ADVANCED' },
 
   { name:'VIPER TAIL',    type:'ATTACK',  color:'#44ff44', glow:'#22cc22', blades:3, shape:'fang',
     maxStamina:70,  mass:0.80, defense:0.80, attackMult:1.78, burstResist:0.20, personality:'aggressive',
     desc:'Snake-strike speed. Fastest in the game — zero margin for error.',
-    atkR:9, defR:2, staR:3, spdR:10, bstR:2 },
+    atkR:9, defR:2, staR:3, spdR:10, bstR:2, tier:'ELITE' },
 
   { name:'ROCK BISON',    type:'DEFENSE', color:'#bb7733', glow:'#884411', blades:4, shape:'hells',
     maxStamina:158, mass:1.92, defense:0.40, attackMult:0.62, burstResist:0.95, personality:'passive',
     desc:'Heaviest blade ever forged. Unmovable wall of earth.',
-    atkR:2, defR:9, staR:10, spdR:1, bstR:9 },
+    atkR:2, defR:9, staR:10, spdR:1, bstR:9, tier:'LEGENDARY' },
+
+  // ── NEW CHARACTERS ──
+  { name:'DRACIEL SHELL', type:'DEFENSE', color:'#00aa88', glow:'#00ddbb', blades:4, shape:'knight',
+    maxStamina:120, mass:1.70, defense:0.35, attackMult:0.50, burstResist:0.88, personality:'passive',
+    desc:'Clamshell energy layer with aqua-teal finish. Round turtle blades absorb impacts from all angles.',
+    atkR:1, defR:10, staR:7, spdR:2, bstR:8, tier:'NOVICE' },
+
+  { name:'STORM PEGASUS', type:'ATTACK',  color:'#ccd8ff', glow:'#88aaff', blades:3, shape:'wing',
+    maxStamina:85,  mass:1.05, defense:0.68, attackMult:1.35, burstResist:0.45, personality:'aggressive',
+    desc:'White-pearl energy layer with sky-blue wing blades. Classic left-spin rush attacker.',
+    atkR:7, defR:4, staR:5, spdR:8, bstR:4, tier:'APPRENTICE' },
+
+  { name:'PHOENIX BLAZE', type:'BALANCE', color:'#ff8800', glow:'#ffcc00', blades:4, shape:'garuda',
+    maxStamina:120, mass:1.25, defense:0.60, attackMult:1.20, burstResist:0.62, personality:'aggressive',
+    desc:'Flame-feather blades in molten red and gold. A phoenix reborn with every hit — attack and endurance combined.',
+    atkR:7, defR:6, staR:7, spdR:6, bstR:6, tier:'ADVANCED' },
+
+  { name:'WOLBORG ICE',   type:'DEFENSE', color:'#88ddff', glow:'#44aaee', blades:3, shape:'fang',
+    maxStamina:140, mass:1.65, defense:0.46, attackMult:0.90, burstResist:0.90, personality:'defensive',
+    desc:'Icy-blue fang blades with silver metallic finish. The wolf endures everything the arena throws at it.',
+    atkR:5, defR:8, staR:8, spdR:4, bstR:9, tier:'CHAMPION' },
+
+  { name:'HELL KERBECS',  type:'BALANCE', color:'#bb00ff', glow:'#ee44ff', blades:4, shape:'drake',
+    maxStamina:160, mass:1.88, defense:0.58, attackMult:1.38, burstResist:0.82, personality:'aggressive',
+    desc:'Tri-pronged shadow blades in deep violet and gold. Three heads of Cerberus forged into one unstoppable force.',
+    atkR:9, defR:9, staR:9, spdR:8, bstR:8, tier:'MYTHICAL' },
 ];
 
 // ── ARENAS ──
@@ -2491,6 +2543,15 @@ function drawBladeToCanvas(cfg, previewCanvas) {
 
 // ── CHARACTER SELECT SCREEN ──
 const TYPE_COLORS = { ATTACK:'#ff4422', DEFENSE:'#4488ff', STAMINA:'#00ff88', BALANCE:'#ffcc00' };
+const TIER_COLORS = {
+  NOVICE:     '#778899',
+  APPRENTICE: '#33cc66',
+  ADVANCED:   '#3399ff',
+  ELITE:      '#9944ff',
+  CHAMPION:   '#ffbb00',
+  LEGENDARY:  '#ff3311',
+  MYTHICAL:   '#ff88ff',
+};
 const STAT_KEYS   = ['atkR','defR','staR','spdR','bstR'];
 const STAT_LABELS = ['ATK','DEF','STA','SPD','BST'];
 
@@ -2517,10 +2578,15 @@ function buildSelectScreen() {
         </div>
       </div>`).join('');
 
+    const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
+    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : '';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
       <div class="char-card-name" style="color:${cfg.color}">${cfg.name}</div>
-      <div class="char-type-badge" style="background:${tc}22;color:${tc}">${cfg.type}</div>
+      <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
+        <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
+        <div class="char-tier-badge${tierClass}" style="background:${tierColor}22;color:${tierColor}">${cfg.tier}</div>
+      </div>
       ${statBars}`;
 
     card.addEventListener('click', () => selectChar(i));
@@ -2543,10 +2609,15 @@ function selectChar(i, rebuild = true) {
   const cfg = CONFIGS[i];
   const tc  = TYPE_COLORS[cfg.type] || '#fff';
 
+  const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
   document.getElementById('detail-name').textContent  = cfg.name;
   document.getElementById('detail-name').style.color  = cfg.color;
   document.getElementById('detail-type').textContent  = cfg.type;
   document.getElementById('detail-type').style.color  = tc;
+  const tierEl = document.getElementById('detail-tier');
+  tierEl.textContent = cfg.tier;
+  tierEl.style.color = tierColor;
+  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : '';
   document.getElementById('detail-desc').textContent  = cfg.desc;
 
   document.getElementById('detail-stats').innerHTML = STAT_KEYS.map((k, si) => `
