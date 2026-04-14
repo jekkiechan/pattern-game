@@ -725,6 +725,8 @@ const HIT_DRAIN_BASE    = 7;
 const AI_INTERVAL       = 0.55;
 const BOOST_COOLDOWN = 3.5;
 const BOOST_POWER    = 9;
+const SPECIAL_CHARGE_TIME = 2.0;   // seconds to fully charge special
+const SPECIAL_COOLDOWN    = 8.0;   // seconds between special uses
 
 // atkR/defR/staR/spdR/bstR: display ratings 1-10 shown on select screen
 // tier: NOVICE | APPRENTICE | ADVANCED | ELITE | CHAMPION | LEGENDARY | MYTHICAL
@@ -732,108 +734,129 @@ const CONFIGS = [
   { name:'IMPACT DRAKE',   type:'ATTACK',  color:'#cc2211', glow:'#ff4422', blades:4, shape:'drake',
     maxStamina:100, mass:1.40, defense:0.80, attackMult:1.40, burstResist:0.60, personality:'aggressive',
     desc:'Heavy rubber contact delivers crushing smash attacks. The balanced powerhouse of Beyblade X.',
-    atkR:8, defR:5, staR:6, spdR:7, bstR:6, tier:'CHAMPION' },
+    atkR:8, defR:5, staR:6, spdR:7, bstR:6, tier:'CHAMPION',
+    special:{ name:'Drake Impact', desc:'+50% attack & repel burst', effect:'drakeImpact' } },
 
   { name:'DRAN SWORD',     type:'ATTACK',  color:'#ff6600', glow:'#ff3300', blades:3, shape:'dran',
     maxStamina:75,  mass:0.85, defense:0.75, attackMult:1.72, burstResist:0.28, personality:'aggressive',
     desc:'Three sword blades hit like a typhoon. Highest attack in the game — zero safety margin.',
-    atkR:10, defR:3, staR:3, spdR:9, bstR:2, tier:'ELITE' },
+    atkR:10, defR:3, staR:3, spdR:9, bstR:2, tier:'ELITE',
+    special:{ name:'Dran Rush', desc:'Burst of double speed for 2s', effect:'dranRush' } },
 
   { name:'COBALT DRAGOON', type:'ATTACK',  color:'#1166cc', glow:'#2288ff', blades:4, shape:'dragoon',
     maxStamina:90,  mass:1.30, defense:0.72, attackMult:1.50, burstResist:0.50, personality:'aggressive',
     desc:'Left-spin dragon blade disrupts right-spin opponents. Cobalt blue attack force.',
-    atkR:9, defR:4, staR:5, spdR:8, bstR:5, tier:'ELITE' },
+    atkR:9, defR:4, staR:5, spdR:8, bstR:5, tier:'ELITE',
+    special:{ name:'Dragoon Vortex', desc:'Pull all nearby foes inward for 2.5s', effect:'dragoonVortex' } },
 
   { name:'CRIMSON GARUDA', type:'BALANCE', color:'#cc1100', glow:'#ff2200', blades:4, shape:'garuda',
     maxStamina:115, mass:1.45, defense:0.62, attackMult:1.10, burstResist:0.68, personality:'aggressive',
     desc:'Wide feather blades adapt to any opponent. The scarlet bird of balance.',
-    atkR:6, defR:7, staR:7, spdR:5, bstR:7, tier:'CHAMPION' },
+    atkR:6, defR:7, staR:7, spdR:5, bstR:7, tier:'CHAMPION',
+    special:{ name:'Gale Redirect', desc:'Instantly reverse velocity (feint)', effect:'galeRedirect' } },
 
   { name:'SAMURAI SABER',  type:'ATTACK',  color:'#2244aa', glow:'#3366cc', blades:2, shape:'saber',
     maxStamina:72,  mass:0.90, defense:0.65, attackMult:1.62, burstResist:0.35, personality:'aggressive',
     desc:'Dual retracting blades deliver devastating one-hit strikes. Samurai precision.',
-    atkR:9, defR:3, staR:4, spdR:9, bstR:3, tier:'ADVANCED' },
+    atkR:9, defR:3, staR:4, spdR:9, bstR:3, tier:'ADVANCED',
+    special:{ name:'Flash Blade', desc:'Next 2 hits deal dmg but take none', effect:'flashBlade' } },
 
   { name:'HELLS CHAIN',   type:'DEFENSE', color:'#9933ff', glow:'#6600cc', blades:4, shape:'hells',
     maxStamina:145, mass:1.75, defense:0.52, attackMult:0.72, burstResist:0.92, personality:'defensive',
     desc:'Near-indestructible tank. Absorbs everything.',
-    atkR:3, defR:8, staR:9, spdR:4, bstR:9, tier:'CHAMPION' },
+    atkR:3, defR:8, staR:9, spdR:4, bstR:9, tier:'CHAMPION',
+    special:{ name:'Chain Bind', desc:'Cap all foes to 40% speed for 3s', effect:'chainBind' } },
 
   { name:'KNIGHT SHIELD', type:'DEFENSE', color:'#4488ff', glow:'#2255cc', blades:3, shape:'knight',
     maxStamina:130, mass:1.60, defense:0.44, attackMult:0.60, burstResist:0.96, personality:'passive',
     desc:'Ultimate defense. Nearly impossible to burst.',
-    atkR:2, defR:9, staR:8, spdR:2, bstR:10, tier:'ELITE' },
+    atkR:2, defR:9, staR:8, spdR:2, bstR:10, tier:'ELITE',
+    special:{ name:'Royal Guard', desc:'Immune to all damage for 2.5s', effect:'royalGuard' } },
 
   { name:'SHARK EDGE',    type:'ATTACK',  color:'#00ffcc', glow:'#00aa88', blades:5, shape:'claw',
     maxStamina:68,  mass:0.78, defense:0.82, attackMult:1.82, burstResist:0.18, personality:'aggressive',
     desc:'Fastest blade alive. One wrong hit and it\'s gone.',
-    atkR:10, defR:2, staR:2, spdR:10, bstR:1, tier:'ADVANCED' },
+    atkR:10, defR:2, staR:2, spdR:10, bstR:1, tier:'ADVANCED',
+    special:{ name:'Hunting Speed', desc:'Lunge at nearest foe at max speed', effect:'huntingSpeed' } },
 
   { name:'LEON CLAW',     type:'ATTACK',  color:'#ffdd00', glow:'#cc9900', blades:4, shape:'claw',
     maxStamina:88,  mass:1.05, defense:0.72, attackMult:1.62, burstResist:0.42, personality:'aggressive',
     desc:'Fearless attacker with lion-claw contact points.',
-    atkR:9, defR:4, staR:5, spdR:7, bstR:4, tier:'ELITE' },
+    atkR:9, defR:4, staR:5, spdR:7, bstR:4, tier:'ELITE',
+    special:{ name:'Pride Roar', desc:'Shockwave pushes all nearby foes away', effect:'prideRoar' } },
 
   { name:'WYVERN GALE',   type:'STAMINA', color:'#00ff66', glow:'#00aa44', blades:4, shape:'horn',
     maxStamina:148, mass:1.32, defense:0.50, attackMult:0.88, burstResist:0.80, personality:'defensive',
     desc:'High endurance wind-type. Outlasts everyone.',
-    atkR:5, defR:6, staR:9, spdR:6, bstR:8, tier:'CHAMPION' },
+    atkR:5, defR:6, staR:9, spdR:6, bstR:8, tier:'CHAMPION',
+    special:{ name:'Wind Recovery', desc:'Restore 25 stamina instantly', effect:'windRecovery' } },
 
   { name:'UNICORN STING', type:'STAMINA', color:'#eeeeff', glow:'#aabbff', blades:3, shape:'wing',
     maxStamina:162, mass:1.15, defense:0.55, attackMult:0.82, burstResist:0.74, personality:'passive',
     desc:'Longest stamina in the arena. Wins by attrition.',
-    atkR:4, defR:6, staR:10, spdR:5, bstR:7, tier:'ELITE' },
+    atkR:4, defR:6, staR:10, spdR:5, bstR:7, tier:'ELITE',
+    special:{ name:'Phantom Drive', desc:'Teleport to center + 20 stamina', effect:'phantomDrive' } },
 
   { name:'WIZARD ARROW',  type:'STAMINA', color:'#ff44cc', glow:'#cc0099', blades:3, shape:'wing',
     maxStamina:138, mass:1.20, defense:0.60, attackMult:0.80, burstResist:0.70, personality:'defensive',
     desc:'Magic-type stamina blade with unpredictable spin.',
-    atkR:4, defR:7, staR:8, spdR:5, bstR:7, tier:'ADVANCED' },
+    atkR:4, defR:7, staR:8, spdR:5, bstR:7, tier:'ADVANCED',
+    special:{ name:'Mirror Spin', desc:'Next collision: zero stamina loss (3s)', effect:'mirrorSpin' } },
 
   { name:'TYRANNO BEAT',  type:'ATTACK',  color:'#ff4400', glow:'#cc2200', blades:4, shape:'horn',
     maxStamina:80,  mass:1.10, defense:0.72, attackMult:1.68, burstResist:0.32, personality:'aggressive',
     desc:'Dinosaur-type. Relentless crusher, but fragile under pressure.',
-    atkR:9, defR:4, staR:4, spdR:8, bstR:3, tier:'ADVANCED' },
+    atkR:9, defR:4, staR:4, spdR:8, bstR:3, tier:'ADVANCED',
+    special:{ name:'Ground Stomp', desc:'Destabilize all foes (+wobble)', effect:'groundStomp' } },
 
   { name:'VIPER TAIL',    type:'ATTACK',  color:'#44ff44', glow:'#22cc22', blades:3, shape:'fang',
     maxStamina:70,  mass:0.80, defense:0.80, attackMult:1.78, burstResist:0.20, personality:'aggressive',
     desc:'Snake-strike speed. Fastest in the game — zero margin for error.',
-    atkR:9, defR:2, staR:3, spdR:10, bstR:2, tier:'ELITE' },
+    atkR:9, defR:2, staR:3, spdR:10, bstR:2, tier:'ELITE',
+    special:{ name:'Venom Mark', desc:'Nearest foe takes 2× burst damage (4s)', effect:'venomMark' } },
 
   { name:'ROCK BISON',    type:'DEFENSE', color:'#bb7733', glow:'#884411', blades:4, shape:'hells',
     maxStamina:158, mass:1.92, defense:0.40, attackMult:0.62, burstResist:0.95, personality:'passive',
     desc:'Heaviest blade ever forged. Unmovable wall of earth.',
-    atkR:2, defR:9, staR:10, spdR:1, bstR:9, tier:'LEGENDARY' },
+    atkR:2, defR:9, staR:10, spdR:1, bstR:9, tier:'LEGENDARY',
+    special:{ name:'Tectonic Stance', desc:'Freeze 3s; next hit reflects back', effect:'tectonicStance' } },
 
   // ── NEW CHARACTERS ──
   { name:'DRACIEL SHELL', type:'DEFENSE', color:'#00aa88', glow:'#00ddbb', blades:4, shape:'knight',
     maxStamina:120, mass:1.70, defense:0.35, attackMult:0.50, burstResist:0.88, personality:'passive',
     desc:'Clamshell energy layer with aqua-teal finish. Round turtle blades absorb impacts from all angles.',
-    atkR:1, defR:10, staR:7, spdR:2, bstR:8, tier:'NOVICE' },
+    atkR:1, defR:10, staR:7, spdR:2, bstR:8, tier:'NOVICE',
+    special:{ name:'Shell Defense', desc:'+30 stamina & halve burst damage (3s)', effect:'shellDefense' } },
 
   { name:'STORM PEGASUS', type:'ATTACK',  color:'#ccd8ff', glow:'#88aaff', blades:3, shape:'wing',
     maxStamina:85,  mass:1.05, defense:0.68, attackMult:1.35, burstResist:0.45, personality:'aggressive',
     desc:'White-pearl energy layer with sky-blue wing blades. Classic left-spin rush attacker.',
-    atkR:7, defR:4, staR:5, spdR:8, bstR:4, tier:'APPRENTICE' },
+    atkR:7, defR:4, staR:5, spdR:8, bstR:4, tier:'APPRENTICE',
+    special:{ name:'Storm Ride', desc:'Chase last attacker at full speed', effect:'stormRide' } },
 
   { name:'PHOENIX BLAZE', type:'BALANCE', color:'#ff8800', glow:'#ffcc00', blades:4, shape:'garuda',
     maxStamina:120, mass:1.25, defense:0.60, attackMult:1.20, burstResist:0.62, personality:'aggressive',
     desc:'Flame-feather blades in molten red and gold. A phoenix reborn with every hit — attack and endurance combined.',
-    atkR:7, defR:6, staR:7, spdR:6, bstR:6, tier:'ADVANCED' },
+    atkR:7, defR:6, staR:7, spdR:6, bstR:6, tier:'ADVANCED',
+    special:{ name:'Phoenix Ember', desc:'If stamina <50%: +25 stamina & +30% atk', effect:'phoenixEmber' } },
 
   { name:'WOLBORG ICE',   type:'DEFENSE', color:'#88ddff', glow:'#44aaee', blades:3, shape:'fang',
     maxStamina:140, mass:1.65, defense:0.46, attackMult:0.90, burstResist:0.90, personality:'defensive',
     desc:'Icy-blue fang blades with silver metallic finish. The wolf endures everything the arena throws at it.',
-    atkR:5, defR:8, staR:8, spdR:4, bstR:9, tier:'CHAMPION' },
+    atkR:5, defR:8, staR:8, spdR:4, bstR:9, tier:'CHAMPION',
+    special:{ name:'Frozen Field', desc:'Slow all nearby foes for 3s', effect:'frozenField' } },
 
   { name:'HELL KERBECS',  type:'BALANCE', color:'#cc8800', glow:'#ff6600', blades:4, shape:'nemesis',
     maxStamina:160, mass:1.88, defense:0.58, attackMult:1.38, burstResist:0.82, personality:'aggressive',
     desc:'Tri-pronged shadow blades in deep violet and gold. Three heads of Cerberus forged into one unstoppable force.',
-    atkR:9, defR:9, staR:9, spdR:8, bstR:8, tier:'MYTHICAL' },
+    atkR:9, defR:9, staR:9, spdR:8, bstR:8, tier:'MYTHICAL',
+    special:{ name:'Dark Pull', desc:'Rush back to center at full speed', effect:'darkPull' } },
 
   { name:'DIABLO NEMESIS', type:'BALANCE', color:'#555566', glow:'#9900cc', blades:4, shape:'kerbecs',
     maxStamina:180, mass:2.00, defense:0.28, attackMult:2.00, burstResist:0.99, personality:'aggressive',
     desc:'The God of Destruction. Forged from the power of every Beyblade ever created — unmatched attack, impenetrable defense, infinite endurance. It cannot be burst.',
-    atkR:10, defR:10, staR:10, spdR:10, bstR:10, tier:'MYTHICAL' },
+    atkR:10, defR:10, staR:10, spdR:10, bstR:10, tier:'MYTHICAL',
+    special:{ name:'Zero-G Void', desc:'Drain 8 stamina from all foes', effect:'zeroGVoid' } },
 ];
 
 // ── ARENAS ──
@@ -944,6 +967,13 @@ class Beyblade {
     this.flash        = 0;
     this.aiTimer      = Math.random() * AI_INTERVAL;
     this.trail        = [];            // motion trail positions
+    // Special move state
+    this.chargeProgress  = 0;          // 0-1 charge amount
+    this.isCharging      = false;      // player is holding to charge
+    this.specialCooldown = 0;          // seconds remaining on cooldown
+    this.specialActive   = false;      // special is currently executing
+    this.specialTimer    = 0;          // remaining duration of active special
+    this.specialData     = {};         // per-special runtime state
   }
 }
 
@@ -975,6 +1005,7 @@ const G = {
   selectedArena:     0,
   activeTime:     0,
   boostCooldown:  0,
+  pressIsCharging: false,   // player is holding for special charge
 };
 
 const stars = Array.from({ length: 90 }, () => ({
@@ -1205,16 +1236,45 @@ function bladeCollide(a, b) {
   const spA = Math.hypot(a.vx, a.vy), spB = Math.hypot(b.vx, b.vy);
   const impactForce = Math.abs(rvn) * 2;
 
+  // Track last attacker for Storm Ride (persists outside specialData)
+  a.lastAttacker = b;
+  b.lastAttacker = a;
+  a.specialData = a.specialData || {};
+  b.specialData = b.specialData || {};
+
   // Stamina damage (attacker's attackMult vs defender's defense)
   const baseDmg = Math.min(HIT_DRAIN_BASE + impactForce * 0.7, 30);
-  a.stamina -= baseDmg * b.attackMult * a.defense;
-  b.stamina -= baseDmg * a.attackMult * b.defense;
+  let staDmgA = baseDmg * b.attackMult * a.defense;
+  let staDmgB = baseDmg * a.attackMult * b.defense;
 
   // Burst meter damage — scales with stamina loss so you can't be one-shot burst at full health
   const wornA = 0.15 + 0.85 * (1 - Math.max(0, Math.min(1, a.stamina / a.maxStamina)));
   const wornB = 0.15 + 0.85 * (1 - Math.max(0, Math.min(1, b.stamina / b.maxStamina)));
-  const burstDmgA = impactForce * b.attackMult * (1 - a.burstResist) * wornA * 14;
-  const burstDmgB = impactForce * a.attackMult * (1 - b.burstResist) * wornB * 14;
+  let burstDmgA = impactForce * b.attackMult * (1 - a.burstResist) * wornA * 14;
+  let burstDmgB = impactForce * a.attackMult * (1 - b.burstResist) * wornB * 14;
+
+  // ── Special move modifiers on damage ──
+  // Royal Guard: immune to all incoming damage
+  if (a.specialData.immune) { staDmgA = 0; burstDmgA = 0; }
+  if (b.specialData.immune) { staDmgB = 0; burstDmgB = 0; }
+  // Flash Blade: dealer takes no damage, consumes one phase hit
+  if (a.specialData.phaseHits > 0) { staDmgA = 0; burstDmgA = 0; a.specialData.phaseHits--; if (a.specialData.phaseHits <= 0) endSpecial(a); }
+  if (b.specialData.phaseHits > 0) { staDmgB = 0; burstDmgB = 0; b.specialData.phaseHits--; if (b.specialData.phaseHits <= 0) endSpecial(b); }
+  // Mirror Spin: zero stamina loss for that blade
+  if (a.specialData.mirror) { staDmgA = 0; }
+  if (b.specialData.mirror) { staDmgB = 0; }
+  // Venom Mark: marked blade takes double burst damage
+  if (a.specialData.venomMark > 0) { burstDmgA *= 2; }
+  if (b.specialData.venomMark > 0) { burstDmgB *= 2; }
+  // Shell Defense: half burst damage
+  if (a.specialData.halfBurst) { burstDmgA *= 0.5; }
+  if (b.specialData.halfBurst) { burstDmgB *= 0.5; }
+  // Tectonic Stance: reflect stamina damage back, nullify own burst damage
+  if (a.specialData.reflect) { b.stamina -= staDmgA; staDmgA = 0; burstDmgA = 0; }
+  if (b.specialData.reflect) { a.stamina -= staDmgB; staDmgB = 0; burstDmgB = 0; }
+
+  a.stamina -= staDmgA;
+  b.stamina -= staDmgB;
   a.burstHealth -= burstDmgA;
   b.burstHealth -= burstDmgB;
 
@@ -1264,6 +1324,253 @@ function triggerBurst(blade) {
   G.shakeX = (Math.random() - .5) * 36;
   G.shakeY = (Math.random() - .5) * 36;
   G.shakeT = 0.5;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SPECIAL MOVES
+// ═══════════════════════════════════════════════════════════
+function nearestAlive(blade) {
+  let best = null, bestD = Infinity;
+  G.blades.forEach(b => {
+    if (b === blade || !b.alive) return;
+    const d = Math.hypot(b.x - blade.x, b.y - blade.y);
+    if (d < bestD) { bestD = d; best = b; }
+  });
+  return best;
+}
+
+function spawnSpecialParticles(x, y, color, count, speed, life) {
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = speed * 60 + Math.random() * speed * 80;
+    G.parts.push(new Particle(x, y, color, Math.cos(a)*s, Math.sin(a)*s, 2.5 + Math.random()*2, life));
+  }
+}
+
+function endSpecial(b) {
+  // Restore any mutated base stats
+  if (b.specialData.savedAtkMult !== undefined) b.attackMult = b.specialData.savedAtkMult;
+  b.specialActive  = false;
+  b.specialTimer   = 0;
+  b.specialData    = {};
+}
+
+function activateSpecial(blade) {
+  if (!blade.alive || blade.specialCooldown > 0) return;
+  blade.specialActive   = true;
+  blade.specialCooldown = SPECIAL_COOLDOWN;
+  blade.specialTimer    = 0;
+  blade.specialData     = {};
+
+  const effect = blade.special.effect;
+  const gx = blade.x, gy = blade.y;
+
+  switch (effect) {
+
+    case 'drakeImpact': {
+      blade.specialTimer = 3;
+      blade.specialData.savedAtkMult = blade.attackMult;
+      blade.attackMult *= 1.5;
+      G.blades.forEach(b => {
+        if (b === blade || !b.alive) return;
+        const dx = b.x - gx, dy = b.y - gy, d = Math.hypot(dx, dy);
+        if (d < 80 && d > 0) { b.vx += (dx/d)*5; b.vy += (dy/d)*5; }
+      });
+      spawnSpecialParticles(gx, gy, blade.glow, 18, 4, 0.9);
+      break;
+    }
+
+    case 'dranRush': {
+      blade.specialTimer = 2;
+      blade.specialData.frictionOverride = true;
+      const spd = Math.hypot(blade.vx, blade.vy) || 1;
+      blade.vx = (blade.vx/spd) * MAX_SPEED * 2;
+      blade.vy = (blade.vy/spd) * MAX_SPEED * 2;
+      spawnSpecialParticles(gx, gy, '#ff6600', 14, 5, 0.8);
+      break;
+    }
+
+    case 'dragoonVortex': {
+      blade.specialTimer = 2.5;
+      blade.specialData.vortex = true;
+      spawnSpecialParticles(gx, gy, '#2288ff', 20, 3, 1.0);
+      break;
+    }
+
+    case 'galeRedirect': {
+      blade.vx *= -1; blade.vy *= -1;
+      spawnSpecialParticles(gx, gy, blade.glow, 10, 3, 0.6);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'flashBlade': {
+      blade.specialTimer = 2.5;
+      blade.specialData.phaseHits = 2;
+      spawnSpecialParticles(gx, gy, '#3366cc', 12, 3, 0.8);
+      break;
+    }
+
+    case 'chainBind': {
+      blade.specialTimer = 3;
+      G.blades.forEach(b => {
+        if (b === blade || !b.alive) return;
+        b.specialData = b.specialData || {};
+        b.specialData.chainBound = 3;
+      });
+      spawnSpecialParticles(gx, gy, '#6600cc', 16, 3, 0.9);
+      break;
+    }
+
+    case 'royalGuard': {
+      blade.specialTimer = 2.5;
+      blade.specialData.immune = true;
+      spawnSpecialParticles(gx, gy, '#4488ff', 14, 2, 1.0);
+      break;
+    }
+
+    case 'huntingSpeed': {
+      const tgt = nearestAlive(blade);
+      if (tgt) {
+        const dx = tgt.x - gx, dy = tgt.y - gy, d = Math.hypot(dx, dy) || 1;
+        blade.vx = (dx/d) * MAX_SPEED;
+        blade.vy = (dy/d) * MAX_SPEED;
+      }
+      spawnSpecialParticles(gx, gy, '#00ffcc', 10, 5, 0.7);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'prideRoar': {
+      G.blades.forEach(b => {
+        if (b === blade || !b.alive) return;
+        const dx = b.x - gx, dy = b.y - gy, d = Math.hypot(dx, dy);
+        if (d < 110 && d > 0) { b.vx += (dx/d)*6; b.vy += (dy/d)*6; }
+      });
+      spawnSpecialParticles(gx, gy, '#ffdd00', 22, 5, 0.9);
+      G.shakeX = (Math.random()-0.5)*10; G.shakeY = (Math.random()-0.5)*10; G.shakeT = 0.2;
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'windRecovery': {
+      blade.stamina = Math.min(blade.maxStamina, blade.stamina + 25);
+      spawnSpecialParticles(gx, gy, '#00ff66', 12, 2, 0.8);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'phantomDrive': {
+      blade.x = G.arenaX; blade.y = G.arenaY;
+      blade.vx *= 0.3; blade.vy *= 0.3;
+      blade.stamina = Math.min(blade.maxStamina, blade.stamina + 20);
+      spawnSpecialParticles(G.arenaX, G.arenaY, '#aabbff', 16, 3, 0.9);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'mirrorSpin': {
+      blade.specialTimer = 3;
+      blade.specialData.mirror = true;
+      spawnSpecialParticles(gx, gy, '#ff44cc', 10, 2, 0.8);
+      break;
+    }
+
+    case 'groundStomp': {
+      G.blades.forEach(b => { if (b !== blade && b.alive) b.wobble = Math.min(1, b.wobble + 0.25); });
+      G.shakeX = (Math.random()-0.5)*20; G.shakeY = (Math.random()-0.5)*20; G.shakeT = 0.3;
+      spawnSpecialParticles(gx, gy, '#ff4400', 20, 4, 0.9);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'venomMark': {
+      const vt = nearestAlive(blade);
+      if (vt) {
+        vt.specialData = vt.specialData || {};
+        vt.specialData.venomMark = 4;
+      }
+      spawnSpecialParticles(gx, gy, '#44ff44', 10, 2, 0.8);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'tectonicStance': {
+      blade.specialTimer = 3;
+      blade.specialData.frozen  = true;
+      blade.specialData.reflect = true;
+      blade.vx = 0; blade.vy = 0;
+      spawnSpecialParticles(gx, gy, '#bb7733', 14, 2, 1.0);
+      break;
+    }
+
+    case 'shellDefense': {
+      blade.stamina = Math.min(blade.maxStamina, blade.stamina + 30);
+      blade.specialTimer = 3;
+      blade.specialData.halfBurst = true;
+      spawnSpecialParticles(gx, gy, '#00ddbb', 12, 2, 0.9);
+      break;
+    }
+
+    case 'stormRide': {
+      const la = blade.lastAttacker;
+      if (la && la.alive) {
+        const dx = la.x - gx, dy = la.y - gy, d = Math.hypot(dx, dy) || 1;
+        blade.vx = (dx/d) * MAX_SPEED;
+        blade.vy = (dy/d) * MAX_SPEED;
+      } else {
+        // No attacker tracked: lunge at nearest
+        const near = nearestAlive(blade);
+        if (near) {
+          const dx = near.x - gx, dy = near.y - gy, d = Math.hypot(dx, dy) || 1;
+          blade.vx = (dx/d) * MAX_SPEED;
+          blade.vy = (dy/d) * MAX_SPEED;
+        }
+      }
+      spawnSpecialParticles(gx, gy, '#88aaff', 12, 4, 0.8);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'phoenixEmber': {
+      if (blade.stamina < blade.maxStamina * 0.5) {
+        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 25);
+        blade.specialTimer = 2;
+        blade.specialData.savedAtkMult = blade.attackMult;
+        blade.attackMult *= 1.3;
+      } else {
+        blade.specialActive = false;   // only fires when low stamina
+      }
+      spawnSpecialParticles(gx, gy, '#ffcc00', 16, 3, 1.0);
+      break;
+    }
+
+    case 'frozenField': {
+      blade.specialTimer = 3;
+      blade.specialData.frozenField = true;
+      spawnSpecialParticles(gx, gy, '#88ddff', 14, 2, 0.9);
+      break;
+    }
+
+    case 'darkPull': {
+      const dx = G.arenaX - gx, dy = G.arenaY - gy, d = Math.hypot(dx, dy) || 1;
+      blade.vx = (dx/d) * MAX_SPEED;
+      blade.vy = (dy/d) * MAX_SPEED;
+      spawnSpecialParticles(gx, gy, '#ff6600', 10, 4, 0.7);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'zeroGVoid': {
+      G.blades.forEach(b => {
+        if (b !== blade && b.alive) b.stamina = Math.max(0, b.stamina - 8);
+      });
+      blade.stamina = Math.min(blade.maxStamina, blade.stamina + 5);
+      spawnSpecialParticles(gx, gy, '#9900cc', 20, 3, 1.0);
+      blade.specialActive = false;
+      break;
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1348,6 +1655,13 @@ function tickAI(b, dt) {
   b.vy += (tdy / tl) * accel;
   const sp = Math.hypot(b.vx, b.vy);
   if (sp > speedCap) { b.vx *= speedCap / sp; b.vy *= speedCap / sp; }
+
+  // AI special: ~15% chance per 10 seconds (~0.0025% per frame at 60fps)
+  if (b.specialCooldown <= 0 && !b.specialActive && b.special) {
+    if (Math.random() < 0.0025 * dt * 60) {
+      activateSpecial(b);
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1375,6 +1689,14 @@ function update(dt) {
 
   if (G.boostCooldown > 0) G.boostCooldown = Math.max(0, G.boostCooldown - dt);
 
+  // Charge progress for player special
+  if (G.pressIsCharging) {
+    const player = G.blades.find(b => b.isPlayer && b.alive);
+    if (player && player.specialCooldown <= 0) {
+      player.chargeProgress = Math.min(1, player.chargeProgress + dt / SPECIAL_CHARGE_TIME);
+    }
+  }
+
   // Power clash slow-mo
   if (G.clashTimer > 0) {
     G.clashTimer -= dt;
@@ -1399,6 +1721,48 @@ function update(dt) {
     b.spinRate = Math.max(0, b.spinRate - dt * (0.25 + b.wobble * 3.5));
     b.angle   += b.spinRate * dt;
     if (b.flash > 0) b.flash -= dt;
+
+    // ── Special cooldown tick ──
+    if (b.specialCooldown > 0) b.specialCooldown = Math.max(0, b.specialCooldown - dt);
+    // ── Venom mark decay ──
+    if (b.specialData.venomMark > 0) b.specialData.venomMark -= dt;
+    // ── Chain bound (applied by HELLS CHAIN) ──
+    if (b.specialData.chainBound > 0) {
+      b.specialData.chainBound -= dt;
+      const cbSpd = Math.hypot(b.vx, b.vy);
+      const cbCap = MAX_SPEED * 0.4;
+      if (cbSpd > cbCap) { b.vx *= cbCap/cbSpd; b.vy *= cbCap/cbSpd; }
+    }
+    // ── Active special per-frame effects ──
+    if (b.specialActive && b.specialTimer > 0) {
+      b.specialTimer -= dt;
+      // Dragoon Vortex: pull nearby foes
+      if (b.specialData.vortex) {
+        G.blades.forEach(other => {
+          if (other === b || !other.alive) return;
+          const dvx = b.x - other.x, dvy = b.y - other.y;
+          const dd = Math.hypot(dvx, dvy);
+          if (dd < 130 && dd > 0) { other.vx += (dvx/dd)*1.8*dt*60; other.vy += (dvy/dd)*1.8*dt*60; }
+        });
+      }
+      // Frozen Field: slow nearby foes each frame
+      if (b.specialData.frozenField) {
+        G.blades.forEach(other => {
+          if (other === b || !other.alive) return;
+          if (Math.hypot(other.x - b.x, other.y - b.y) < 95) { other.vx *= 0.97; other.vy *= 0.97; }
+        });
+      }
+      // Tectonic Stance: keep frozen in place
+      if (b.specialData.frozen) { b.vx = 0; b.vy = 0; }
+      // Dran Rush: skip max-speed cap this frame (already boosted above MAX_SPEED)
+      if (b.specialData.frictionOverride) {
+        const rushSpd = Math.hypot(b.vx, b.vy);
+        if (rushSpd > 0 && rushSpd < MAX_SPEED * 1.8) { /* maintain momentum, don't clamp */ }
+      }
+      if (b.specialTimer <= 0) endSpecial(b);
+    } else if (b.specialActive) {
+      endSpecial(b);
+    }
 
     // Motion trail
     const spd = Math.hypot(b.vx, b.vy);
@@ -1653,6 +2017,50 @@ function drawBlade(b) {
     ctx.shadowBlur  = 5;
     ctx.shadowColor = b.glow;
     ctx.fillText('YOU', dx, dy + R + 16);
+    ctx.restore();
+  }
+
+  // ── Charge ring (fills clockwise as player holds) ──
+  if (b.chargeProgress > 0) {
+    ctx.save();
+    // Dim track ring
+    ctx.beginPath();
+    ctx.arc(dx, dy, R + 11, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    // Glowing charge arc
+    ctx.beginPath();
+    ctx.arc(dx, dy, R + 11, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * b.chargeProgress);
+    ctx.strokeStyle = b.glow;
+    ctx.lineWidth   = 4;
+    ctx.shadowBlur  = 14;
+    ctx.shadowColor = b.glow;
+    ctx.globalAlpha = 0.9;
+    ctx.stroke();
+    // Flash when fully charged
+    if (b.chargeProgress >= 1.0) {
+      const pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.015);
+      ctx.globalAlpha = 0.5 + 0.4 * pulse;
+      ctx.beginPath();
+      ctx.arc(dx, dy, R + 11, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ── Active special pulse ring ──
+  if (b.specialActive) {
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.012);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(dx, dy, R + 15, 0, Math.PI * 2);
+    ctx.strokeStyle = b.glow;
+    ctx.lineWidth   = 3;
+    ctx.shadowBlur  = 22;
+    ctx.shadowColor = b.glow;
+    ctx.globalAlpha = 0.35 + 0.45 * pulse;
+    ctx.stroke();
     ctx.restore();
   }
 }
@@ -2654,6 +3062,49 @@ function drawBoostIndicator() {
   ctx.restore();
 }
 
+function drawSpecialIndicator() {
+  if (G.state !== 'active') return;
+  const player = G.blades.find(b => b.isPlayer && b.alive);
+  if (!player || !player.special) return;
+
+  const R       = player.radius + 22;    // outer ring, outside the boost ring
+  const ready   = player.specialCooldown <= 0 && player.chargeProgress === 0;
+  const charging = player.chargeProgress > 0;
+  const onCooldown = player.specialCooldown > 0;
+
+  ctx.save();
+
+  // Dim track ring
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, R, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if (onCooldown && !charging) {
+    // Cooldown refill arc (dim color filling up)
+    const pct = 1 - player.specialCooldown / SPECIAL_COOLDOWN;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, R, -Math.PI / 2, -Math.PI / 2 + pct * Math.PI * 2);
+    ctx.strokeStyle = 'rgba(180,180,220,0.35)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  if (ready) {
+    // "SPECIAL" label
+    ctx.font        = `bold 7px 'Share Tech Mono', monospace`;
+    ctx.textAlign   = 'center';
+    ctx.fillStyle   = player.glow;
+    ctx.shadowBlur  = 8;
+    ctx.shadowColor = player.glow;
+    ctx.globalAlpha = 0.9;
+    ctx.fillText('HOLD', player.x, player.y + R + 10);
+  }
+
+  ctx.restore();
+}
+
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
@@ -2668,6 +3119,7 @@ function render() {
   drawLaunchPad(G.blades[0]);
   drawAimGuide();
   drawBoostIndicator();
+  drawSpecialIndicator();
   drawCountdown();
 
   // ── POWER CLASH overlay ──
@@ -2736,6 +3188,22 @@ function pos(e) {
   return { x: t.clientX - rc.left, y: t.clientY - rc.top };
 }
 
+function doBoost(player, p) {
+  const dx = p.x - player.x, dy = p.y - player.y;
+  const d  = Math.hypot(dx, dy) || 1;
+  player.vx += (dx / d) * BOOST_POWER;
+  player.vy += (dy / d) * BOOST_POWER;
+  const sp = Math.hypot(player.vx, player.vy);
+  if (sp > MAX_SPEED) { player.vx *= MAX_SPEED / sp; player.vy *= MAX_SPEED / sp; }
+  G.boostCooldown = BOOST_COOLDOWN;
+  for (let i = 0; i < 12; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = 70 + Math.random() * 110;
+    G.parts.push(new Particle(player.x, player.y, player.color,
+      Math.cos(a)*s, Math.sin(a)*s, 1.8, 0.18 + Math.random()*0.22));
+  }
+}
+
 function onDown(e) {
   if (G.state === 'ready') {
     const player = G.blades[0];
@@ -2747,29 +3215,37 @@ function onDown(e) {
     }
   } else if (G.state === 'active') {
     const player = G.blades.find(b => b.isPlayer && b.alive);
-    if (!player || G.boostCooldown > 0) return;
-    const p  = pos(e);
-    const dx = p.x - player.x, dy = p.y - player.y;
-    const d  = Math.hypot(dx, dy) || 1;
-    player.vx += (dx / d) * BOOST_POWER;
-    player.vy += (dy / d) * BOOST_POWER;
-    const sp = Math.hypot(player.vx, player.vy);
-    if (sp > MAX_SPEED) { player.vx *= MAX_SPEED / sp; player.vy *= MAX_SPEED / sp; }
-    G.boostCooldown = BOOST_COOLDOWN;
-    for (let i = 0; i < 12; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const s = 70 + Math.random() * 110;
-      G.parts.push(new Particle(player.x, player.y, player.color,
-        Math.cos(a)*s, Math.sin(a)*s, 1.8, 0.18 + Math.random()*0.22));
-    }
+    if (!player) return;
+    // Begin tracking for charge (used in update loop)
+    G.pressIsCharging = true;
+    G.boostTapPos = pos(e);   // store tap position for boost on quick release
   }
 }
 function onMove(e) {
+  if (G.state === 'active') {
+    G.boostTapPos = pos(e);   // update target direction while held
+  }
   if (!G.aiming) return;
   const p = pos(e);
   G.aimX = p.x; G.aimY = p.y;
 }
 function onUp(e) {
+  if (G.state === 'active') {
+    const player = G.blades.find(b => b.isPlayer && b.alive);
+    G.pressIsCharging = false;
+    if (player) {
+      if (player.chargeProgress >= 1.0 && player.specialCooldown <= 0) {
+        // Long hold — fire special
+        activateSpecial(player);
+      } else if (G.boostCooldown <= 0) {
+        // Short tap — boost in tapped direction
+        const tapPos = G.boostTapPos || pos(e);
+        doBoost(player, tapPos);
+      }
+      player.chargeProgress = 0;
+    }
+    return;
+  }
   if (!G.aiming) return;
   G.aiming = false;
   const player = G.blades[0];
