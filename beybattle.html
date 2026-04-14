@@ -889,6 +889,12 @@ const CONFIGS = [
     desc:'The Eternal Phantom. Ball Driver spins without end — beyond gravity, beyond burst, beyond time itself. No force in existence can stop it. The greatest Beyblade ever forged.',
     atkR:9, defR:13, staR:15, spdR:10, bstR:15, tier:'TRANSCENDENT',
     special:{ name:'Phantom Orbit', desc:'Restore 50 stamina & immune to drain (5s)', effect:'phantomOrbit' } },
+
+  { name:'BIG BANG PEGASIS F:D', type:'ATTACK', color:'#1a4acc', glow:'#88ccff', blades:4, shape:'pegasis',
+    maxStamina:200, mass:2.05, defense:0.22, attackMult:2.20, burstResist:0.95, personality:'aggressive',
+    desc:'The Final Evolution of Pegasus. The F:D Final Drive tip switches between raw speed and unstoppable momentum — shattering gods and destroyers alike. Born from the hope of every Blader, it transcends every limit ever known.',
+    atkR:15, defR:5, staR:10, spdR:14, bstR:8, tier:'TRANSCENDENT',
+    special:{ name:'Final Drive', desc:'Slam all foes & double attack power (4s)', effect:'finalDrive' } },
 ];
 
 // ── ARENAS ──
@@ -1619,6 +1625,44 @@ function activateSpecial(blade) {
       spawnSpecialParticles(gx, gy, '#66aaff', 18, 3, 1.1);
       break;
     }
+
+    case 'finalDrive': {
+      // Slam all living opponents: deal massive stamina damage + knockback
+      const foes = G.blades.filter(b => b !== blade && b.alive);
+      foes.forEach(foe => {
+        const dx = foe.x - gx, dy = foe.y - gy, d = Math.hypot(dx, dy) || 1;
+        foe.stamina = Math.max(0, foe.stamina - 40);
+        foe.wobble  = Math.min(1, foe.wobble + 0.50);
+        foe.vx += (dx / d) * 14;
+        foe.vy += (dy / d) * 14;
+        spawnSpecialParticles(foe.x, foe.y, '#ffffff', 10, 3, 0.8);
+      });
+      // Boost toward nearest foe at hyper speed
+      const nearest = nearestAlive(blade);
+      if (nearest) {
+        const dx = nearest.x - gx, dy = nearest.y - gy, d = Math.hypot(dx, dy) || 1;
+        blade.vx = (dx / d) * MAX_SPEED * 1.6;
+        blade.vy = (dy / d) * MAX_SPEED * 1.6;
+      }
+      // Double attack multiplier for 4 seconds
+      blade.specialTimer = 4;
+      blade.specialData.savedAtkMult = blade.attackMult;
+      blade.attackMult *= 2.0;
+      // Big Bang burst: radial shockwave of blue-white particles
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 10) {
+        const r = 30 + Math.random() * 30;
+        G.parts.push(new Particle(
+          gx + Math.cos(a) * r, gy + Math.sin(a) * r,
+          Math.random() < 0.5 ? '#ffffff' : '#66aaff',
+          Math.cos(a) * (50 + Math.random() * 40),
+          Math.sin(a) * (50 + Math.random() * 40),
+          2 + Math.random() * 2.5, 0.85 + Math.random() * 0.4
+        ));
+      }
+      spawnSpecialParticles(gx, gy, '#aaddff', 24, 5, 1.2);
+      G.shakeX = (Math.random() - 0.5) * 22; G.shakeY = (Math.random() - 0.5) * 22; G.shakeT = 0.45;
+      break;
+    }
   }
 }
 
@@ -2030,6 +2074,7 @@ function drawBlade(b) {
     else if (b.shape === 'kerbecs') drawKerbecsBlade(R);
     else if (b.shape === 'nemesis') drawNemesisBlade(R);
     else if (b.shape === 'orion')   drawOrionBlade(R);
+    else if (b.shape === 'pegasis') drawPegasisBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -2045,6 +2090,7 @@ function drawBlade(b) {
   else if (b.shape === 'kerbecs') { drawKerbecsHub(R); }
   else if (b.shape === 'nemesis') { drawNemesisHub(R); }
   else if (b.shape === 'orion')   { drawOrionHub(R); }
+  else if (b.shape === 'pegasis') { drawPegasisHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -2859,6 +2905,109 @@ function drawOrionHub(R) {
   ctx.beginPath(); ctx.arc(0, 0, R * 0.072, 0, Math.PI * 2); ctx.fill();
 }
 
+function drawPegasisBlade(R) {
+  // Big Bang Pegasis F:D — swept forward-attack wing with sharp leading edge
+  ctx.beginPath();
+  ctx.moveTo(R * 0.04, -R * 0.16);
+  ctx.bezierCurveTo(R * 0.12, -R * 0.52, R * 0.56, -R * 0.88, R * 1.10, -R * 0.76);
+  ctx.bezierCurveTo(R * 1.48, -R * 0.64, R * 1.62, -R * 0.28, R * 1.54,  R * 0.04);
+  ctx.bezierCurveTo(R * 1.44,  R * 0.32, R * 1.10,  R * 0.46, R * 0.78,  R * 0.44);
+  ctx.bezierCurveTo(R * 0.44,  R * 0.40, R * 0.14,  R * 0.24, R * 0.04,  R * 0.16);
+  ctx.closePath();
+  const bg = ctx.createLinearGradient(0, -R * 0.85, R * 1.55, R * 0.45);
+  bg.addColorStop(0,    '#ddeeff');
+  bg.addColorStop(0.18, '#88bbee');
+  bg.addColorStop(0.50, '#2255cc');
+  bg.addColorStop(0.78, '#112299');
+  bg.addColorStop(1,    '#060e40');
+  ctx.fillStyle   = bg;
+  ctx.shadowBlur  = 26; ctx.shadowColor = '#66aaff';
+  ctx.fill();
+  // Bright leading-edge highlight
+  ctx.beginPath();
+  ctx.moveTo(R * 0.10, -R * 0.22);
+  ctx.bezierCurveTo(R * 0.22, -R * 0.56, R * 0.60, -R * 0.84, R * 1.10, -R * 0.76);
+  ctx.strokeStyle = 'rgba(200,230,255,0.90)';
+  ctx.lineWidth   = 2.2;
+  ctx.shadowBlur  = 12; ctx.shadowColor = '#aaddff';
+  ctx.stroke();
+  // Red accent stripe — speed motif
+  ctx.beginPath();
+  ctx.moveTo(R * 0.30, -R * 0.30);
+  ctx.bezierCurveTo(R * 0.60, -R * 0.46, R * 0.96, -R * 0.44, R * 1.22, -R * 0.28);
+  ctx.strokeStyle = 'rgba(255,60,60,0.75)';
+  ctx.lineWidth   = 1.6; ctx.shadowBlur = 8; ctx.shadowColor = '#ff4444';
+  ctx.stroke();
+  // Silver trailing edge
+  ctx.beginPath();
+  ctx.moveTo(R * 0.78, R * 0.44);
+  ctx.bezierCurveTo(R * 1.10, R * 0.46, R * 1.44, R * 0.32, R * 1.54, R * 0.04);
+  ctx.strokeStyle = 'rgba(160,200,255,0.55)';
+  ctx.lineWidth   = 1.0; ctx.shadowBlur = 4; ctx.shadowColor = '#88aaff';
+  ctx.stroke();
+  // Bright speed pip
+  ctx.fillStyle  = 'rgba(255,255,255,0.88)';
+  ctx.shadowBlur = 12; ctx.shadowColor = '#aaddff';
+  ctx.beginPath(); ctx.arc(R * 0.82, -R * 0.38, R * 0.042, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawPegasisHub(R) {
+  // Outer silver-blue ring
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, Math.PI * 2);
+  const or = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.62);
+  or.addColorStop(0,   '#eef6ff');
+  or.addColorStop(0.3, '#99cce8');
+  or.addColorStop(0.7, '#2255aa');
+  or.addColorStop(1,   '#060e36');
+  ctx.fillStyle = or;
+  ctx.shadowBlur = 30; ctx.shadowColor = '#66aaff';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(180,220,255,0.92)';
+  ctx.lineWidth   = 2.0;
+  ctx.shadowBlur  = 14; ctx.shadowColor = '#aaccff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.60, 0, Math.PI * 2); ctx.stroke();
+  // F:D Final Drive tip — spherical with a chrome ring
+  const fd = ctx.createRadialGradient(-R * 0.12, -R * 0.14, 0, R * 0.02, R * 0.02, R * 0.36);
+  fd.addColorStop(0,    '#ffffff');
+  fd.addColorStop(0.15, '#cce4ff');
+  fd.addColorStop(0.50, '#4477cc');
+  fd.addColorStop(0.82, '#1a3080');
+  fd.addColorStop(1,    '#060d28');
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.36, 0, Math.PI * 2);
+  ctx.fillStyle = fd;
+  ctx.shadowBlur = 18; ctx.shadowColor = '#88bbff';
+  ctx.fill();
+  // Chrome ring around F:D tip
+  ctx.strokeStyle = 'rgba(200,228,255,0.80)';
+  ctx.lineWidth   = 1.6; ctx.shadowBlur = 8; ctx.shadowColor = '#ccddff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.36, 0, Math.PI * 2); ctx.stroke();
+  // Pegasus wing emblem — two curved wing arcs
+  ctx.save();
+  ctx.shadowBlur  = 8; ctx.shadowColor = '#aaddff';
+  ctx.strokeStyle = 'rgba(220,240,255,0.85)';
+  ctx.lineWidth   = 1.4;
+  // Left wing
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.02, -R * 0.06);
+  ctx.bezierCurveTo(-R * 0.16, -R * 0.20, -R * 0.26, -R * 0.10, -R * 0.22, R * 0.04);
+  ctx.stroke();
+  // Right wing
+  ctx.beginPath();
+  ctx.moveTo( R * 0.02, -R * 0.06);
+  ctx.bezierCurveTo( R * 0.16, -R * 0.20,  R * 0.26, -R * 0.10,  R * 0.22, R * 0.04);
+  ctx.stroke();
+  ctx.restore();
+  // Centre brilliant pip
+  ctx.fillStyle  = '#ffffff';
+  ctx.shadowBlur = 22; ctx.shadowColor = '#aaddff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.068, 0, Math.PI * 2); ctx.fill();
+  // F:D lettering dots (two tiny accent pips)
+  ctx.fillStyle  = 'rgba(255,255,255,0.65)';
+  ctx.shadowBlur = 6; ctx.shadowColor = '#88aaff';
+  ctx.beginPath(); ctx.arc(-R * 0.20, R * 0.18, R * 0.028, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc( R * 0.20, R * 0.18, R * 0.028, 0, Math.PI * 2); ctx.fill();
+}
+
 function drawHellsBlade(R) {
   // Dark purple-black rounded heavy blade
   ctx.beginPath();
@@ -3454,6 +3603,7 @@ function drawBladeToCanvas(cfg, previewCanvas) {
     else if (cfg.shape === 'kerbecs') drawKerbecsBlade(R);
     else if (cfg.shape === 'nemesis') drawNemesisBlade(R);
     else if (cfg.shape === 'orion')   drawOrionBlade(R);
+    else if (cfg.shape === 'pegasis') drawPegasisBlade(R);
     else drawBladeShape(cfg.shape, R, cfg.color);
     ctx.restore();
   }
@@ -3468,6 +3618,7 @@ function drawBladeToCanvas(cfg, previewCanvas) {
   else if (cfg.shape === 'kerbecs') drawKerbecsHub(R);
   else if (cfg.shape === 'nemesis') drawNemesisHub(R);
   else if (cfg.shape === 'orion')   drawOrionHub(R);
+  else if (cfg.shape === 'pegasis') drawPegasisHub(R);
   else {
     const hub = ctx.createRadialGradient(-R*0.18, -R*0.18, 0, 0, 0, R*0.58);
     hub.addColorStop(0,    '#ffffff');
