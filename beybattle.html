@@ -388,6 +388,32 @@
     animation: mythicalShimmer 2.4s linear infinite;
   }
 
+  @keyframes transcendentShimmer {
+    0%   { color: #ffffff; text-shadow: 0 0 14px #ffffffff, 0 0 28px #88bbff88; }
+    25%  { color: #aaddff; text-shadow: 0 0 14px #aaddffcc, 0 0 28px #aaddff88; }
+    50%  { color: #ffffff; text-shadow: 0 0 20px #ffffffff, 0 0 40px #66aaffaa; }
+    75%  { color: #cce8ff; text-shadow: 0 0 14px #cce8ffcc, 0 0 28px #cce8ff88; }
+    100% { color: #ffffff; text-shadow: 0 0 14px #ffffffff, 0 0 28px #88bbff88; }
+  }
+
+  .tier-transcendent {
+    animation: transcendentShimmer 1.8s ease-in-out infinite;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+  }
+
+  .stat-fill-overflow {
+    background: linear-gradient(90deg, #66aaff, #aaddff, #ffffff, #aaddff, #66aaff) !important;
+    background-size: 200% 100% !important;
+    animation: overflowPulse 1.4s linear infinite !important;
+    box-shadow: 0 0 10px #aaddffcc !important;
+  }
+
+  @keyframes overflowPulse {
+    0%   { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+  }
+
   .stat-row {
     display: flex;
     align-items: center;
@@ -847,9 +873,9 @@ const CONFIGS = [
     special:{ name:'Frozen Field', desc:'Slow all nearby foes for 3s', effect:'frozenField' } },
 
   { name:'HELL KERBECS',  type:'BALANCE', color:'#cc8800', glow:'#ff6600', blades:4, shape:'nemesis',
-    maxStamina:160, mass:1.88, defense:0.58, attackMult:1.38, burstResist:0.82, personality:'aggressive',
-    desc:'Tri-pronged shadow blades in deep violet and gold. Three heads of Cerberus forged into one unstoppable force.',
-    atkR:9, defR:9, staR:9, spdR:8, bstR:8, tier:'MYTHICAL',
+    maxStamina:175, mass:1.96, defense:0.38, attackMult:1.65, burstResist:0.93, personality:'aggressive',
+    desc:'Tri-pronged shadow blades in deep violet and gold. Three heads of Cerberus forged into one unstoppable force. Cerberus does not fall.',
+    atkR:10, defR:10, staR:10, spdR:8, bstR:9, tier:'MYTHICAL',
     special:{ name:'Dark Pull', desc:'Rush back to center at full speed', effect:'darkPull' } },
 
   { name:'DIABLO NEMESIS', type:'BALANCE', color:'#555566', glow:'#9900cc', blades:4, shape:'kerbecs',
@@ -857,6 +883,12 @@ const CONFIGS = [
     desc:'The God of Destruction. Forged from the power of every Beyblade ever created — unmatched attack, impenetrable defense, infinite endurance. It cannot be burst.',
     atkR:10, defR:10, staR:10, spdR:10, bstR:10, tier:'MYTHICAL',
     special:{ name:'Zero-G Void', desc:'Drain 8 stamina from all foes', effect:'zeroGVoid' } },
+
+  { name:'PHANTOM ORION', type:'STAMINA', color:'#c8d8f0', glow:'#66aaff', blades:5, shape:'orion',
+    maxStamina:230, mass:2.15, defense:0.18, attackMult:1.90, burstResist:1.00, personality:'passive',
+    desc:'The Eternal Phantom. Ball Driver spins without end — beyond gravity, beyond burst, beyond time itself. No force in existence can stop it. The greatest Beyblade ever forged.',
+    atkR:9, defR:13, staR:15, spdR:10, bstR:15, tier:'TRANSCENDENT',
+    special:{ name:'Phantom Orbit', desc:'Restore 50 stamina & immune to drain (5s)', effect:'phantomOrbit' } },
 ];
 
 // ── ARENAS ──
@@ -1198,7 +1230,7 @@ function wallCheck(b, arena) {
   }
 
   const frac = dist / G.arenaRCurrent;
-  if (frac > EDGE_START) {
+  if (frac > EDGE_START && !(b.specialData && b.specialData.immuneDrain)) {
     b.stamina -= eDrain * ((frac - EDGE_START) / (1 - EDGE_START)) * 2.2;
   }
 }
@@ -1570,6 +1602,23 @@ function activateSpecial(blade) {
       blade.specialActive = false;
       break;
     }
+
+    case 'phantomOrbit': {
+      blade.stamina = Math.min(blade.maxStamina, blade.stamina + 50);
+      blade.specialTimer = 5;
+      blade.specialData.immuneDrain = true;
+      // Spawn a wide orbital ring of particles
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 12) {
+        const r = 55 + Math.random() * 25;
+        G.parts.push(new Particle(gx + Math.cos(a) * r, gy + Math.sin(a) * r,
+          Math.random() < 0.5 ? '#aaddff' : '#ffffff',
+          Math.cos(a + Math.PI * 0.5) * (20 + Math.random() * 30),
+          Math.sin(a + Math.PI * 0.5) * (20 + Math.random() * 30),
+          1.5 + Math.random() * 2, 0.7 + Math.random() * 0.5));
+      }
+      spawnSpecialParticles(gx, gy, '#66aaff', 18, 3, 1.1);
+      break;
+    }
   }
 }
 
@@ -1758,6 +1807,10 @@ function update(dt) {
       if (b.specialData.frictionOverride) {
         const rushSpd = Math.hypot(b.vx, b.vy);
         if (rushSpd > 0 && rushSpd < MAX_SPEED * 1.8) { /* maintain momentum, don't clamp */ }
+      }
+      // Phantom Orbit: slowly recover stamina while immune to drain
+      if (b.specialData.immuneDrain) {
+        b.stamina = Math.min(b.maxStamina, b.stamina + dt * 3.5);
       }
       if (b.specialTimer <= 0) endSpecial(b);
     } else if (b.specialActive) {
@@ -1976,6 +2029,7 @@ function drawBlade(b) {
     else if (b.shape === 'knight')  drawKnightBlade(R);
     else if (b.shape === 'kerbecs') drawKerbecsBlade(R);
     else if (b.shape === 'nemesis') drawNemesisBlade(R);
+    else if (b.shape === 'orion')   drawOrionBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -1990,6 +2044,7 @@ function drawBlade(b) {
   else if (b.shape === 'knight')  { drawKnightHub(R); }
   else if (b.shape === 'kerbecs') { drawKerbecsHub(R); }
   else if (b.shape === 'nemesis') { drawNemesisHub(R); }
+  else if (b.shape === 'orion')   { drawOrionHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -2720,6 +2775,90 @@ function drawNemesisHub(R) {
   ctx.beginPath(); ctx.arc(0, 0, R * 0.09, 0, Math.PI * 2); ctx.fill();
 }
 
+// ── PHANTOM ORION B:D: wide orbital disc, cosmic silver-blue, Ball Driver hub ──
+function drawOrionBlade(R) {
+  // Wide sweeping orbital wing — smooth, massive, effortless
+  ctx.beginPath();
+  ctx.moveTo(R * 0.06, -R * 0.20);
+  ctx.bezierCurveTo(R * 0.18, -R * 0.58, R * 0.68, -R * 0.90, R * 1.22, -R * 0.56);
+  ctx.bezierCurveTo(R * 1.52, -R * 0.30, R * 1.50,  R * 0.08, R * 1.16,  R * 0.32);
+  ctx.bezierCurveTo(R * 0.78,  R * 0.58, R * 0.20,  R * 0.42, R * 0.06,  R * 0.20);
+  ctx.closePath();
+  const bg = ctx.createLinearGradient(0, -R * 0.8, R * 1.2, R * 0.4);
+  bg.addColorStop(0,   '#eef5ff');
+  bg.addColorStop(0.25,'#a8c8ee');
+  bg.addColorStop(0.6, '#4a80cc');
+  bg.addColorStop(1,   '#1a2e58');
+  ctx.fillStyle = bg;
+  ctx.shadowBlur = 24; ctx.shadowColor = '#66aaff';
+  ctx.fill();
+  // Silver edge
+  ctx.strokeStyle = 'rgba(200,228,255,0.85)';
+  ctx.lineWidth   = 1.4;
+  ctx.shadowBlur  = 8; ctx.shadowColor = '#aaddff';
+  ctx.stroke();
+  // Inner orbital groove line
+  ctx.beginPath();
+  ctx.moveTo(R * 0.14, -R * 0.24);
+  ctx.bezierCurveTo(R * 0.32, -R * 0.54, R * 0.72, -R * 0.74, R * 1.02, -R * 0.44);
+  ctx.bezierCurveTo(R * 1.24, -R * 0.20, R * 1.12,  R * 0.10, R * 0.90,  R * 0.20);
+  ctx.strokeStyle = 'rgba(160,200,255,0.50)';
+  ctx.lineWidth   = 0.9; ctx.shadowBlur = 4; ctx.shadowColor = '#88bbff';
+  ctx.stroke();
+  // Star accent pip on blade
+  ctx.fillStyle   = 'rgba(255,255,255,0.72)';
+  ctx.shadowBlur  = 10; ctx.shadowColor = '#aaddff';
+  ctx.beginPath(); ctx.arc(R * 0.72, -R * 0.44, R * 0.045, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawOrionHub(R) {
+  // Outer cosmic silver ring
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.64, 0, Math.PI * 2);
+  const or = ctx.createRadialGradient(-R * 0.16, -R * 0.16, 0, 0, 0, R * 0.64);
+  or.addColorStop(0,   '#f2f8ff');
+  or.addColorStop(0.3, '#b8d4f0');
+  or.addColorStop(0.7, '#5888c0');
+  or.addColorStop(1,   '#1a2e50');
+  ctx.fillStyle = or;
+  ctx.shadowBlur = 28; ctx.shadowColor = '#88bbff';
+  ctx.fill();
+  // Bright chrome border ring
+  ctx.strokeStyle = 'rgba(220,240,255,0.90)';
+  ctx.lineWidth   = 1.8;
+  ctx.shadowBlur  = 14; ctx.shadowColor = '#aaccff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.62, 0, Math.PI * 2); ctx.stroke();
+  // Ball Driver (B:D) — the spherical tip that lets it spin forever
+  const ballGrad = ctx.createRadialGradient(-R * 0.13, -R * 0.16, 0, R * 0.04, R * 0.04, R * 0.38);
+  ballGrad.addColorStop(0,    '#ffffff');
+  ballGrad.addColorStop(0.12, '#e0eeff');
+  ballGrad.addColorStop(0.45, '#8ab0e0');
+  ballGrad.addColorStop(0.80, '#2a4880');
+  ballGrad.addColorStop(1,    '#080e20');
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.38, 0, Math.PI * 2);
+  ctx.fillStyle = ballGrad;
+  ctx.shadowBlur = 20; ctx.shadowColor = '#aaddff';
+  ctx.fill();
+  // Ball Driver specular highlight arc
+  ctx.strokeStyle = 'rgba(220,240,255,0.65)';
+  ctx.lineWidth   = 1.2; ctx.shadowBlur = 5; ctx.shadowColor = '#ccddff';
+  ctx.beginPath();
+  ctx.arc(-R * 0.06, -R * 0.09, R * 0.24, Math.PI * 1.05, Math.PI * 1.75);
+  ctx.stroke();
+  // Orion constellation — 5 orbital star pips
+  const starAngles = [0, Math.PI * 0.4, Math.PI * 0.8, Math.PI * 1.2, Math.PI * 1.6];
+  ctx.shadowBlur  = 10; ctx.shadowColor = '#88aaff';
+  starAngles.forEach((a, idx) => {
+    ctx.fillStyle = idx === 0 ? '#ffffff' : '#aaccff';
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * R * 0.24, Math.sin(a) * R * 0.24, R * (idx === 0 ? 0.042 : 0.030), 0, Math.PI * 2);
+    ctx.fill();
+  });
+  // Brilliant center pip
+  ctx.fillStyle   = '#ffffff';
+  ctx.shadowBlur  = 20; ctx.shadowColor = '#aaddff';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.072, 0, Math.PI * 2); ctx.fill();
+}
+
 function drawHellsBlade(R) {
   // Dark purple-black rounded heavy blade
   ctx.beginPath();
@@ -3312,6 +3451,9 @@ function drawBladeToCanvas(cfg, previewCanvas) {
     else if (cfg.shape === 'saber')   drawSaberBlade(R);
     else if (cfg.shape === 'hells')   drawHellsBlade(R);
     else if (cfg.shape === 'knight')  drawKnightBlade(R);
+    else if (cfg.shape === 'kerbecs') drawKerbecsBlade(R);
+    else if (cfg.shape === 'nemesis') drawNemesisBlade(R);
+    else if (cfg.shape === 'orion')   drawOrionBlade(R);
     else drawBladeShape(cfg.shape, R, cfg.color);
     ctx.restore();
   }
@@ -3323,6 +3465,9 @@ function drawBladeToCanvas(cfg, previewCanvas) {
   else if (cfg.shape === 'saber')   drawSaberHub(R);
   else if (cfg.shape === 'hells')   drawHellsHub(R);
   else if (cfg.shape === 'knight')  drawKnightHub(R);
+  else if (cfg.shape === 'kerbecs') drawKerbecsHub(R);
+  else if (cfg.shape === 'nemesis') drawNemesisHub(R);
+  else if (cfg.shape === 'orion')   drawOrionHub(R);
   else {
     const hub = ctx.createRadialGradient(-R*0.18, -R*0.18, 0, 0, 0, R*0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -3345,13 +3490,14 @@ function drawBladeToCanvas(cfg, previewCanvas) {
 // ── CHARACTER SELECT SCREEN ──
 const TYPE_COLORS = { ATTACK:'#ff4422', DEFENSE:'#4488ff', STAMINA:'#00ff88', BALANCE:'#ffcc00' };
 const TIER_COLORS = {
-  NOVICE:     '#778899',
-  APPRENTICE: '#33cc66',
-  ADVANCED:   '#3399ff',
-  ELITE:      '#9944ff',
-  CHAMPION:   '#ffbb00',
-  LEGENDARY:  '#ff3311',
-  MYTHICAL:   '#ff88ff',
+  NOVICE:        '#778899',
+  APPRENTICE:    '#33cc66',
+  ADVANCED:      '#3399ff',
+  ELITE:         '#9944ff',
+  CHAMPION:      '#ffbb00',
+  LEGENDARY:     '#ff3311',
+  MYTHICAL:      '#ff88ff',
+  TRANSCENDENT:  '#ffffff',
 };
 const STAT_KEYS   = ['atkR','defR','staR','spdR','bstR'];
 const STAT_LABELS = ['ATK','DEF','STA','SPD','BST'];
@@ -3371,16 +3517,24 @@ function buildSelectScreen() {
       card.style.boxShadow   = `0 0 14px ${cfg.color}55`;
     }
 
-    const statBars = STAT_KEYS.map((k, si) => `
+    const statBars = STAT_KEYS.map((k, si) => {
+      const val = cfg[k];
+      const overMax = val > 10;
+      const w = overMax ? 100 : val * 10;
+      const fillClass = overMax ? ' stat-fill-overflow' : '';
+      const fillStyle = overMax ? '' : `background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88`;
+      const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
+      return `
       <div class="stat-row">
-        <div class="stat-label">${STAT_LABELS[si]}</div>
+        <div class="stat-label">${STAT_LABELS[si]}${valLabel}</div>
         <div class="stat-track">
-          <div class="stat-fill" style="width:${cfg[k]*10}%;background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88"></div>
+          <div class="stat-fill${fillClass}" style="width:${w}%;${fillStyle}"></div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : '';
+    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : '';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
       <div class="char-card-name" style="color:${cfg.color}">${cfg.name}</div>
@@ -3418,7 +3572,7 @@ function selectChar(i, rebuild = true) {
   const tierEl = document.getElementById('detail-tier');
   tierEl.textContent = cfg.tier;
   tierEl.style.color = tierColor;
-  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : '';
+  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : cfg.tier === 'TRANSCENDENT' ? 'tier-transcendent' : '';
   document.getElementById('detail-desc').textContent  = cfg.desc;
 
   document.getElementById('detail-stats').innerHTML = STAT_KEYS.map((k, si) => `
@@ -3503,13 +3657,21 @@ function buildOpponentsScreen() {
       card.style.borderColor = '#1a1f2e';
     }
 
-    const statBars = STAT_KEYS.map((k, si) => `
+    const statBars = STAT_KEYS.map((k, si) => {
+      const val = cfg[k];
+      const overMax = val > 10;
+      const w = overMax ? 100 : val * 10;
+      const fillClass = overMax ? ' stat-fill-overflow' : '';
+      const fillStyle = overMax ? '' : `background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88`;
+      const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
+      return `
       <div class="stat-row">
-        <div class="stat-label">${STAT_LABELS[si]}</div>
+        <div class="stat-label">${STAT_LABELS[si]}${valLabel}</div>
         <div class="stat-track">
-          <div class="stat-fill" style="width:${cfg[k]*10}%;background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88"></div>
+          <div class="stat-fill${fillClass}" style="width:${w}%;${fillStyle}"></div>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
