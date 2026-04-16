@@ -1,0 +1,596 @@
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    overflow: hidden;
+    font-family: 'Orbitron', monospace;
+    user-select: none;
+    cursor: default;
+  }
+
+  @media (max-width: 600px) {
+    body { overflow-y: auto; }
+  }
+
+  canvas { display: block; cursor: crosshair; }
+
+  /* ── HUD ── */
+  #hud {
+    position: fixed;
+    top: 18px;
+    left: 0; right: 0;
+    display: none;
+    justify-content: center;
+    gap: 16px;
+    pointer-events: none;
+    z-index: 5;
+    flex-wrap: wrap;
+    padding: 0 12px;
+  }
+
+  .stamina-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .stamina-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    opacity: 0.9;
+  }
+
+  .stamina-track {
+    width: 84px;
+    height: 5px;
+    background: #0a0a0a;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #1a1a1a;
+  }
+
+  .stamina-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.08s linear;
+  }
+
+  /* ── OVERLAY ── */
+  #overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 20;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 600px) {
+    #overlay {
+      align-items: flex-start;
+      padding: 16px 0;
+    }
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    pointer-events: all;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .screen.active { display: flex; }
+
+  h1 {
+    font-size: clamp(32px, 9vw, 110px);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    line-height: 1;
+    text-shadow:
+      0 0 30px #00d4ff,
+      0 0 70px #00d4ff55,
+      0 0 140px #00d4ff22;
+    animation: titlePulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 0 30px #00d4ff, 0 0 70px #00d4ff55; }
+    50%       { text-shadow: 0 0 50px #00d4ff, 0 0 100px #00d4ff77, 0 0 200px #00d4ff22; }
+  }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    color: #556;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    padding: 15px 52px;
+    background: transparent;
+    border: 2px solid #00d4ff;
+    color: #00d4ff;
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.2s;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #00d4ff;
+    transform: translateX(-101%);
+    transition: transform 0.22s ease;
+    z-index: -1;
+  }
+
+  .btn:hover::before { transform: translateX(0); }
+  .btn:hover { color: #000; }
+
+  .result-title {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .win  { color: #00ff88; text-shadow: 0 0 40px #00ff88, 0 0 80px #00ff8833; }
+  .lose { color: #ff3030; text-shadow: 0 0 40px #ff3030, 0 0 80px #ff303033; }
+  .draw { color: #ffcc00; text-shadow: 0 0 40px #ffcc00, 0 0 80px #ffcc0033; }
+
+  /* ── LAUNCH HINT ── */
+  #launch-hint {
+    position: fixed;
+    bottom: 52px;
+    left: 50%; transform: translateX(-50%);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #334;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+    animation: hint 1.8s ease-in-out infinite;
+  }
+
+  @keyframes hint {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 0.85; }
+  }
+
+  /* ── CHARACTER SELECT ── */
+  #screen-select {
+    width: 100%;
+    max-width: 980px;
+    padding: 12px 16px 20px;
+  }
+
+  #screen-select h2 {
+    font-size: clamp(16px, 3vw, 28px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #fff;
+    text-shadow: 0 0 20px #00d4ff;
+    margin-bottom: 14px;
+  }
+
+  #char-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 600px) {
+    #char-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ── OPPONENT SELECT ── */
+  #screen-opponents {
+    width: 100%;
+    max-width: 980px;
+    padding: 12px 16px 20px;
+  }
+  #screen-opponents h2 {
+    font-size: clamp(16px, 3vw, 28px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #fff;
+    text-shadow: 0 0 20px #ff4422;
+    margin-bottom: 6px;
+  }
+  #opp-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 600px) {
+    #opp-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .opp-card.selected-opp {
+    transform: translateY(-3px);
+  }
+  .opp-card.disabled-opp {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* ── ARENA SELECT ── */
+  #screen-arena {
+    width: 100%;
+    max-width: 820px;
+    padding: 12px 16px 20px;
+  }
+  #screen-arena h2 {
+    font-size: clamp(16px, 3vw, 26px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #fff;
+    text-shadow: 0 0 20px #00d4ff;
+    margin-bottom: 14px;
+  }
+  #arena-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 600px) {
+    #arena-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .arena-card {
+    background: #05080f;
+    border: 1.5px solid #1a1f2e;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+    position: relative;
+  }
+  .arena-card:hover { transform: translateY(-2px); }
+  .arena-card.selected { transform: translateY(-3px); }
+  .arena-card canvas { display: block; width: 100%; height: 80px; }
+  .arena-card-body { padding: 7px 8px 9px; }
+  .arena-card-name {
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 1px; color: #fff;
+    margin-bottom: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .arena-card-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px; letter-spacing: 1px; color: #445;
+    margin-bottom: 6px;
+  }
+  .arena-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px; letter-spacing: 2px;
+    padding: 1px 5px; border-radius: 2px; display: inline-block;
+  }
+  #arena-detail {
+    background: #05080f; border: 1px solid #1a1f2e;
+    border-radius: 6px; padding: 12px 18px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 16px; min-height: 54px;
+  }
+  #arena-detail-name {
+    font-size: clamp(12px, 2vw, 18px); font-weight: 900;
+    letter-spacing: 3px; color: #fff;
+  }
+  #arena-detail-desc {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; color: #445; margin-top: 4px; letter-spacing: 1px;
+  }
+
+  .char-card {
+    background: #05080f;
+    border: 1.5px solid #1a1f2e;
+    border-radius: 6px;
+    padding: 10px 8px 9px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .char-card:hover {
+    transform: translateY(-2px);
+    border-color: #334;
+  }
+
+  .char-card.selected {
+    transform: translateY(-3px);
+  }
+
+  .char-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--c);
+    box-shadow: 0 0 10px var(--c);
+  }
+
+  .char-card-name {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    margin: 6px 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .char-type-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 2px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-bottom: 7px;
+    display: inline-block;
+  }
+
+  .char-tier-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 2px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  @keyframes mythicalShimmer {
+    0%   { color: #ff88ff; text-shadow: 0 0 8px #ff88ff88; }
+    20%  { color: #ff4488; text-shadow: 0 0 8px #ff448888; }
+    40%  { color: #ffcc00; text-shadow: 0 0 8px #ffcc0088; }
+    60%  { color: #44ffcc; text-shadow: 0 0 8px #44ffcc88; }
+    80%  { color: #8844ff; text-shadow: 0 0 8px #8844ff88; }
+    100% { color: #ff88ff; text-shadow: 0 0 8px #ff88ff88; }
+  }
+
+  .tier-mythical {
+    animation: mythicalShimmer 2.4s linear infinite;
+  }
+
+  @keyframes transcendentShimmer {
+    0%   { color: #ffffff; text-shadow: 0 0 14px #ffffffff, 0 0 28px #88bbff88; }
+    25%  { color: #aaddff; text-shadow: 0 0 14px #aaddffcc, 0 0 28px #aaddff88; }
+    50%  { color: #ffffff; text-shadow: 0 0 20px #ffffffff, 0 0 40px #66aaffaa; }
+    75%  { color: #cce8ff; text-shadow: 0 0 14px #cce8ffcc, 0 0 28px #cce8ff88; }
+    100% { color: #ffffff; text-shadow: 0 0 14px #ffffffff, 0 0 28px #88bbff88; }
+  }
+
+  .tier-transcendent {
+    animation: transcendentShimmer 1.8s ease-in-out infinite;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+  }
+
+  @keyframes unknownShimmer {
+    0%   { color: #cc44ff; text-shadow: 0 0 8px #cc44ff88; }
+    20%  { color: #aa22dd; text-shadow: 0 0 6px #aa22dd66; }
+    35%  { color: #ffffff; text-shadow: 0 0 14px #cc66ffaa; }
+    50%  { color: #7700bb; text-shadow: 0 0 8px #7700bb88; }
+    65%  { color: #ffffff; text-shadow: 0 0 16px #ee99ffaa; }
+    80%  { color: #aa22dd; text-shadow: 0 0 6px #aa22dd66; }
+    100% { color: #cc44ff; text-shadow: 0 0 8px #cc44ff88; }
+  }
+
+  .tier-unknown {
+    animation: unknownShimmer 1.6s linear infinite;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+  }
+
+  @keyframes unknownStatPulse {
+    0%   { background-position: 0% 0; }
+    100% { background-position: 300% 0; }
+  }
+
+  .stat-fill-unknown {
+    background: linear-gradient(90deg, #33004466, #8844cccc, #cc66ffaa, #8844cccc, #33004466) !important;
+    background-size: 300% 100% !important;
+    animation: unknownStatPulse 2.0s linear infinite !important;
+    box-shadow: 0 0 6px #cc66ff66 !important;
+  }
+
+  .stat-fill-overflow {
+    background: linear-gradient(90deg, #66aaff, #aaddff, #ffffff, #aaddff, #66aaff) !important;
+    background-size: 200% 100% !important;
+    animation: overflowPulse 1.4s linear infinite !important;
+    box-shadow: 0 0 10px #aaddffcc !important;
+  }
+
+  @keyframes overflowPulse {
+    0%   { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 3px;
+  }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px;
+    color: #556;
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .stat-track {
+    flex: 1;
+    height: 4px;
+    background: #0d1018;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .stat-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  /* ── DETAIL PANEL ── */
+  #char-detail {
+    background: #05080f;
+    border: 1px solid #1a1f2e;
+    border-radius: 6px;
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 64px;
+  }
+
+  #detail-name {
+    font-size: clamp(12px, 2vw, 20px);
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #fff;
+  }
+
+  #detail-type {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-top: 2px;
+  }
+
+  #detail-desc {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #445;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  #detail-special {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #667;
+    margin-top: 6px;
+    letter-spacing: 1px;
+    border-top: 1px solid #1a1f2e;
+    padding-top: 6px;
+  }
+  #detail-special .special-name {
+    color: #ffcc00;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  #detail-stats {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+  }
+
+  .big-stat {
+    text-align: center;
+  }
+
+  .big-stat-val {
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .big-stat-lbl {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: #445;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .nav-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-back {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid #334;
+    color: #445;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-back:hover { border-color: #556; color: #778; }
+
+  .btn-secondary {
+    padding: 12px 32px;
+    background: transparent;
+    border: 2px solid #334;
+    color: #556;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-secondary:hover { border-color: #00d4ff; color: #00d4ff; }
+
+  .affinity-row {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .affinity-pos { color: #00ff88; }
+  .affinity-neg { color: #ff4422; }
+
+  .card-affinity {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
