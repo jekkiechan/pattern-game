@@ -402,6 +402,34 @@
     letter-spacing: 0.03em;
   }
 
+  @keyframes unknownShimmer {
+    0%   { color: #cc44ff; text-shadow: 0 0 8px #cc44ff88; }
+    20%  { color: #aa22dd; text-shadow: 0 0 6px #aa22dd66; }
+    35%  { color: #ffffff; text-shadow: 0 0 14px #cc66ffaa; }
+    50%  { color: #7700bb; text-shadow: 0 0 8px #7700bb88; }
+    65%  { color: #ffffff; text-shadow: 0 0 16px #ee99ffaa; }
+    80%  { color: #aa22dd; text-shadow: 0 0 6px #aa22dd66; }
+    100% { color: #cc44ff; text-shadow: 0 0 8px #cc44ff88; }
+  }
+
+  .tier-unknown {
+    animation: unknownShimmer 1.6s linear infinite;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+  }
+
+  @keyframes unknownStatPulse {
+    0%   { background-position: 0% 0; }
+    100% { background-position: 300% 0; }
+  }
+
+  .stat-fill-unknown {
+    background: linear-gradient(90deg, #33004466, #8844cccc, #cc66ffaa, #8844cccc, #33004466) !important;
+    background-size: 300% 100% !important;
+    animation: unknownStatPulse 2.0s linear infinite !important;
+    box-shadow: 0 0 6px #cc66ff66 !important;
+  }
+
   .stat-fill-overflow {
     background: linear-gradient(90deg, #66aaff, #aaddff, #ffffff, #aaddff, #66aaff) !important;
     background-size: 200% 100% !important;
@@ -914,6 +942,12 @@ const CONFIGS = [
     desc:'The Final Evolution of Pegasus. The F:D Final Drive tip switches between raw speed and unstoppable momentum — shattering gods and destroyers alike. Born from the hope of every Blader, it transcends every limit ever known.',
     atkR:15, defR:5, staR:10, spdR:14, bstR:8, tier:'TRANSCENDENT',
     special:{ name:'Final Drive', desc:'Slam all foes & double attack power (4s)', effect:'finalDrive' } },
+
+  { name:'THE UNKNOWN',         type:'???',     color:'#8844cc', glow:'#cc66ff', blades:3, shape:'unknown',
+    maxStamina:130, mass:1.50, defense:0.55, attackMult:1.55, burstResist:0.65, personality:'chaotic',
+    desc:"No origin. No records. No name. It appeared in the arena without warning — and no blade that has faced it has ever accurately described the encounter.",
+    atkR:'???', defR:'???', staR:'???', spdR:'???', bstR:'???', tier:'UNKNOWN',
+    special:{ name:"Fate's Hand", desc:'Chaos — one of four random effects fires', effect:'fatesHand' } },
 ];
 
 // ── ARENAS ──
@@ -1407,6 +1441,7 @@ function spawnSpecialParticles(x, y, color, count, speed, life) {
 function endSpecial(b) {
   // Restore any mutated base stats
   if (b.specialData.savedAtkMult !== undefined) b.attackMult = b.specialData.savedAtkMult;
+  if (b.specialData.savedDef     !== undefined) b.defense    = b.specialData.savedDef;
   b.specialActive  = false;
   b.specialTimer   = 0;
   b.specialData    = {};
@@ -1682,6 +1717,57 @@ function activateSpecial(blade) {
       G.shakeX = (Math.random() - 0.5) * 22; G.shakeY = (Math.random() - 0.5) * 22; G.shakeT = 0.45;
       break;
     }
+
+    case 'fatesHand': {
+      const roll = Math.random();
+      if (roll < 0.25) {
+        // Chaos Strike: rush at nearest foe + deal massive stamina damage + attack boost
+        const target = nearestAlive(blade);
+        if (target) {
+          const dx = target.x - gx, dy = target.y - gy, d = Math.hypot(dx, dy) || 1;
+          blade.vx = (dx/d) * MAX_SPEED * 2.2;
+          blade.vy = (dy/d) * MAX_SPEED * 2.2;
+          target.stamina = Math.max(0, target.stamina - 30);
+          target.wobble  = Math.min(1, target.wobble + 0.65);
+          spawnSpecialParticles(target.x, target.y, '#cc66ff', 14, 4, 1.0);
+        }
+        blade.specialData.savedAtkMult = blade.attackMult;
+        blade.attackMult *= 1.9;
+        blade.specialTimer = 2.5;
+        spawnSpecialParticles(gx, gy, '#cc66ff', 10, 4, 0.9);
+      } else if (roll < 0.5) {
+        // Void Restore: recover 35 stamina + temporary defense boost
+        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 35);
+        blade.specialData.savedDef = blade.defense;
+        blade.defense = Math.max(0.10, blade.defense - 0.22);
+        blade.specialTimer = 3.5;
+        spawnSpecialParticles(gx, gy, '#aa44ff', 20, 3, 0.9);
+      } else if (roll < 0.75) {
+        // Chaotic Repel: fling all foes in random directions
+        G.blades.forEach(b => {
+          if (b === blade || !b.alive) return;
+          const ang = Math.random() * Math.PI * 2;
+          b.vx += Math.cos(ang) * 13;
+          b.vy += Math.sin(ang) * 13;
+          b.wobble  = Math.min(1, b.wobble + 0.55);
+          b.stamina = Math.max(0, b.stamina - 10);
+          spawnSpecialParticles(b.x, b.y, '#ff44ff', 8, 3, 0.8);
+        });
+        G.shakeX = (Math.random()-0.5)*18; G.shakeY = (Math.random()-0.5)*18; G.shakeT = 0.35;
+        spawnSpecialParticles(gx, gy, '#cc66ff', 26, 5, 1.2);
+      } else {
+        // Fate Drain: drain stamina from all foes, recover self
+        G.blades.forEach(b => {
+          if (b !== blade && b.alive) {
+            b.stamina = Math.max(0, b.stamina - 15);
+            spawnSpecialParticles(b.x, b.y, '#9900cc', 6, 2, 0.7);
+          }
+        });
+        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 20);
+        spawnSpecialParticles(gx, gy, '#cc66ff', 14, 3, 0.9);
+      }
+      break;
+    }
   }
 }
 
@@ -1747,6 +1833,33 @@ function tickAI(b, dt) {
     ty       = G.arenaY + Math.sin(angle) * orbitR;
     accel    = 1.2 + arenaPhase * 1.0 + Math.random() * 0.5;
     speedCap = MAX_SPEED * (0.50 + arenaPhase * 0.3);
+
+  } else if (b.personality === 'chaotic') {
+    // Randomly switches between aggressive, defensive, and wild lunge each interval
+    if (b.aiTimer > 0) return;
+    const mode = Math.floor(Math.random() * 3);
+    if (mode === 0) {
+      b.aiTimer = AI_INTERVAL * (0.25 + Math.random() * 0.25);
+      accel     = 2.5 + arenaPhase * 1.5;
+      speedCap  = MAX_SPEED * (0.9 + arenaPhase * 0.1);
+      if (target) { tx = target.x + (Math.random()-0.5)*20; ty = target.y + (Math.random()-0.5)*20; }
+      else { tx = G.arenaX; ty = G.arenaY; }
+    } else if (mode === 1) {
+      b.aiTimer = AI_INTERVAL * (0.5 + Math.random() * 0.4);
+      const orbitR = Math.min(G.arenaRCurrent * 0.35, 90);
+      const angle  = Math.atan2(b.y - G.arenaY, b.x - G.arenaX) + (0.6 + arenaPhase * 0.5);
+      tx = G.arenaX + Math.cos(angle) * orbitR;
+      ty = G.arenaY + Math.sin(angle) * orbitR;
+      accel    = 1.5 + arenaPhase;
+      speedCap = MAX_SPEED * (0.55 + arenaPhase * 0.25);
+    } else {
+      b.aiTimer = AI_INTERVAL * (0.3 + Math.random() * 0.3);
+      const a = Math.random() * Math.PI * 2;
+      tx = G.arenaX + Math.cos(a) * G.arenaRCurrent * 0.45;
+      ty = G.arenaY + Math.sin(a) * G.arenaRCurrent * 0.45;
+      accel    = 2.8 + Math.random();
+      speedCap = MAX_SPEED;
+    }
 
   } else {
     // 'passive' — still orbits, just tighter and slower, but NOT stationary
@@ -2094,6 +2207,7 @@ function drawBlade(b) {
     else if (b.shape === 'nemesis') drawNemesisBlade(R);
     else if (b.shape === 'orion')   drawOrionBlade(R);
     else if (b.shape === 'pegasis') drawPegasisBlade(R);
+    else if (b.shape === 'unknown') drawUnknownBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -2110,6 +2224,7 @@ function drawBlade(b) {
   else if (b.shape === 'nemesis') { drawNemesisHub(R); }
   else if (b.shape === 'orion')   { drawOrionHub(R); }
   else if (b.shape === 'pegasis') { drawPegasisHub(R); }
+  else if (b.shape === 'unknown') { drawUnknownHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -3167,6 +3282,66 @@ function drawKnightHub(R) {
   ctx.closePath(); ctx.fill(); ctx.restore();
 }
 
+// ── THE UNKNOWN: fractured void crystal shard ──
+function drawUnknownBlade(R) {
+  // Jagged crystalline shard — sharp asymmetric polygon
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(R * 0.42, -R * 0.58);
+  ctx.lineTo(R * 0.82, -R * 0.32);
+  ctx.lineTo(R * 1.28,  R * 0.08);
+  ctx.lineTo(R * 0.92,  R * 0.44);
+  ctx.lineTo(R * 0.28,  R * 0.22);
+  ctx.closePath();
+
+  const gr = ctx.createLinearGradient(0, 0, R * 1.3, 0);
+  gr.addColorStop(0,    '#330044bb');
+  gr.addColorStop(0.38, '#8844ccee');
+  gr.addColorStop(0.65, '#cc66ffdd');
+  gr.addColorStop(1,    '#22003344');
+  ctx.fillStyle   = gr;
+  ctx.strokeStyle = 'rgba(200, 100, 255, 0.55)';
+  ctx.lineWidth   = 0.9;
+  ctx.fill();
+  ctx.stroke();
+
+  // Inner void accent shard
+  ctx.beginPath();
+  ctx.moveTo(R * 0.18, -R * 0.10);
+  ctx.lineTo(R * 0.54, -R * 0.30);
+  ctx.lineTo(R * 0.90,  R * 0.06);
+  ctx.lineTo(R * 0.60,  R * 0.24);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0, 0, 20, 0.42)';
+  ctx.fill();
+}
+
+function drawUnknownHub(R) {
+  // Deep void core with purple radial gradient
+  const hub = ctx.createRadialGradient(-R * 0.14, -R * 0.14, 0, 0, 0, R * 0.56);
+  hub.addColorStop(0,    'rgba(255,255,255,0.75)');
+  hub.addColorStop(0.22, '#cc66ff');
+  hub.addColorStop(0.60, '#330044');
+  hub.addColorStop(1,    '#000000');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.56, 0, Math.PI * 2);
+  ctx.fillStyle = hub;
+  ctx.shadowBlur  = 16;
+  ctx.shadowColor = '#cc66ff';
+  ctx.fill();
+
+  // "?" glyph in the hub center
+  ctx.save();
+  ctx.font         = `bold ${Math.round(R * 0.40)}px 'Orbitron', monospace`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle    = 'rgba(210, 130, 255, 0.90)';
+  ctx.shadowBlur   = 8;
+  ctx.shadowColor  = '#cc66ff';
+  ctx.fillText('?', 0, R * 0.04);
+  ctx.restore();
+}
+
 function drawBladeShape(shape, R, color) {
   ctx.beginPath();
   if (shape === 'wing') {
@@ -3658,7 +3833,7 @@ function drawBladeToCanvas(cfg, previewCanvas) {
 }
 
 // ── CHARACTER SELECT SCREEN ──
-const TYPE_COLORS = { ATTACK:'#ff4422', DEFENSE:'#4488ff', STAMINA:'#00ff88', BALANCE:'#ffcc00' };
+const TYPE_COLORS = { ATTACK:'#ff4422', DEFENSE:'#4488ff', STAMINA:'#00ff88', BALANCE:'#ffcc00', '???':'#aa66ff' };
 const TIER_COLORS = {
   NOVICE:        '#778899',
   APPRENTICE:    '#33cc66',
@@ -3668,6 +3843,7 @@ const TIER_COLORS = {
   LEGENDARY:     '#ff3311',
   MYTHICAL:      '#ff88ff',
   TRANSCENDENT:  '#ffffff',
+  UNKNOWN:       '#cc44ff',
 };
 const STAT_KEYS   = ['atkR','defR','staR','spdR','bstR'];
 const STAT_LABELS = ['ATK','DEF','STA','SPD','BST'];
@@ -3689,6 +3865,15 @@ function buildSelectScreen() {
 
     const statBars = STAT_KEYS.map((k, si) => {
       const val = cfg[k];
+      if (val === '???') {
+        return `
+      <div class="stat-row">
+        <div class="stat-label">${STAT_LABELS[si]}</div>
+        <div class="stat-track">
+          <div class="stat-fill stat-fill-unknown" style="width:100%"></div>
+        </div>
+      </div>`;
+      }
       const overMax = val > 10;
       const w = overMax ? 100 : val * 10;
       const fillClass = overMax ? ' stat-fill-overflow' : '';
@@ -3704,7 +3889,7 @@ function buildSelectScreen() {
     }).join('');
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : '';
+    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
       <div class="char-card-name" style="color:${cfg.color}">${cfg.name}</div>
@@ -3742,16 +3927,23 @@ function selectChar(i, rebuild = true) {
   const tierEl = document.getElementById('detail-tier');
   tierEl.textContent = cfg.tier;
   tierEl.style.color = tierColor;
-  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : cfg.tier === 'TRANSCENDENT' ? 'tier-transcendent' : '';
+  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : cfg.tier === 'TRANSCENDENT' ? 'tier-transcendent' : cfg.tier === 'UNKNOWN' ? 'tier-unknown' : '';
   document.getElementById('detail-desc').textContent  = cfg.desc;
   document.getElementById('detail-special').innerHTML =
     `<span class="special-name">◆ ${cfg.special.name}</span>  ${cfg.special.desc}`;
 
-  document.getElementById('detail-stats').innerHTML = STAT_KEYS.map((k, si) => `
+  document.getElementById('detail-stats').innerHTML = STAT_KEYS.map((k, si) => {
+    const val = cfg[k];
+    const valHtml = val === '???'
+      ? `<span class="tier-unknown" style="font-size:inherit">???</span>`
+      : val;
+    const valStyle = val === '???' ? '' : `color:${cfg.color};text-shadow:0 0 12px ${cfg.color}`;
+    return `
     <div class="big-stat">
-      <div class="big-stat-val" style="color:${cfg.color};text-shadow:0 0 12px ${cfg.color}">${cfg[k]}</div>
+      <div class="big-stat-val" style="${valStyle}">${valHtml}</div>
       <div class="big-stat-lbl">${STAT_LABELS[si]}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 document.getElementById('btn-start').addEventListener('click', () => {
@@ -3831,6 +4023,15 @@ function buildOpponentsScreen() {
 
     const statBars = STAT_KEYS.map((k, si) => {
       const val = cfg[k];
+      if (val === '???') {
+        return `
+      <div class="stat-row">
+        <div class="stat-label">${STAT_LABELS[si]}</div>
+        <div class="stat-track">
+          <div class="stat-fill stat-fill-unknown" style="width:100%"></div>
+        </div>
+      </div>`;
+      }
       const overMax = val > 10;
       const w = overMax ? 100 : val * 10;
       const fillClass = overMax ? ' stat-fill-overflow' : '';
@@ -3846,7 +4047,7 @@ function buildOpponentsScreen() {
     }).join('');
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : '';
+    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
       <div class="char-card-name" style="color:${sel ? cfg.color : '#445'}">${cfg.name}</div>
