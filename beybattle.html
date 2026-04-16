@@ -478,6 +478,21 @@
     letter-spacing: 1px;
   }
 
+  #detail-special {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #667;
+    margin-top: 6px;
+    letter-spacing: 1px;
+    border-top: 1px solid #1a1f2e;
+    padding-top: 6px;
+  }
+  #detail-special .special-name {
+    color: #ffcc00;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
   #detail-stats {
     display: flex;
     gap: 12px;
@@ -589,10 +604,14 @@
           <div id="detail-tier" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px"></div>
         </div>
         <div id="detail-desc"></div>
+        <div id="detail-special"></div>
       </div>
       <div id="detail-stats"></div>
     </div>
-    <button class="btn" id="btn-fight">CHOOSE ARENA →</button>
+    <div class="nav-row">
+      <button class="btn-back" id="btn-select-back">← BACK</button>
+      <button class="btn" id="btn-fight">CHOOSE ARENA →</button>
+    </div>
   </div>
 
   <div class="screen" id="screen-opponents">
@@ -3725,6 +3744,8 @@ function selectChar(i, rebuild = true) {
   tierEl.style.color = tierColor;
   tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : cfg.tier === 'TRANSCENDENT' ? 'tier-transcendent' : '';
   document.getElementById('detail-desc').textContent  = cfg.desc;
+  document.getElementById('detail-special').innerHTML =
+    `<span class="special-name">◆ ${cfg.special.name}</span>  ${cfg.special.desc}`;
 
   document.getElementById('detail-stats').innerHTML = STAT_KEYS.map((k, si) => `
     <div class="big-stat">
@@ -3824,10 +3845,15 @@ function buildOpponentsScreen() {
       </div>`;
     }).join('');
 
+    const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
+    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : '';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
       <div class="char-card-name" style="color:${sel ? cfg.color : '#445'}">${cfg.name}</div>
-      <div class="char-type-badge" style="background:${tc}22;color:${tc}">${cfg.type}</div>
+      <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
+        <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
+        <div class="char-tier-badge${tierClass}" style="background:${tierColor}22;color:${tierColor}">${cfg.tier}</div>
+      </div>
       ${statBars}`;
 
     // Arena affinity indicator dot
@@ -3888,6 +3914,10 @@ function randomizeOpponents() {
   }
   buildOpponentsScreen();
 }
+
+document.getElementById('btn-select-back').addEventListener('click', () => {
+  showScreen('screen-start');
+});
 
 document.getElementById('btn-fight').addEventListener('click', () => {
   buildArenaScreen();
