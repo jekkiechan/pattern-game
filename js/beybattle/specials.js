@@ -306,46 +306,47 @@ function activateSpecial(blade) {
         const target = nearestAlive(blade);
         if (target) {
           const dx = target.x - gx, dy = target.y - gy, d = Math.hypot(dx, dy) || 1;
-          blade.vx = (dx/d) * MAX_SPEED * 2.2;
-          blade.vy = (dy/d) * MAX_SPEED * 2.2;
-          target.stamina = Math.max(0, target.stamina - 30);
-          target.wobble  = Math.min(1, target.wobble + 0.65);
-          spawnSpecialParticles(target.x, target.y, '#cc66ff', 14, 4, 1.0);
+          blade.vx = (dx/d) * MAX_SPEED * 2.6;
+          blade.vy = (dy/d) * MAX_SPEED * 2.6;
+          target.stamina = Math.max(0, target.stamina - 45);
+          target.wobble  = Math.min(1, target.wobble + 0.80);
+          spawnSpecialParticles(target.x, target.y, '#cc66ff', 18, 5, 1.1);
         }
         blade.specialData.savedAtkMult = blade.attackMult;
-        blade.attackMult *= 1.9;
-        blade.specialTimer = 2.5;
-        spawnSpecialParticles(gx, gy, '#cc66ff', 10, 4, 0.9);
+        blade.attackMult *= 2.3;
+        blade.specialTimer = 3.0;
+        spawnSpecialParticles(gx, gy, '#cc66ff', 14, 5, 1.0);
       } else if (roll < 0.5) {
-        // Void Restore: recover 35 stamina + temporary defense boost
-        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 35);
+        // Void Restore: recover 55 stamina + temporary defense boost
+        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 55);
         blade.specialData.savedDef = blade.defense;
-        blade.defense = Math.max(0.10, blade.defense - 0.22);
-        blade.specialTimer = 3.5;
-        spawnSpecialParticles(gx, gy, '#aa44ff', 20, 3, 0.9);
+        blade.defense = Math.max(0.10, blade.defense - 0.28);
+        blade.specialTimer = 4.0;
+        spawnSpecialParticles(gx, gy, '#aa44ff', 24, 4, 1.0);
       } else if (roll < 0.75) {
         // Chaotic Repel: fling all foes in random directions
         G.blades.forEach(b => {
           if (b === blade || !b.alive) return;
           const ang = Math.random() * Math.PI * 2;
-          b.vx += Math.cos(ang) * 13;
-          b.vy += Math.sin(ang) * 13;
-          b.wobble  = Math.min(1, b.wobble + 0.55);
-          b.stamina = Math.max(0, b.stamina - 10);
-          spawnSpecialParticles(b.x, b.y, '#ff44ff', 8, 3, 0.8);
+          b.vx += Math.cos(ang) * 17;
+          b.vy += Math.sin(ang) * 17;
+          b.wobble  = Math.min(1, b.wobble + 0.70);
+          b.stamina = Math.max(0, b.stamina - 22);
+          spawnSpecialParticles(b.x, b.y, '#ff44ff', 10, 4, 0.9);
         });
-        G.shakeX = (Math.random()-0.5)*18; G.shakeY = (Math.random()-0.5)*18; G.shakeT = 0.35;
-        spawnSpecialParticles(gx, gy, '#cc66ff', 26, 5, 1.2);
+        G.shakeX = (Math.random()-0.5)*22; G.shakeY = (Math.random()-0.5)*22; G.shakeT = 0.45;
+        spawnSpecialParticles(gx, gy, '#cc66ff', 30, 5, 1.3);
       } else {
         // Fate Drain: drain stamina from all foes, recover self
         G.blades.forEach(b => {
           if (b !== blade && b.alive) {
-            b.stamina = Math.max(0, b.stamina - 15);
-            spawnSpecialParticles(b.x, b.y, '#9900cc', 6, 2, 0.7);
+            b.stamina = Math.max(0, b.stamina - 28);
+            b.wobble  = Math.min(1, b.wobble + 0.35);
+            spawnSpecialParticles(b.x, b.y, '#9900cc', 10, 3, 0.8);
           }
         });
-        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 20);
-        spawnSpecialParticles(gx, gy, '#cc66ff', 14, 3, 0.9);
+        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 40);
+        spawnSpecialParticles(gx, gy, '#cc66ff', 18, 4, 1.0);
       }
       break;
     }

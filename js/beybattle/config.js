@@ -162,7 +162,7 @@ const CONFIGS = [
     special:{ name:'Final Drive', desc:'Slam all foes & double attack power (4s)', effect:'finalDrive' } },
 
   { name:'THE UNKNOWN',         type:'???',     color:'#8844cc', glow:'#cc66ff', blades:3, shape:'unknown',
-    maxStamina:130, mass:1.50, defense:0.55, attackMult:1.55, burstResist:0.65, personality:'chaotic',
+    maxStamina:160, mass:1.55, defense:0.46, attackMult:1.80, burstResist:0.72, personality:'chaotic',
     desc:"No origin. No records. No name. It appeared in the arena without warning — and no blade that has faced it has ever accurately described the encounter.",
     atkR:'???', defR:'???', staR:'???', spdR:'???', bstR:'???', tier:'UNKNOWN',
     special:{ name:"Fate's Hand", desc:'Chaos — one of four random effects fires', effect:'fatesHand' } },
