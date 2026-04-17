@@ -18,9 +18,13 @@
   <div class="screen active" id="screen-start">
     <h1>BeyBattle</h1>
     <div class="subtitle">Spinning Top Arena Combat</div>
-    <button class="btn" id="btn-start">SELECT BLADE</button>
+    <div class="mode-row">
+      <button class="btn" id="btn-start">QUICK BATTLE</button>
+      <button class="btn btn-tournament" id="btn-tournament">TOURNAMENT</button>
+    </div>
+    <div id="trophy-display"></div>
     <div class="subtitle" style="font-size:10px;color:#333;margin-top:-8px">
-      10 characters · 3 enemies · last blade standing wins
+      3 rounds · stamina carries over · be crowned champion
     </div>
   </div>
 
@@ -77,6 +81,30 @@
     <div class="subtitle" id="result-sub" style="color:#445"></div>
     <button class="btn" id="btn-restart">BATTLE AGAIN</button>
   </div>
+
+  <div class="screen" id="screen-bracket">
+    <h2 class="bracket-title">TOURNAMENT</h2>
+    <div id="bracket-rounds"></div>
+    <div id="bracket-status" class="subtitle"></div>
+    <button class="btn" id="btn-next-round">BEGIN ROUND 1 →</button>
+  </div>
+
+  <div class="screen" id="screen-champion">
+    <div class="champion-crown">♔</div>
+    <div class="result-title win">CHAMPION!</div>
+    <div class="subtitle" id="champion-sub"></div>
+    <div id="champion-stats">
+      <div class="champ-stat">
+        <div class="champ-stat-val" id="champion-trophies">0</div>
+        <div class="champ-stat-lbl">TROPHIES</div>
+      </div>
+      <div class="champ-stat">
+        <div class="champ-stat-val" id="champion-streak">—</div>
+        <div class="champ-stat-lbl">RECORD</div>
+      </div>
+    </div>
+    <button class="btn" id="btn-champion-home">BACK TO TITLE</button>
+  </div>
 </div>
 
 <script src="js/beybattle/audio.js"></script>
@@ -89,6 +117,7 @@
 <script src="js/beybattle/ai.js"></script>
 <script src="js/beybattle/update.js"></script>
 <script src="js/beybattle/render.js"></script>
+<script src="js/beybattle/tournament.js"></script>
 <script src="js/beybattle/game.js"></script>
 </body>
 </html>

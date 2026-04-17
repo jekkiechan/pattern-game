@@ -1563,7 +1563,37 @@ function render() {
     ctx.restore();
   }
 
+  // ── BURST FINISHER cinematic overlay ──
+  if (G.finisher) {
+    const b = G.finisher.blade;
+    if (b && b.alive) {
+      // Expanding shockwave ring
+      const phase = 1 - Math.max(0, G.finisher.t) / G.finisher.max;
+      const ringR = 30 + phase * 260;
+      const ringA = Math.max(0, 1 - phase) * 0.9;
+      ctx.save();
+      ctx.globalAlpha = ringA;
+      ctx.strokeStyle = b.glow;
+      ctx.lineWidth   = 5;
+      ctx.shadowBlur  = 40;
+      ctx.shadowColor = b.glow;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, ringR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   ctx.restore();
+
+  // ── FINISHER full-screen flash (above shake transform) ──
+  if (G.finisher && G.finisher.flash > 0) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, G.finisher.flash / 0.25) * 0.55;
+    ctx.fillStyle   = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
 
   // ── BURST events rendered in screen space ──
   G.popups = (G.popups || []).filter(p => p.timer > 0);

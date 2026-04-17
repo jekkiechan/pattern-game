@@ -38,6 +38,17 @@ function update(dt) {
     dt *= 0.18;
   }
 
+  // Burst Finisher slow-mo (stacks with clash — take the smaller scale)
+  if (G.finisher && G.finisher.t > 0) {
+    G.finisher.t      -= dt;
+    G.finisher.flash   = Math.max(0, G.finisher.flash - dt);
+    // Heavy slow-mo early, easing back to normal
+    const phase = 1 - Math.max(0, G.finisher.t) / G.finisher.max;
+    const scale = 0.25 + phase * 0.55; // 0.25 → 0.80
+    dt *= scale;
+    if (G.finisher.t <= 0) G.finisher = null;
+  }
+
   // Shake decay
   if (G.shakeT > 0) {
     G.shakeT -= dt;
@@ -160,6 +171,13 @@ function checkWin() {
   const rT  = document.getElementById('result-title');
   const rS  = document.getElementById('result-sub');
   const w   = alive[0];
+
+  // Tournament routing: player won → next round or champion; otherwise eliminated
+  if (G.mode === 'tournament' && G.tournament) {
+    const playerAlive = w && w.isPlayer;
+    setTimeout(() => tOnRoundEnd(playerAlive, playerAlive ? w : null), 1400);
+    return;
+  }
 
   if (!w) {
     rT.textContent = 'DRAW'; rT.className = 'result-title draw';

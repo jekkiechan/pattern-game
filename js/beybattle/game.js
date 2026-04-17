@@ -296,6 +296,16 @@ function selectChar(i, rebuild = true) {
 
 document.getElementById('btn-start').addEventListener('click', () => {
   audio();
+  G.mode = 'single';
+  G.tournament = null;
+  buildSelectScreen();
+  showScreen('screen-select');
+});
+
+document.getElementById('btn-tournament').addEventListener('click', () => {
+  audio();
+  G.mode = 'tournament';
+  G.tournament = null;
   buildSelectScreen();
   showScreen('screen-select');
 });
@@ -479,8 +489,13 @@ document.getElementById('btn-arena-back').addEventListener('click', () => {
 });
 
 document.getElementById('btn-arena-next').addEventListener('click', () => {
-  buildOpponentsScreen();
-  showScreen('screen-opponents');
+  if (G.mode === 'tournament') {
+    tStartTournament();
+    tShowBracket();
+  } else {
+    buildOpponentsScreen();
+    showScreen('screen-opponents');
+  }
 });
 
 document.getElementById('btn-opp-back').addEventListener('click', () => {
@@ -497,8 +512,22 @@ document.getElementById('btn-opponents').addEventListener('click', () => {
 });
 
 document.getElementById('btn-restart').addEventListener('click', () => {
+  // If eliminated in tournament, return to title so trophy count refreshes
+  if (G.mode === 'tournament') {
+    tExit();
+    tRefreshTrophyDisplay();
+    document.getElementById('btn-restart').textContent = 'BATTLE AGAIN';
+    showScreen('screen-start');
+    return;
+  }
   buildSelectScreen();
   showScreen('screen-select');
+});
+
+document.getElementById('btn-champion-home').addEventListener('click', () => {
+  tExit();
+  tRefreshTrophyDisplay();
+  showScreen('screen-start');
 });
 
 // ═══════════════════════════════════════════════════════════
@@ -506,5 +535,6 @@ document.getElementById('btn-restart').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('resize', resize);
 resize();
+tRefreshTrophyDisplay();
 G.lastTime = performance.now();
 requestAnimationFrame(loop);

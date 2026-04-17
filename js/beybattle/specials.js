@@ -23,17 +23,71 @@ function endSpecial(b) {
   // Restore any mutated base stats
   if (b.specialData.savedAtkMult !== undefined) b.attackMult = b.specialData.savedAtkMult;
   if (b.specialData.savedDef     !== undefined) b.defense    = b.specialData.savedDef;
+  if (b.specialData.finisherAtk  !== undefined) b.attackMult = b.specialData.finisherAtk;
   b.specialActive  = false;
   b.specialTimer   = 0;
   b.specialData    = {};
+  b.burstFinisher  = false;
+}
+
+// Burst-Finisher threshold: firing a special below this stamina ratio
+// triggers a cinematic slow-mo burst with amplified payoff.
+const FINISHER_THRESHOLD = 0.30;
+
+function triggerBurstFinisher(blade) {
+  G.finisher = { t: 1.2, max: 1.2, blade, flash: 0.25 };
+
+  // Radial burst wave: visual shockwave + AOE stamina damage
+  const gx = blade.x, gy = blade.y;
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 14) {
+    const r = 18 + Math.random() * 18;
+    G.parts.push(new Particle(
+      gx + Math.cos(a) * r, gy + Math.sin(a) * r,
+      Math.random() < 0.5 ? '#ffffff' : blade.glow,
+      Math.cos(a) * (160 + Math.random() * 80),
+      Math.sin(a) * (160 + Math.random() * 80),
+      2.5 + Math.random() * 2.5, 0.9 + Math.random() * 0.4
+    ));
+  }
+  G.blades.forEach(foe => {
+    if (foe === blade || !foe.alive) return;
+    const d = Math.hypot(foe.x - gx, foe.y - gy);
+    if (d < 170) {
+      foe.stamina = Math.max(0, foe.stamina - 14);
+      foe.wobble  = Math.min(1, foe.wobble + 0.25);
+      const nx = (foe.x - gx) / (d || 1), ny = (foe.y - gy) / (d || 1);
+      foe.vx += nx * 4.5; foe.vy += ny * 4.5;
+    }
+  });
+
+  // Extra attack boost for the duration of the special
+  blade.specialData = blade.specialData || {};
+  blade.specialData.finisherAtk = blade.attackMult;
+  blade.attackMult *= 1.5;
+
+  G.shakeX = (Math.random() - 0.5) * 24;
+  G.shakeY = (Math.random() - 0.5) * 24;
+  G.shakeT = 0.5;
+
+  G.popups = G.popups || [];
+  G.popups.push({
+    x: canvas.width / 2, y: canvas.height * 0.35,
+    text: 'BURST FINISHER!', color: '#ffdd44',
+    timer: 1.6, maxTimer: 1.6
+  });
+
+  playLaunch();
 }
 
 function activateSpecial(blade) {
   if (!blade.alive || blade.specialCooldown > 0) return;
+  const isFinisher = (blade.stamina / blade.maxStamina) < FINISHER_THRESHOLD;
   blade.specialActive   = true;
   blade.specialCooldown = SPECIAL_COOLDOWN;
   blade.specialTimer    = 0;
   blade.specialData     = {};
+  blade.burstFinisher   = isFinisher;
+  if (isFinisher) triggerBurstFinisher(blade);
 
   const effect = blade.special.effect;
   const gx = blade.x, gy = blade.y;
