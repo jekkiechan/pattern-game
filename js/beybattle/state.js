@@ -27,6 +27,9 @@ const G = {
   activeTime:     0,
   boostCooldown:  0,
   pressIsCharging: false,   // player is holding for special charge
+  mode:           'single',  // 'single' | 'tournament'
+  tournament:     null,      // set when running tournament flow
+  finisher:       null,      // { t, max, blade } when burst-finisher cinematic is playing
 };
 
 const stars = Array.from({ length: 90 }, () => ({

@@ -52,7 +52,15 @@ function startRound() {
       if (mod.burstResist) b.burstResist  = Math.min(0.99, b.burstResist * mod.burstResist);
     });
   }
+
+  // Tournament stamina carryover for the player blade
+  if (G.mode === 'tournament' && G.tournament && G.tournament.round > 1) {
+    const pct = Math.max(0.3, Math.min(1, G.tournament.carryPct));
+    player.stamina = player.maxStamina * pct;
+  }
+
   G.boostCooldown = 0;
+  G.finisher      = null;
 
   buildHUD();
   document.getElementById('hud').style.display = 'flex';
