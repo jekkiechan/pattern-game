@@ -114,12 +114,13 @@ function buildHUD() {
   hud.innerHTML = '';
   G.blades.forEach(b => {
     const id = b.name.replace(/\s/g, '-');
+    const dc = displayColor(b);
     hud.insertAdjacentHTML('beforeend', `
       <div class="stamina-bar">
-        <div class="stamina-label" style="color:${b.color}">${b.name}</div>
+        <div class="stamina-label" style="color:${dc}">${b.name}</div>
         <div class="stamina-track">
           <div class="stamina-fill" id="sf-${id}"
-               style="width:100%;background:${b.color};box-shadow:0 0 6px ${b.color}88"></div>
+               style="width:100%;background:${dc};box-shadow:0 0 6px ${dc}88"></div>
         </div>
       </div>`);
   });
