@@ -231,6 +231,7 @@ const charFilter  = { types: new Set(ALL_TYPES) };
 
 function buildFilterChips(containerId, onChange) {
   const c = document.getElementById(containerId);
+  if (!c) return;
   c.innerHTML = '';
   ALL_TYPES.forEach(t => {
     const tc   = TYPE_COLORS[t] || '#fff';
