@@ -16,8 +16,8 @@ function startRound() {
   G.aimX = G.aimY = 0;
   G.shakeX = G.shakeY = G.shakeT = 0;
 
-  // Place all 4 blades evenly around rim (launch positions)
-  const startR  = r * 0.74;
+  // Place all 4 blades just outside the rim — they launch INTO the arena
+  const startR  = r * 1.12;
   const rimAngles = [
     Math.PI * 0.5,             // bottom  → player
     Math.PI * 1.5,             // top
