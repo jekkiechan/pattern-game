@@ -194,15 +194,83 @@
   }
 
   #char-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
     margin-bottom: 14px;
   }
 
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+    margin-bottom: 10px;
+    justify-content: center;
+  }
+
+  .filter-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: transparent;
+    border: 1.5px solid #1a1f2e;
+    color: #556;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+  .filter-chip:hover {
+    border-color: var(--c, #445);
+    color: #ccd;
+  }
+  .filter-chip.active {
+    background: color-mix(in srgb, var(--c, #fff) 14%, transparent);
+    border-color: var(--c, #fff);
+    color: var(--c, #fff);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--c, #fff) 40%, transparent);
+  }
+
+  .tier-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tier-header {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tier-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, currentColor, transparent);
+    opacity: 0.4;
+  }
+  .tier-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .filter-empty {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #445;
+    text-align: center;
+    padding: 24px;
+  }
+
   @media (max-width: 600px) {
-    #char-grid { grid-template-columns: repeat(3, 1fr); }
+    .tier-row { grid-template-columns: repeat(3, 1fr); }
   }
 
   /* ── OPPONENT SELECT ── */
@@ -220,14 +288,11 @@
     margin-bottom: 6px;
   }
   #opp-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
     margin-bottom: 14px;
-  }
-  @media (max-width: 600px) {
-    #opp-grid { grid-template-columns: repeat(3, 1fr); }
   }
   .opp-card.selected-opp {
     animation: cardPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;

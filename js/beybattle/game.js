@@ -225,12 +225,109 @@ const TIER_COLORS = {
 const STAT_KEYS   = ['atkR','defR','staR','spdR','bstR'];
 const STAT_LABELS = ['ATK','DEF','STA','SPD','BST'];
 
+const TIER_ORDER  = ['TRANSCENDENT','MYTHICAL','LEGENDARY','CHAMPION','ELITE','ADVANCED','APPRENTICE','NOVICE','UNKNOWN'];
+const ALL_TYPES   = ['ATTACK','DEFENSE','STAMINA','BALANCE','???'];
+const charFilter  = { types: new Set(ALL_TYPES) };
+
+function buildFilterChips(containerId, onChange) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  ALL_TYPES.forEach(t => {
+    const tc   = TYPE_COLORS[t] || '#fff';
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip' + (charFilter.types.has(t) ? ' active' : '');
+    chip.style.setProperty('--c', tc);
+    chip.textContent = t;
+    chip.addEventListener('click', () => {
+      if (charFilter.types.has(t)) charFilter.types.delete(t);
+      else charFilter.types.add(t);
+      onChange();
+    });
+    c.appendChild(chip);
+  });
+}
+
+function groupByTier(entries) {
+  const groups = new Map();
+  entries.forEach(e => {
+    if (!groups.has(e.cfg.tier)) groups.set(e.cfg.tier, []);
+    groups.get(e.cfg.tier).push(e);
+  });
+  return TIER_ORDER
+    .filter(t => groups.has(t))
+    .map(t => ({ tier: t, entries: groups.get(t) }));
+}
+
+function makeCharCardHTML(cfg, dc, tc) {
+  const statBars = STAT_KEYS.map((k, si) => {
+    const val = cfg[k];
+    if (val === '???') {
+      return `
+    <div class="stat-row">
+      <div class="stat-label">${STAT_LABELS[si]}</div>
+      <div class="stat-track">
+        <div class="stat-fill stat-fill-unknown" style="width:100%"></div>
+      </div>
+    </div>`;
+    }
+    const overMax = val > 10;
+    const w = overMax ? 100 : val * 10;
+    const fillClass = overMax ? ' stat-fill-overflow' : '';
+    const fillStyle = overMax ? '' : `background:${dc};box-shadow:0 0 4px ${dc}88`;
+    const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
+    return `
+    <div class="stat-row">
+      <div class="stat-label">${STAT_LABELS[si]}${valLabel}</div>
+      <div class="stat-track">
+        <div class="stat-fill${fillClass}" style="width:${w}%;${fillStyle}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
+  const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
+  return { tierColor, tierClass, statBars };
+}
+
+function appendTierSections(grid, groups, makeCard) {
+  if (groups.length === 0) {
+    grid.innerHTML = '<div class="filter-empty">NO BLADES MATCH FILTER</div>';
+    return [];
+  }
+  const previewCanvases = [];
+  groups.forEach(({ tier, entries }) => {
+    const tierColor = TIER_COLORS[tier] || '#aaa';
+    const section = document.createElement('div');
+    section.className = 'tier-section';
+    const header = document.createElement('div');
+    header.className = 'tier-header';
+    header.style.color = tierColor;
+    header.textContent = tier;
+    section.appendChild(header);
+    const row = document.createElement('div');
+    row.className = 'tier-row';
+    entries.forEach(({ cfg, idx }) => {
+      const card = makeCard(cfg, idx);
+      row.appendChild(card);
+      previewCanvases.push({ canvas: card.querySelector('.blade-preview'), cfg });
+    });
+    section.appendChild(row);
+    grid.appendChild(section);
+  });
+  return previewCanvases;
+}
+
 function buildSelectScreen() {
+  buildFilterChips('char-filters', buildSelectScreen);
+
   const grid = document.getElementById('char-grid');
   grid.innerHTML = '';
-  const previewCanvases = [];
 
-  CONFIGS.forEach((cfg, i) => {
+  const filtered = CONFIGS
+    .map((cfg, idx) => ({ cfg, idx }))
+    .filter(({ cfg }) => charFilter.types.has(cfg.type));
+
+  const previewCanvases = appendTierSections(grid, groupByTier(filtered), (cfg, i) => {
     const tc   = TYPE_COLORS[cfg.type] || '#fff';
     const dc   = displayColor(cfg);
     const card = document.createElement('div');
@@ -240,50 +337,19 @@ function buildSelectScreen() {
       card.style.borderColor = dc;
       card.style.boxShadow   = `0 0 14px ${dc}55`;
     }
-
-    const statBars = STAT_KEYS.map((k, si) => {
-      const val = cfg[k];
-      if (val === '???') {
-        return `
-      <div class="stat-row">
-        <div class="stat-label">${STAT_LABELS[si]}</div>
-        <div class="stat-track">
-          <div class="stat-fill stat-fill-unknown" style="width:100%"></div>
-        </div>
-      </div>`;
-      }
-      const overMax = val > 10;
-      const w = overMax ? 100 : val * 10;
-      const fillClass = overMax ? ' stat-fill-overflow' : '';
-      const fillStyle = overMax ? '' : `background:${dc};box-shadow:0 0 4px ${dc}88`;
-      const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
-      return `
-      <div class="stat-row">
-        <div class="stat-label">${STAT_LABELS[si]}${valLabel}</div>
-        <div class="stat-track">
-          <div class="stat-fill${fillClass}" style="width:${w}%;${fillStyle}"></div>
-        </div>
-      </div>`;
-    }).join('');
-
-    const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
-    const nameC = dc;
+    const { tierColor, tierClass, statBars } = makeCharCardHTML(cfg, dc, tc);
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
-      <div class="char-card-name" style="color:${nameC};text-shadow:0 0 6px ${cfg.glow}66">${cfg.name}</div>
+      <div class="char-card-name" style="color:${dc};text-shadow:0 0 6px ${cfg.glow}66">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
         <div class="char-tier-badge${tierClass}" style="background:${tierColor}22;color:${tierColor}">${cfg.tier}</div>
       </div>
       ${statBars}`;
-
     card.addEventListener('click', () => selectChar(i));
-    grid.appendChild(card);
-    previewCanvases.push({ canvas: card.querySelector('.blade-preview'), cfg });
+    return card;
   });
 
-  // Render blade previews after DOM is ready
   requestAnimationFrame(() => {
     previewCanvases.forEach(({ canvas: pc, cfg }) => drawBladeToCanvas(cfg, pc));
   });
@@ -394,13 +460,16 @@ function buildOpponentsScreen() {
   // Remove player from opponents if they changed their own blade to one that's in opponents
   G.selectedOpponents = G.selectedOpponents.filter(i => i !== G.selectedChar);
 
+  buildFilterChips('opp-filters', buildOpponentsScreen);
+
   const grid = document.getElementById('opp-grid');
   grid.innerHTML = '';
-  const previewCanvases = [];
 
-  CONFIGS.forEach((cfg, i) => {
-    if (i === G.selectedChar) return; // can't pick yourself
+  const filtered = CONFIGS
+    .map((cfg, idx) => ({ cfg, idx }))
+    .filter(({ cfg, idx }) => idx !== G.selectedChar && charFilter.types.has(cfg.type));
 
+  const previewCanvases = appendTierSections(grid, groupByTier(filtered), (cfg, i) => {
     const tc   = TYPE_COLORS[cfg.type] || '#fff';
     const dc   = displayColor(cfg);
     const sel  = G.selectedOpponents.includes(i);
@@ -413,34 +482,7 @@ function buildOpponentsScreen() {
     } else {
       card.style.borderColor = '#1a1f2e';
     }
-
-    const statBars = STAT_KEYS.map((k, si) => {
-      const val = cfg[k];
-      if (val === '???') {
-        return `
-      <div class="stat-row">
-        <div class="stat-label">${STAT_LABELS[si]}</div>
-        <div class="stat-track">
-          <div class="stat-fill stat-fill-unknown" style="width:100%"></div>
-        </div>
-      </div>`;
-      }
-      const overMax = val > 10;
-      const w = overMax ? 100 : val * 10;
-      const fillClass = overMax ? ' stat-fill-overflow' : '';
-      const fillStyle = overMax ? '' : `background:${dc};box-shadow:0 0 4px ${dc}88`;
-      const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
-      return `
-      <div class="stat-row">
-        <div class="stat-label">${STAT_LABELS[si]}${valLabel}</div>
-        <div class="stat-track">
-          <div class="stat-fill${fillClass}" style="width:${w}%;${fillStyle}"></div>
-        </div>
-      </div>`;
-    }).join('');
-
-    const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-    const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
+    const { tierColor, tierClass, statBars } = makeCharCardHTML(cfg, dc, tc);
     const nameC = sel ? dc : '#667';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
@@ -451,14 +493,13 @@ function buildOpponentsScreen() {
       </div>
       ${statBars}`;
 
-    // Arena affinity indicator dot
     const arMods = ARENAS[G.selectedArena].typeModifiers;
     const mod = arMods && arMods[cfg.type];
     if (mod && Object.keys(mod).length > 0) {
       let score = 0;
       if (mod.attackMult)  score += mod.attackMult  > 1 ? 1 : -1;
       if (mod.maxStamina)  score += mod.maxStamina  > 1 ? 1 : -1;
-      if (mod.defense)     score += mod.defense     < 1 ? 1 : -1; // lower defense = better
+      if (mod.defense)     score += mod.defense     < 1 ? 1 : -1;
       if (mod.burstResist) score += mod.burstResist > 1 ? 1 : -1;
       if (score !== 0) {
         const dot = document.createElement('div');
@@ -479,9 +520,7 @@ function buildOpponentsScreen() {
       }
       buildOpponentsScreen();
     });
-
-    grid.appendChild(card);
-    previewCanvases.push({ canvas: card.querySelector('.blade-preview'), cfg });
+    return card;
   });
 
   requestAnimationFrame(() => {
