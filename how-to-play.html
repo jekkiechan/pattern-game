@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOW TO PLAY — BEYBLADE GAMES</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#000;
+  color:#fff;
+  font-family:'Share Tech Mono', monospace;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── HEADER ── */
+.page-header {
+  position:sticky; top:0; z-index:100;
+  background:#000;
+  border-bottom:1px solid #0a0f1f;
+  display:flex; align-items:center; gap:20px;
+  padding:16px 28px;
+}
+.back-btn {
+  font-family:'Orbitron', monospace;
+  font-size:0.65rem; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:#334; text-decoration:none;
+  padding:7px 14px;
+  border:1px solid #1a1f2e; border-radius:4px;
+  transition:color .2s, border-color .2s;
+  flex-shrink:0;
+}
+.back-btn:hover { color:#00e5ff; border-color:#00e5ff44; }
+h1 {
+  font-family:'Orbitron', monospace;
+  font-size:clamp(1rem, 3.5vw, 1.6rem);
+  font-weight:900; letter-spacing:8px; text-transform:uppercase;
+  color:#00e5ff; text-shadow:0 0 24px #00e5ff55;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  background:#000; border-bottom:1px solid #0a0f1f;
+  display:flex; padding:0 28px; gap:4px;
+}
+.tab-btn {
+  font-family:'Orbitron', monospace;
+  font-size:0.72rem; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:#334; background:none; border:none;
+  border-bottom:2px solid transparent;
+  padding:14px 22px; cursor:pointer;
+  transition:color .2s, border-color .2s;
+}
+.tab-btn:hover { color:#667; }
+.tab-btn.active { color:#00e5ff; border-bottom-color:#00e5ff; }
+
+/* ── GUIDE SECTION ── */
+.guide-section { display:none; }
+.guide-section.active { display:block; }
+.section-inner {
+  max-width:900px; margin:0 auto;
+  padding:32px 24px; display:flex; flex-direction:column; gap:32px;
+}
+
+/* ── BLOCKS ── */
+.guide-block {
+  background:#04070e;
+  border:1px solid #0c1220; border-radius:8px; overflow:hidden;
+}
+.block-header { padding:18px 22px 14px; border-bottom:1px solid #080d18; }
+.block-title {
+  font-family:'Orbitron', monospace;
+  font-size:0.72rem; font-weight:900; letter-spacing:5px; text-transform:uppercase;
+  color:#00e5ff; margin-bottom:5px;
+}
+.block-desc { font-size:0.68rem; color:#445; line-height:1.7; letter-spacing:.5px; }
+.block-content { padding:20px 22px; }
+
+/* Canvas wrapper — scales canvas down on narrow screens */
+.cv-wrap {
+  background:#020408; border-radius:6px; overflow:hidden;
+  display:flex; justify-content:center;
+}
+.cv-wrap canvas { display:block; max-width:100%; height:auto; }
+
+/* ── TYPE CARDS ── */
+.type-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:14px;
+}
+.type-card {
+  background:#030608; border:1px solid; border-radius:6px; padding:16px;
+}
+.type-card.attack  { border-color:#ff442233; }
+.type-card.defense { border-color:#4488ff33; }
+.type-card.stamina { border-color:#00ff8833; }
+.type-card.balance { border-color:#ffcc0033; }
+.type-name {
+  font-family:'Orbitron', monospace;
+  font-size:0.7rem; font-weight:900; letter-spacing:4px; margin-bottom:10px;
+}
+.attack  .type-name { color:#ff4422; }
+.defense .type-name { color:#4488ff; }
+.stamina .type-name { color:#00ff88; }
+.balance .type-name { color:#ffcc00; }
+.type-bars { margin-bottom:10px; display:flex; flex-direction:column; gap:4px; }
+.type-bar-row { display:flex; align-items:center; gap:6px; }
+.type-bar-label { font-size:0.6rem; color:#334; width:24px; flex-shrink:0; }
+.type-bar-bg { flex:1; height:5px; background:#0a1020; border-radius:3px; overflow:hidden; }
+.type-bar-fill { height:100%; border-radius:3px; }
+.type-trait { font-size:0.63rem; color:#445; line-height:1.8; }
+.type-trait strong { color:#778; }
+
+/* ── TIER LADDER ── */
+.tier-list { display:flex; flex-direction:column; gap:7px; }
+.tier-row { display:flex; align-items:center; gap:12px; }
+.tier-badge {
+  font-family:'Orbitron', monospace;
+  font-size:0.58rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:5px 12px; border-radius:3px; min-width:118px; text-align:center; flex-shrink:0;
+}
+.tier-desc { font-size:0.63rem; color:#334; line-height:1.5; }
+
+/* ── ARENA GRID ── */
+.arena-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(155px,1fr)); gap:12px;
+}
+.arena-card {
+  background:#030608; border:1px solid #0a1020; border-radius:6px; overflow:hidden;
+}
+.arena-cv-wrap { display:flex; justify-content:center; padding:10px 0; background:#020308; }
+.arena-info { padding:10px 12px; }
+.arena-name {
+  font-family:'Orbitron', monospace;
+  font-size:0.58rem; font-weight:700; letter-spacing:2px; margin-bottom:4px;
+}
+.arena-desc { font-size:0.6rem; color:#334; line-height:1.6; margin-bottom:6px; }
+.arena-tags { display:flex; flex-direction:column; gap:2px; }
+.tag-favors   { font-size:0.58rem; color:#00ff88; letter-spacing:1px; }
+.tag-penalize { font-size:0.58rem; color:#ff4422; letter-spacing:1px; }
+
+/* ── PLATFORM GRID ── */
+.platform-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:14px;
+}
+.platform-card {
+  background:#030608; border:1px solid #0a1020; border-radius:6px; overflow:hidden; text-align:center;
+}
+.platform-cv-wrap { padding:12px; background:#020408; display:flex; justify-content:center; }
+.platform-label {
+  font-family:'Orbitron', monospace;
+  font-size:0.6rem; font-weight:700; letter-spacing:2px;
+  padding:6px; border-top:1px solid #0a1020;
+}
+.platform-desc { font-size:0.6rem; color:#334; padding:0 8px 10px; line-height:1.6; }
+
+/* ── STAGE GRID ── */
+.stage-grid {
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(155px,1fr)); gap:10px;
+}
+.stage-card {
+  background:#030608; border:1px solid #0a1020; border-radius:6px; padding:12px;
+}
+.stage-num { font-size:0.58rem; color:#223; letter-spacing:2px; margin-bottom:3px; }
+.stage-name {
+  font-family:'Orbitron', monospace;
+  font-size:0.68rem; font-weight:700; letter-spacing:3px; color:#00e5ff; margin-bottom:8px;
+}
+.stage-bar { height:3px; background:#0a1020; border-radius:2px; overflow:hidden; margin-bottom:6px; }
+.stage-fill { height:100%; border-radius:2px; }
+.stage-traits { font-size:0.58rem; color:#334; line-height:1.7; }
+
+/* ── CONTROLS GRID ── */
+.controls-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:18px;
+}
+.control-item { display:flex; gap:12px; align-items:flex-start; }
+.control-key {
+  font-family:'Orbitron', monospace;
+  font-size:0.6rem; font-weight:700; letter-spacing:2px;
+  color:#ffcc00; background:#0a0c00; border:1px solid #ffcc0022;
+  border-radius:4px; padding:4px 10px; flex-shrink:0; min-width:80px; text-align:center;
+}
+.control-desc { font-size:0.65rem; color:#334; line-height:1.7; }
+.control-desc strong { color:#667; }
+
+/* ── TIPS ── */
+.tips-list { display:flex; flex-direction:column; gap:8px; }
+.tip-row {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:10px 14px; background:#030608; border:1px solid #0a1020; border-radius:6px;
+}
+.tip-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+.tip-text { font-size:0.65rem; color:#445; line-height:1.7; }
+.tip-text strong { color:#778; }
+
+/* ── STAT EXPLANATION ── */
+.stat-ex-list { display:flex; flex-direction:column; gap:10px; }
+.stat-ex-row {
+  display:flex; gap:14px; padding:14px 16px;
+  background:#030608; border:1px solid #0a1020; border-radius:6px; align-items:flex-start;
+}
+.stat-ex-row.danger { border-color:#ff442233; background:#0a0308; }
+.stat-ex-abbr {
+  font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:900;
+  width:46px; flex-shrink:0; line-height:1; padding-top:3px;
+}
+.stat-ex-name {
+  font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700;
+  letter-spacing:4px; color:#889; margin-bottom:5px;
+}
+.stat-ex-desc { font-size:0.65rem; color:#445; line-height:1.8; }
+.stat-ex-desc strong { color:#778; }
+.char-pills { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.char-pill { font-size:0.58rem; padding:3px 9px; border-radius:3px; border:1px solid; letter-spacing:.5px; }
+
+/* ── BURST FORMULA ── */
+.burst-formula { margin-top:16px; padding:14px 16px; background:#07010f; border:1px solid #ff442222; border-radius:6px; }
+.formula-row { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; margin-bottom:8px; }
+.formula-label { font-family:'Orbitron',monospace; font-size:0.6rem; color:#445; letter-spacing:2px; flex-shrink:0; }
+.formula-expr { font-size:0.65rem; color:#667; line-height:1.8; }
+.formula-note { font-size:0.63rem; color:#445; line-height:1.8; }
+.formula-note strong { color:#778; }
+
+@media (max-width:580px) {
+  .page-header { padding:12px 16px; }
+  .tab-bar { padding:0 16px; }
+  .section-inner { padding:16px; gap:20px; }
+  .controls-grid { grid-template-columns:1fr; }
+  .block-content { padding:14px 16px; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <a class="back-btn" href="index.html">← HOME</a>
+  <h1>HOW TO PLAY</h1>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" data-tab="battle">⚔️ BEYBATTLE</button>
+  <button class="tab-btn" data-tab="climber">🌀 CLIMBER</button>
+</nav>
+
+<!-- ════════════════════ BEYBATTLE ════════════════════ -->
+<section id="tab-battle" class="guide-section active">
+<div class="section-inner">
+
+  <!-- OBJECTIVE -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">OBJECTIVE</div>
+      <div class="block-desc">Face 3 opponents in a circular arena. Deplete their stamina through collisions to "burst" them. Be the last blade spinning to win.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvObjective" width="560" height="170"></canvas></div>
+    </div>
+  </div>
+
+  <!-- LAUNCHING -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">LAUNCHING</div>
+      <div class="block-desc">Before battle, you must launch your blade into the arena. The direction and power of your launch determines your opening position.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvLaunch" width="560" height="200"></canvas></div>
+    </div>
+  </div>
+
+  <!-- COMBAT CONTROLS -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">COMBAT CONTROLS</div>
+      <div class="block-desc">Two actions available once your blade is active. Mastering the timing between them is the key to winning.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvCombat" width="560" height="190"></canvas></div>
+    </div>
+  </div>
+
+  <!-- STAMINA & BURST -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">STAMINA & BURST</div>
+      <div class="block-desc">Every blade has a stamina bar. Collisions drain it. Drifting near the arena edge drains it faster. Hit zero — you burst.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvStamina" width="560" height="140"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CHARACTER TYPES -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">CHARACTER TYPES</div>
+      <div class="block-desc">Four types define a blade's stat profile. Arena choice interacts with type — pick both wisely.</div>
+    </div>
+    <div class="block-content">
+      <div class="type-grid">
+        <div class="type-card attack">
+          <div class="type-name">⚔ ATTACK</div>
+          <div class="type-bars">
+            <div class="type-bar-row"><span class="type-bar-label">ATK</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:90%;background:#ff4422"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">DEF</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:30%;background:#ff4422"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">STA</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:40%;background:#ff4422"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">BST</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:25%;background:#ff4422"></div></div></div>
+          </div>
+          <div class="type-trait"><strong>High damage</strong> per hit · Fast, aggressive style · <strong>Fragile under pressure</strong> · Thrives in Volcano Crater</div>
+        </div>
+        <div class="type-card defense">
+          <div class="type-name">🛡 DEFENSE</div>
+          <div class="type-bars">
+            <div class="type-bar-row"><span class="type-bar-label">ATK</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:20%;background:#4488ff"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">DEF</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:90%;background:#4488ff"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">STA</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:80%;background:#4488ff"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">BST</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:95%;background:#4488ff"></div></div></div>
+          </div>
+          <div class="type-trait"><strong>Near-impossible to burst</strong> · Low attack threat · <strong>Absorbs punishment</strong> · Best in Shadow Void</div>
+        </div>
+        <div class="type-card stamina">
+          <div class="type-name">⚡ STAMINA</div>
+          <div class="type-bars">
+            <div class="type-bar-row"><span class="type-bar-label">ATK</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:40%;background:#00ff88"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">DEF</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:55%;background:#00ff88"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">STA</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:100%;background:#00ff88"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">BST</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:75%;background:#00ff88"></div></div></div>
+          </div>
+          <div class="type-trait"><strong>Longest stamina bar</strong> · Outlasts everyone · Moderate attack · <strong>Dominates Frozen Tundra</strong></div>
+        </div>
+        <div class="type-card balance">
+          <div class="type-name">⚖ BALANCE</div>
+          <div class="type-bars">
+            <div class="type-bar-row"><span class="type-bar-label">ATK</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:60%;background:#ffcc00"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">DEF</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:65%;background:#ffcc00"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">STA</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:70%;background:#ffcc00"></div></div></div>
+            <div class="type-bar-row"><span class="type-bar-label">BST</span><div class="type-bar-bg"><div class="type-bar-fill" style="width:65%;background:#ffcc00"></div></div></div>
+          </div>
+          <div class="type-trait"><strong>Versatile all-round stats</strong> · No hard counter · <strong>Adapts to any arena</strong> · Ideal for beginners</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS EXPLAINED -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">STATS EXPLAINED</div>
+      <div class="block-desc">Five stats, each with a distinct in-game effect. Understanding them changes everything about how you pick and play your blade.</div>
+    </div>
+    <div class="block-content">
+      <div class="stat-ex-list">
+
+        <div class="stat-ex-row">
+          <div class="stat-ex-abbr" style="color:#ff4422">ATK</div>
+          <div class="stat-ex-body">
+            <div class="stat-ex-name">ATTACK POWER</div>
+            <div class="stat-ex-desc">
+              How hard your hits drain the enemy's stamina. Every collision deals
+              <strong>base force × your ATK × their DEF</strong>. High ATK turns even glancing blows into brutal stamina drains.
+              <div class="char-pills">
+                <span class="char-pill" style="color:#88ccff;border-color:#4488ff44">BIG BANG PEGASIS ATK 15 — highest in the game</span>
+                <span class="char-pill" style="color:#556;border-color:#22334433">DRACIEL SHELL ATK 1 — barely tickles opponents</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-ex-row">
+          <div class="stat-ex-abbr" style="color:#4488ff">DEF</div>
+          <div class="stat-ex-body">
+            <div class="stat-ex-name">DAMAGE REDUCTION</div>
+            <div class="stat-ex-desc">
+              Reduces how much stamina you lose per collision. High DEF means each hit hurts less.
+              <strong>Important: DEF does NOT protect against bursting — that's BST's job.</strong>
+              A blade can have DEF 13 and still burst if its BST is low.
+              <div class="char-pills">
+                <span class="char-pill" style="color:#aabbdd;border-color:#4488ff33">PHANTOM ORION DEF 13 — barely loses stamina from any hit</span>
+                <span class="char-pill" style="color:#556;border-color:#22334433">BIG BANG PEGASIS DEF 5 — bleeds fast when caught</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-ex-row">
+          <div class="stat-ex-abbr" style="color:#00ff88">STA</div>
+          <div class="stat-ex-body">
+            <div class="stat-ex-name">STAMINA POOL</div>
+            <div class="stat-ex-desc">
+              Your total health. As it drains, your <strong>burst vulnerability rises sharply</strong> — a blade at 30% stamina can be one-shot
+              burst by the same hit that would only sting at full health. Larger pools give you more room to survive bad exchanges and edge drain.
+              <div class="char-pills">
+                <span class="char-pill" style="color:#00ff88;border-color:#00ff8833">PHANTOM ORION STA 15 — 230 points, takes forever to empty</span>
+                <span class="char-pill" style="color:#556;border-color:#22334433">SHARK EDGE STA 2 — 68 points, drains in seconds</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-ex-row">
+          <div class="stat-ex-abbr" style="color:#00d4ff">SPD</div>
+          <div class="stat-ex-body">
+            <div class="stat-ex-name">SPEED & IMPACT FORCE</div>
+            <div class="stat-ex-desc">
+              Faster, lighter blades generate more impact force on collision — which amplifies
+              <strong>both stamina damage and burst pressure</strong> dealt. A fast blade slamming at full speed deals significantly more
+              burst damage than a slow heavy blade nudging the same opponent. Heavier blades are harder to push around but hit softer.
+              <div class="char-pills">
+                <span class="char-pill" style="color:#00d4ff;border-color:#00d4ff33">VIPER TAIL SPD 10 — hits like a bullet</span>
+                <span class="char-pill" style="color:#556;border-color:#22334433">ROCK BISON SPD 1 — slow, immovable wall</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-ex-row danger">
+          <div class="stat-ex-abbr" style="color:#ffcc00">BST</div>
+          <div class="stat-ex-body">
+            <div class="stat-ex-name">BURST RESISTANCE — THE HIDDEN DANGER ⚠</div>
+            <div class="stat-ex-desc">
+              Controls whether a collision instantly bursts you — <strong>independent of your stamina bar</strong>.
+              Burst damage is calculated separately from stamina damage: <strong>impact force × enemy ATK × (1 − your BST) × worn factor</strong>.
+              The worn factor scales from 0.15 at full health to 1.0 at zero stamina — meaning as you take hits,
+              you become exponentially more vulnerable to a single big collision finishing you instantly.
+              <strong>A BST 1 blade can be one-shot by any high-ATK opponent once its stamina dips below ~60%.</strong>
+              <div class="char-pills">
+                <span class="char-pill" style="color:#00ff88;border-color:#00ff8833">PHANTOM ORION BST 15 — cannot be burst under any circumstances</span>
+                <span class="char-pill" style="color:#00ff88;border-color:#00ff8833">KNIGHT SHIELD BST 10 — near-impossible to one-shot</span>
+                <span class="char-pill" style="color:#ff4422;border-color:#ff442233">SHARK EDGE BST 1 — one good hit when worn = instant burst</span>
+                <span class="char-pill" style="color:#ff4422;border-color:#ff442233">DRAN SWORD BST 2 — glass cannon, dies how it lives</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- BURST MECHANIC -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">CAUTION: THE BST TRAP</div>
+      <div class="block-desc">Some blades have BST so high they are nearly impossible to burst — but their ATK can still devastate you. If your BST is low, colliding with one of these can instantly burst you while they barely notice. Always check your opponent's BST before playing aggressively.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvBurstMech" width="560" height="210"></canvas></div>
+      <div class="burst-formula">
+        <div class="formula-row">
+          <span class="formula-label">BURST DAMAGE YOU TAKE =</span>
+          <span class="formula-expr">impact force × <span style="color:#ff4422">ENEMY ATK</span> × (1 − <span style="color:#ffcc00">YOUR BST</span>) × <span style="color:#ff8800">worn factor</span></span>
+        </div>
+        <div class="formula-note">
+          <strong>Worn factor</strong> rises from 0.15 at full health to 1.0 at zero stamina — every hit you take makes the next one more dangerous.<br>
+          A blade with BST 15 takes near-zero burst damage from any hit. A blade with BST 1 can be finished by a single hard collision once worn down.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIER SYSTEM -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">TIER SYSTEM</div>
+      <div class="block-desc">Higher tiers have meaningfully stronger stats. Skilled play can upset one tier below. Beating two tiers down requires a miracle.</div>
+    </div>
+    <div class="block-content">
+      <div class="tier-list">
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#ff00ee18;color:#ff66ee;border:1px solid #ff44cc44">MYTHICAL</div>
+          <div class="tier-desc">Near-peak power. Dominant in their domain with extraordinary specials.</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#9933ff18;color:#aa44ff;border:1px solid #8844ff44">LEGENDARY</div>
+          <div class="tier-desc">Elite warriors with game-changing abilities. Top-tier threats.</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#00d4ff18;color:#00d4ff;border:1px solid #00d4ff44">CHAMPION</div>
+          <div class="tier-desc">Strong all-rounders. Competitive in any arena with the right play.</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#00ff8818;color:#00ff88;border:1px solid #00ff8844">ELITE</div>
+          <div class="tier-desc">Powerful specialists. Excellent when matched to the right arena.</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#ffcc0018;color:#ffcc00;border:1px solid #ffcc0044">ADVANCED</div>
+          <div class="tier-desc">Skilled contenders. Viable with good special timing and arena choice.</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#ff660018;color:#ff8844;border:1px solid #ff662233">APPRENTICE</div>
+          <div class="tier-desc">Learning fighters. Need a skill edge or favorable arena to compete.</div>
+        </div>
+        <div class="tier-row">
+          <div class="tier-badge" style="background:#33333318;color:#556;border:1px solid #33333333">NOVICE</div>
+          <div class="tier-desc">Starter blades. Good for learning — outmatched against higher tiers.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPECIAL MOVES -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">SPECIAL MOVES</div>
+      <div class="block-desc">Hold to charge over 2 seconds, then release for a unique ability. A well-timed special can flip a losing fight. 8-second cooldown after use.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvSpecial" width="560" height="170"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ARENAS -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">ARENAS</div>
+      <div class="block-desc">Each arena modifies physics and applies stat bonuses/penalties by type. Picking the right arena for your blade is half the battle.</div>
+    </div>
+    <div class="block-content">
+      <div class="arena-grid">
+        <div class="arena-card">
+          <div class="arena-cv-wrap"><canvas id="cvA0" width="90" height="90"></canvas></div>
+          <div class="arena-info">
+            <div class="arena-name" style="color:#6699ff">BEY STADIUM</div>
+            <div class="arena-desc">Standard balanced dish. No modifiers — fair for all.</div>
+            <div class="arena-tags"><div class="tag-favors">▲ ALL TYPES</div></div>
+          </div>
+        </div>
+        <div class="arena-card">
+          <div class="arena-cv-wrap"><canvas id="cvA1" width="90" height="90"></canvas></div>
+          <div class="arena-info">
+            <div class="arena-name" style="color:#ff6633">VOLCANO CRATER</div>
+            <div class="arena-desc">2× edge drain. Stay center or get scorched.</div>
+            <div class="arena-tags">
+              <div class="tag-favors">▲ ATTACK</div>
+              <div class="tag-penalize">▼ STAMINA</div>
+            </div>
+          </div>
+        </div>
+        <div class="arena-card">
+          <div class="arena-cv-wrap"><canvas id="cvA2" width="90" height="90"></canvas></div>
+          <div class="arena-info">
+            <div class="arena-name" style="color:#00ff88">CYBER GRID</div>
+            <div class="arena-desc">Near-zero friction. Blades never slow down.</div>
+            <div class="arena-tags">
+              <div class="tag-favors">▲ STAMINA</div>
+              <div class="tag-penalize">▼ DEFENSE</div>
+            </div>
+          </div>
+        </div>
+        <div class="arena-card">
+          <div class="arena-cv-wrap"><canvas id="cvA3" width="90" height="90"></canvas></div>
+          <div class="arena-info">
+            <div class="arena-name" style="color:#88ddff">FROZEN TUNDRA</div>
+            <div class="arena-desc">Extreme slipperiness. Walls barely hurt.</div>
+            <div class="arena-tags">
+              <div class="tag-favors">▲ STAMINA</div>
+              <div class="tag-penalize">▼ ATTACK</div>
+            </div>
+          </div>
+        </div>
+        <div class="arena-card">
+          <div class="arena-cv-wrap"><canvas id="cvA4" width="90" height="90"></canvas></div>
+          <div class="arena-info">
+            <div class="arena-name" style="color:#cc44ff">SHADOW VOID</div>
+            <div class="arena-desc">Weakest edge drain. Long brutal dark battles.</div>
+            <div class="arena-tags">
+              <div class="tag-favors">▲ STAMINA · DEFENSE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="guide-block">
+    <div class="block-header"><div class="block-title">TIPS & STRATEGY</div></div>
+    <div class="block-content">
+      <div class="tips-list">
+        <div class="tip-row"><div class="tip-icon">⏳</div><div class="tip-text"><strong>Save your special for the right moment.</strong> Don't use it at full health — wait until you're cornered, outnumbered, or an enemy is one good hit from bursting.</div></div>
+        <div class="tip-row"><div class="tip-icon">🌋</div><div class="tip-text"><strong>Use the edge as a weapon.</strong> Tap near the wall to knock opponents into the edge-drain zone. Near the rim, stamina evaporates — one push can decide a match.</div></div>
+        <div class="tip-row"><div class="tip-icon">🏟</div><div class="tip-text"><strong>Match your type to the arena.</strong> ATTACK thrives in Volcano Crater, STAMINA/DEFENSE dominate Shadow Void and Frozen Tundra.</div></div>
+        <div class="tip-row"><div class="tip-icon">👁</div><div class="tip-text"><strong>Let enemies tire each other out.</strong> You start 1v3 — hang back after launching and boost in only once someone is already weakened. Gang-up damage stacks fast.</div></div>
+        <div class="tip-row"><div class="tip-icon">⚖</div><div class="tip-text"><strong>Tier gap is real.</strong> Fighting two tiers above you is nearly impossible. Focus the lowest-tier enemy first, use specials aggressively, and pick an arena that favors your type.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ════════════════════ CLIMBER ════════════════════ -->
+<section id="tab-climber" class="guide-section">
+<div class="section-inner">
+
+  <!-- OBJECTIVE -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">OBJECTIVE</div>
+      <div class="block-desc">Boost your Beyblade upward through 10 increasingly dangerous stages. Collect all stars and reach the glowing finish platform at the top.</div>
+    </div>
+    <div class="block-content">
+      <div class="cv-wrap"><canvas id="cvClimberObj" width="560" height="220"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">CONTROLS</div>
+      <div class="block-desc">Single tap/click controls — works on both desktop and touch screens.</div>
+    </div>
+    <div class="block-content">
+      <div class="controls-grid">
+        <div class="control-item">
+          <div class="control-key">TAP / CLICK</div>
+          <div class="control-desc"><strong>Boost toward</strong> the tapped location. Your blade launches in that direction with fixed force.</div>
+        </div>
+        <div class="control-item">
+          <div class="control-key">COOLDOWN</div>
+          <div class="control-desc">Each boost has a <strong>3.5-second cooldown</strong>. The bar refills — don't waste boosts or you'll fall.</div>
+        </div>
+        <div class="control-item">
+          <div class="control-key">GRAVITY</div>
+          <div class="control-desc">Your blade falls constantly. <strong>Land on platforms</strong> to stop falling and line up your next boost.</div>
+        </div>
+        <div class="control-item">
+          <div class="control-key">WALLS</div>
+          <div class="control-desc">Side walls <strong>bounce you back.</strong> Wall-bouncing is useful for reaching platforms that seem too far.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATFORM TYPES -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">PLATFORM TYPES</div>
+      <div class="block-desc">Five platform types, each with different behavior. Stages introduce more complex types as difficulty increases.</div>
+    </div>
+    <div class="block-content">
+      <div class="platform-grid">
+        <div class="platform-card">
+          <div class="platform-cv-wrap"><canvas id="cvPN" width="120" height="75"></canvas></div>
+          <div class="platform-label" style="color:#aabbcc">NORMAL</div>
+          <div class="platform-desc">Solid and permanent. Safe to land on as many times as you need.</div>
+        </div>
+        <div class="platform-card">
+          <div class="platform-cv-wrap"><canvas id="cvPF" width="120" height="75"></canvas></div>
+          <div class="platform-label" style="color:#ff6644">FRAGILE</div>
+          <div class="platform-desc">Cracks and disappears after you land. One use only!</div>
+        </div>
+        <div class="platform-card">
+          <div class="platform-cv-wrap"><canvas id="cvPM" width="120" height="75"></canvas></div>
+          <div class="platform-label" style="color:#00d4ff">MOVING</div>
+          <div class="platform-desc">Slides left and right continuously. Time your boost to land on it.</div>
+        </div>
+        <div class="platform-card">
+          <div class="platform-cv-wrap"><canvas id="cvPB" width="120" height="75"></canvas></div>
+          <div class="platform-label" style="color:#ffcc00">BOOST</div>
+          <div class="platform-desc">Launches you upward on contact — a free shortcut higher.</div>
+        </div>
+        <div class="platform-card">
+          <div class="platform-cv-wrap"><canvas id="cvPG" width="120" height="75"></canvas></div>
+          <div class="platform-label" style="color:#00ff88">FINISH</div>
+          <div class="platform-desc">Glows green at the very top. Reach it to complete the stage.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE PROGRESSION -->
+  <div class="guide-block">
+    <div class="block-header">
+      <div class="block-title">STAGE PROGRESSION</div>
+      <div class="block-desc">10 stages from easy intro to expert gauntlet. The bar shows relative difficulty.</div>
+    </div>
+    <div class="block-content">
+      <div class="stage-grid" id="stageGrid"></div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="guide-block">
+    <div class="block-header"><div class="block-title">TIPS & STRATEGY</div></div>
+    <div class="block-content">
+      <div class="tips-list">
+        <div class="tip-row"><div class="tip-icon">⏱</div><div class="tip-text"><strong>Guard your boost cooldown.</strong> 3.5 seconds is a long time while falling. Never burn a boost unless you're sure you won't need another one immediately after.</div></div>
+        <div class="tip-row"><div class="tip-icon">🟡</div><div class="tip-text"><strong>Prioritize boost platforms.</strong> Yellow boost pads send you flying upward for free — route your climb to hit them instead of grinding normal platforms.</div></div>
+        <div class="tip-row"><div class="tip-icon">⚠</div><div class="tip-text"><strong>Fragile platforms vanish on landing.</strong> Plan your route before you touch down — if the next boost requires landing there again, you'll fall through nothing.</div></div>
+        <div class="tip-row"><div class="tip-icon">↔</div><div class="tip-text"><strong>Use moving platform momentum.</strong> A moving platform at its edge acts like a slingshot sideways. Use this to reach platforms that look impossible from a standing position.</div></div>
+        <div class="tip-row"><div class="tip-icon">★</div><div class="tip-text"><strong>Plan your star route.</strong> Stars cluster near platforms. Scout the layout from below and pick a path that sweeps stars naturally — don't chase them mid-air and waste your boost.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<script>
+// ══════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════
+function ha(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function blade(ctx, x, y, r, col, glow, rot, n=4) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  // outer glow
+  const g = ctx.createRadialGradient(0,0,0,0,0,r*1.7);
+  g.addColorStop(0, ha(glow,.25)); g.addColorStop(1,'transparent');
+  ctx.beginPath(); ctx.arc(0,0,r*1.7,0,Math.PI*2);
+  ctx.fillStyle = g; ctx.fill();
+  // blades
+  for (let i=0; i<n; i++) {
+    ctx.save(); ctx.rotate((i/n)*Math.PI*2);
+    ctx.beginPath();
+    ctx.moveTo(0,-r*.35);
+    ctx.quadraticCurveTo(r*.75,-r*.15, r*.85, r*.1);
+    ctx.quadraticCurveTo(r*.35, r*.38, 0, r*.35);
+    ctx.fillStyle = col; ctx.fill();
+    ctx.restore();
+  }
+  // hub
+  const h = ctx.createRadialGradient(0,0,0,0,0,r*.4);
+  h.addColorStop(0,'#ffffff'); h.addColorStop(.4,col); h.addColorStop(1,ha(col,.5));
+  ctx.beginPath(); ctx.arc(0,0,r*.4,0,Math.PI*2);
+  ctx.fillStyle = h; ctx.fill();
+  ctx.restore();
+}
+
+function arenaRing(ctx, cx, cy, r, rim, glow) {
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle = rim; ctx.lineWidth = 2;
+  ctx.shadowColor = glow; ctx.shadowBlur = 14;
+  ctx.stroke(); ctx.shadowBlur = 0;
+}
+
+// ══════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ══════════════════════════════════════════════════
+// OBJECTIVE CANVAS — 4 blades in arena, one bursting
+// ══════════════════════════════════════════════════
+(function() {
+  const cv = document.getElementById('cvObjective');
+  const c = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const CX = W/2, CY = H/2;
+  const R = Math.min(W,H) * .40;
+
+  const blades = [
+    { ox:.0,  oy:.5,  col:'#00d4ff', glo:'#0077ff', sp:2.1,  sta:1.00, label:'YOU' },
+    { ox:-.55, oy:-.28, col:'#ff4422', glo:'#cc2200', sp:1.6,  sta:.72,  label:'' },
+    { ox:.55,  oy:-.28, col:'#ff7700', glo:'#cc5500', sp:1.8,  sta:.45,  label:'' },
+    { ox:.0,  oy:-.6,  col:'#9933ff', glo:'#6600cc', sp:1.4,  sta:.18,  label:'' },
+  ];
+
+  function draw(ts) {
+    const t = ts * .001;
+    c.clearRect(0,0,W,H);
+
+    // arena floor
+    const fl = c.createRadialGradient(CX,CY,0,CX,CY,R);
+    fl.addColorStop(0,'#06090f'); fl.addColorStop(1,'#020408');
+    c.beginPath(); c.arc(CX,CY,R,0,Math.PI*2); c.fillStyle = fl; c.fill();
+
+    // edge drain zone
+    const eg = c.createRadialGradient(CX,CY,R*.78,CX,CY,R);
+    eg.addColorStop(0,'transparent'); eg.addColorStop(1,ha('#ff3300',.12));
+    c.beginPath(); c.arc(CX,CY,R,0,Math.PI*2); c.fillStyle = eg; c.fill();
+
+    arenaRing(c, CX, CY, R, '#2a3d5a', '#00d4ff');
+
+    // edge drain label
+    c.save();
+    c.font = '7px Share Tech Mono, monospace';
+    c.fillStyle = ha('#ff4422',.5);
+    c.textAlign = 'center';
+    c.fillText('EDGE DRAIN ZONE', CX, CY + R*.88);
+    c.restore();
+
+    blades.forEach((b, i) => {
+      const bx = CX + b.ox * R * .72;
+      const by = CY + b.oy * R * .72;
+      const rot = t * b.sp;
+
+      // blade 3 (low stamina) — animate bursting every 6s
+      const cyc = t % 6;
+      if (i === 3) {
+        const burstProg = Math.max(0, (cyc - 3) / 1.5);
+        if (burstProg > 0) {
+          for (let p=0;p<8;p++) {
+            const pa = (p/8)*Math.PI*2 + t*4;
+            const pr = burstProg * R * .28;
+            c.beginPath(); c.arc(bx+Math.cos(pa)*pr, by+Math.sin(pa)*pr, 2.5*(1-burstProg), 0, Math.PI*2);
+            c.fillStyle = ha(b.glo, 1-burstProg); c.fill();
+          }
+          if (burstProg < .6) blade(c, bx, by, 13*(1-burstProg), b.col, b.glo, rot);
+          // BURST text
+          if (burstProg > .3 && burstProg < 1) {
+            c.font = `700 ${9+burstProg*4}px Orbitron, monospace`;
+            c.fillStyle = ha('#ff4422', 1-burstProg);
+            c.textAlign = 'center'; c.textBaseline = 'middle';
+            c.fillText('BURST!', bx, by - 18*burstProg);
+            c.textBaseline = 'alphabetic';
+          }
+        } else {
+          blade(c, bx, by, 13, b.col, b.glo, rot);
+        }
+      } else {
+        blade(c, bx, by, i===0?17:13, b.col, b.glo, rot);
+        // "YOU" label
+        if (b.label) {
+          c.font = '700 8px Orbitron, monospace';
+          c.fillStyle = b.col; c.textAlign = 'center';
+          c.fillText(b.label, bx, by - 22);
+        }
+      }
+
+      // stamina bar
+      const bw=36, bh=4;
+      const bx2=bx-bw/2, by2=by+(i===0?20:17);
+      c.fillStyle='#080e1c'; c.beginPath(); c.roundRect(bx2,by2,bw,bh,2); c.fill();
+      const eff = i===3 ? Math.max(0,b.sta-(Math.max(0,(t%6)-1.5))*.45) : b.sta;
+      if (eff>0) {
+        const sc = eff>.5?'#00ff88':eff>.25?'#ffcc00':'#ff4422';
+        c.fillStyle=sc; c.beginPath(); c.roundRect(bx2,by2,bw*eff,bh,2); c.fill();
+      }
+    });
+
+    // caption
+    c.font = '700 8px Orbitron, monospace';
+    c.fillStyle = '#1a2030'; c.textAlign = 'center';
+    c.fillText('LAST BLADE SPINNING WINS', CX, H-8);
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ══════════════════════════════════════════════════
+// LAUNCH CANVAS — click → drag → release animation
+// ══════════════════════════════════════════════════
+(function() {
+  const cv = document.getElementById('cvLaunch');
+  const c = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const CYCLE = 8;
+
+  const arX=W*.7, arY=H*.5, arR=H*.38;
+  const startX=W*.18, startY=H*.5;
+
+  function draw(ts) {
+    const t = (ts*.001) % CYCLE;
+    c.clearRect(0,0,W,H);
+
+    // arena
+    const fl=c.createRadialGradient(arX,arY,0,arX,arY,arR);
+    fl.addColorStop(0,'#05080f'); fl.addColorStop(1,'#020408');
+    c.beginPath(); c.arc(arX,arY,arR,0,Math.PI*2); c.fillStyle=fl; c.fill();
+    arenaRing(c,arX,arY,arR,'#2a3d5a','#00d4ff');
+
+    // enemy blade in arena
+    blade(c, arX, arY-arR*.3, 12, '#ff4422','#cc2200', ts*.0015);
+
+    // phases
+    // 0-1.5: idle + cursor pulse
+    // 1.5-4: drag line
+    // 4-6: launch arc
+    // 6-8: in arena
+
+    let bx = startX, by = startY;
+    const rot = ts * .002;
+
+    if (t < 1.5) {
+      // CLICK — pulse ring
+      bx = startX; by = startY;
+      const pulse = (Math.sin(t*7)+1)*.5;
+      c.beginPath(); c.arc(bx,by,18+10*pulse,0,Math.PI*2);
+      c.strokeStyle=ha('#00d4ff',.35-pulse*.25); c.lineWidth=1.5; c.stroke();
+
+      c.font='700 9px Orbitron, monospace';
+      c.fillStyle='#00d4ff'; c.textAlign='center';
+      c.fillText('1  CLICK YOUR BLADE', bx, by-32);
+      c.font='7px Share Tech Mono, monospace';
+      c.fillStyle='#334'; c.fillText('tap on your beyblade', bx, by-20);
+
+    } else if (t < 4) {
+      // DRAG — dotted line going left
+      const p = (t-1.5)/2.5;
+      bx = startX - 55*p; by = startY;
+
+      c.save(); c.setLineDash([6,4]);
+      c.strokeStyle=ha('#00d4ff',.45); c.lineWidth=1.5;
+      c.beginPath(); c.moveTo(startX,startY); c.lineTo(bx,by); c.stroke();
+      c.setLineDash([]); c.restore();
+
+      // arrow showing aim direction (right)
+      c.save();
+      c.strokeStyle=ha('#00d4ff',.25); c.lineWidth=1;
+      c.setLineDash([4,6]);
+      c.beginPath(); c.moveTo(startX,startY); c.lineTo(arX-arR*.5, startY); c.stroke();
+      c.setLineDash([]); c.restore();
+
+      c.font='700 9px Orbitron, monospace';
+      c.fillStyle='#00d4ff'; c.textAlign='center';
+      c.fillText('2  DRAG BACK TO AIM', bx+27, by-32);
+      c.font='7px Share Tech Mono, monospace';
+      c.fillStyle='#334'; c.fillText('drag opposite to target', bx+27, by-20);
+
+    } else if (t < 6) {
+      // RELEASE — blade flies toward arena
+      const p = (t-4)/2;
+      const ep = p<.5 ? 2*p*p : 1-2*(1-p)*(1-p);
+      bx = startX - 55 + (arX - arR*.35 - (startX-55)) * ep;
+      by = startY;
+
+      // launch trail
+      for (let i=4; i>0; i--) {
+        const tp = ep - i*.04;
+        if (tp<0) continue;
+        const tx2 = startX-55 + (arX-arR*.35-(startX-55))*tp;
+        c.beginPath(); c.arc(tx2,by,2,0,Math.PI*2);
+        c.fillStyle=ha('#ffcc00',.15*i); c.fill();
+      }
+
+      // power arrow
+      c.save();
+      c.strokeStyle='#ffcc00'; c.lineWidth=2;
+      c.shadowColor='#ffcc00'; c.shadowBlur=8;
+      const ah=bx-12;
+      c.beginPath(); c.moveTo(bx-55,by); c.lineTo(ah,by);
+      c.moveTo(ah,by); c.lineTo(ah-8,by-6);
+      c.moveTo(ah,by); c.lineTo(ah-8,by+6);
+      c.stroke(); c.shadowBlur=0; c.restore();
+
+      c.font='700 9px Orbitron, monospace';
+      c.fillStyle='#ffcc00'; c.textAlign='center';
+      c.fillText('3  RELEASE!', startX-27, by-32);
+      c.font='7px Share Tech Mono, monospace';
+      c.fillStyle='#556'; c.fillText('blade launches toward target', startX-27, by-20);
+
+    } else {
+      // IN ARENA — battle
+      bx = arX - arR*.32; by = arY + arR*.32;
+      const ht = (t-6)/2;
+      if (ht < .5) {
+        for (let i=0;i<6;i++) {
+          const pa=(i/6)*Math.PI*2+t;
+          const pr=ht*32;
+          c.beginPath(); c.arc(bx+Math.cos(pa)*pr,by+Math.sin(pa)*pr,2.5,0,Math.PI*2);
+          c.fillStyle=ha('#00d4ff',Math.max(0,1-ht*2)); c.fill();
+        }
+      }
+      c.font='700 9px Orbitron, monospace';
+      c.fillStyle='#00ff88'; c.textAlign='center';
+      c.fillText('4  BATTLE!', bx, by-32);
+    }
+
+    blade(c, bx, by, 16, '#00d4ff','#0077ff', rot);
+
+    // step dots at bottom
+    const steps=['CLICK','DRAG','RELEASE','BATTLE'];
+    steps.forEach((s,i) => {
+      const active=(i===0&&t<1.5)||(i===1&&t>=1.5&&t<4)||(i===2&&t>=4&&t<6)||(i===3&&t>=6);
+      const sx=W*(.18+i*.22);
+      c.beginPath(); c.arc(sx,H-14,4,0,Math.PI*2);
+      c.fillStyle=active?'#00d4ff':'#0a1020'; c.fill();
+      if(active){c.strokeStyle='#00d4ff44';c.lineWidth=1;c.stroke();}
+    });
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ══════════════════════════════════════════════════
+// COMBAT CANVAS — tap (boost) vs hold (special)
+// ══════════════════════════════════════════════════
+(function() {
+  const cv = document.getElementById('cvCombat');
+  const c = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const lx=W*.26, rx=W*.74, my=H*.46;
+
+  function draw(ts) {
+    const t = ts*.001;
+    c.clearRect(0,0,W,H);
+
+    // divider
+    c.fillStyle='#0a1020'; c.fillRect(W/2-.5,16,1,H-32);
+
+    // ── LEFT: QUICK TAP ──
+    c.font='700 10px Orbitron, monospace';
+    c.fillStyle='#00d4ff'; c.textAlign='center';
+    c.fillText('QUICK TAP', lx, 20);
+    c.font='7px Share Tech Mono, monospace';
+    c.fillStyle='#334';
+    c.fillText('boost in tap direction  ·  3.5s cooldown', lx, 33);
+
+    const tapT = t % 3;
+    if (tapT < 1.4) {
+      for (let r=0;r<3;r++) {
+        const rp=((tapT*.7+r*.34)%1);
+        c.beginPath(); c.arc(lx,my,18+rp*38,0,Math.PI*2);
+        c.strokeStyle=ha('#00d4ff',.45*(1-rp)); c.lineWidth=1.5; c.stroke();
+      }
+      const ap = Math.min(1,tapT*1.8);
+      if (ap>0) {
+        c.save(); c.strokeStyle='#ffcc00'; c.lineWidth=2.5;
+        c.shadowColor='#ffcc00'; c.shadowBlur=8;
+        const al=lx+10+ap*38;
+        c.beginPath(); c.moveTo(lx+10,my); c.lineTo(al,my);
+        c.moveTo(al,my); c.lineTo(al-8,my-5); c.moveTo(al,my); c.lineTo(al-8,my+5);
+        c.stroke(); c.shadowBlur=0; c.restore();
+      }
+    }
+    blade(c,lx,my,15,'#00d4ff','#0077ff',t*2.2);
+
+    // boost cooldown bar
+    const bprog=(t%3.5)/3.5;
+    const bw=100; const bx=lx-bw/2, bby=H-32;
+    c.fillStyle='#080e1c'; c.beginPath(); c.roundRect(bx,bby,bw,6,3); c.fill();
+    c.fillStyle=bprog>.95?'#00ff88':'#00d4ff';
+    c.beginPath(); c.roundRect(bx,bby,bw*bprog,6,3); c.fill();
+    c.font='7px Share Tech Mono, monospace'; c.fillStyle='#223'; c.textAlign='center';
+    c.fillText('BOOST COOLDOWN', lx, bby-6);
+    c.fillText(bprog>.95?'READY!':Math.round(3.5-bprog*3.5).toFixed(1)+'s', lx, bby+16);
+
+    // ── RIGHT: HOLD FOR SPECIAL ──
+    c.font='700 10px Orbitron, monospace';
+    c.fillStyle='#ffcc00'; c.textAlign='center';
+    c.fillText('HOLD 2 SECONDS', rx, 20);
+    c.font='7px Share Tech Mono, monospace';
+    c.fillStyle='#334';
+    c.fillText('charge & release special move  ·  8s cooldown', rx, 33);
+
+    const ct = t % 8;
+    const cp = ct<2 ? ct/2 : ct<2.8 ? 1 : Math.max(0,1-(ct-2.8)/.6);
+    const discharged = ct>=2 && ct<2.8;
+    const idleColor = cp>.5 ? '#ffcc00' : '#00d4ff';
+    const idleGlow  = cp>.5 ? '#cc9900' : '#0077ff';
+
+    // charge ring arc
+    if (!discharged && cp>0) {
+      c.save();
+      c.beginPath();
+      c.arc(rx,my,22,-Math.PI/2,-Math.PI/2+Math.PI*2*cp);
+      c.strokeStyle=ha('#ffcc00',.8); c.lineWidth=3;
+      c.shadowColor='#ffcc00'; c.shadowBlur=10;
+      c.stroke(); c.shadowBlur=0; c.restore();
+    }
+    // discharge burst
+    if (discharged) {
+      const dp=(ct-2)/.8;
+      for(let i=0;i<10;i++){
+        const pa=(i/10)*Math.PI*2+t;
+        const pr=dp*40;
+        c.beginPath(); c.arc(rx+Math.cos(pa)*pr,my+Math.sin(pa)*pr,3.5*(1-dp),0,Math.PI*2);
+        c.fillStyle=ha('#ffcc00',1-dp); c.fill();
+      }
+      c.font=`700 ${10+dp*6}px Orbitron, monospace`;
+      c.fillStyle=ha('#ffcc00',1-dp*.7);
+      c.textAlign='center'; c.textBaseline='middle';
+      c.fillText('SPECIAL!', rx, my-30+dp*8);
+      c.textBaseline='alphabetic';
+    }
+    blade(c,rx,my,15,idleColor,idleGlow,t*2.2);
+
+    // charge bar
+    const cw=100; const cbx=rx-cw/2, cby=H-32;
+    c.fillStyle='#080e1c'; c.beginPath(); c.roundRect(cbx,cby,cw,6,3); c.fill();
+    if(cp>0){
+      c.fillStyle=cp>.99?'#fff':ha('#ffcc00',.35+cp*.65);
+      c.beginPath(); c.roundRect(cbx,cby,cw*cp,6,3); c.fill();
+    }
+    if(cp>.99){
+      c.fillStyle=ha('#ffcc00',.2);
+      c.beginPath(); c.roundRect(cbx,cby,cw,6,3); c.fill();
+    }
+    c.font='7px Share Tech Mono, monospace'; c.fillStyle='#223'; c.textAlign='center';
+    c.fillText('SPECIAL CHARGE', rx, cby-6);
+    c.fillText(cp>.99?'RELEASE NOW!':ct<2?`CHARGING ${Math.round(ct*50)}%`:'COOLDOWN', rx, cby+16);
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ══════════════════════════════════════════════════
+// STAMINA CANVAS — three states: normal / edge / burst
+// ══════════════════════════════════════════════════
+(function() {
+  const cv = document.getElementById('cvStamina');
+  const c = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+
+  function draw(ts) {
+    const t = ts*.001;
+    c.clearRect(0,0,W,H);
+
+    const scenes = [
+      { x:W*.18, col:'#00d4ff', glo:'#0077ff', label:'CENTER', sublabel:'stamina drains slowly',
+        sta: 1-(t*.07%1), edge:false, burst:false },
+      { x:W*.5,  col:'#ff8833', glo:'#cc5500', label:'NEAR EDGE', sublabel:'drain ×2 — danger!',
+        sta: Math.max(0,.85-(t*.22%1)), edge:true, burst:false },
+      { x:W*.82, col:'#444',    glo:'#222',    label:'BURST',  sublabel:'stamina hit zero',
+        sta:0, edge:false, burst:true },
+    ];
+
+    scenes.forEach(s => {
+      const by = H*.52;
+      if (!s.burst) {
+        blade(c,s.x,by,17,s.col,s.glo,t*2*(s.sta+.1));
+      } else {
+        // exploding shards
+        for(let i=0;i<6;i++){
+          const pa=(i/6)*Math.PI*2+t*.8;
+          const pr=12+Math.sin(t*1.5+i)*6;
+          c.save();
+          c.translate(s.x+Math.cos(pa)*pr, by+Math.sin(pa)*pr);
+          c.rotate(pa+t); c.fillStyle=ha('#ff4422',.35);
+          c.fillRect(-4,-2,8,4); c.restore();
+        }
+        c.font='700 10px Orbitron, monospace';
+        c.fillStyle=ha('#ff4422',.7+(Math.sin(t*4)+1)*.15);
+        c.textAlign='center'; c.textBaseline='middle';
+        c.fillText('💥 BURST!', s.x, by-28);
+        c.textBaseline='alphabetic';
+      }
+
+      // edge warning
+      if (s.edge) {
+        c.font='7px Share Tech Mono, monospace';
+        c.fillStyle=ha('#ff4422',.6+Math.sin(t*4)*.3);
+        c.textAlign='center';
+        c.fillText('⚠ EDGE DRAIN ACTIVE', s.x, by-28);
+      }
+
+      // stamina bar
+      const bw=60,bh=8,bx=s.x-bw/2,bby=H*.74;
+      c.fillStyle='#080e1c'; c.beginPath(); c.roundRect(bx,bby,bw,bh,3); c.fill();
+      if(s.sta>0){
+        const sc=s.sta>.5?'#00ff88':s.sta>.25?'#ffcc00':'#ff4422';
+        c.fillStyle=sc; c.beginPath(); c.roundRect(bx,bby,bw*s.sta,bh,3); c.fill();
+      }
+      c.font='7px Share Tech Mono, monospace'; c.fillStyle='#334'; c.textAlign='center';
+      c.fillText(!s.burst?`STA ${Math.round(s.sta*100)}%`:'STA 0%', s.x, bby-5);
+      c.font='700 8px Orbitron, monospace';
+      c.fillStyle=s.burst?'#ff4422':'#445';
+      c.fillText(s.label, s.x, bby+bh+14);
+      c.font='7px Share Tech Mono, monospace'; c.fillStyle='#223';
+      c.fillText(s.sublabel, s.x, bby+bh+25);
+    });
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ══════════════════════════════════════════════════
+// SPECIAL CANVAS — showcase 4 different special types
+// ══════════════════════════════════════════════════
+(function() {
+  const cv = document.getElementById('cvSpecial');
+  const c = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+
+  const specials = [
+    { name:'DRAKE IMPACT',    desc:'+50% attack · repel burst', col:'#ff4422', type:'explosion' },
+    { name:'DRAGOON VORTEX',  desc:'pull all foes inward',      col:'#2288ff', type:'vortex'    },
+    { name:'WIND RECOVERY',   desc:'restore 25 stamina',        col:'#00ff88', type:'heal'      },
+    { name:'CHAIN BIND',      desc:'cap all foes to 40% speed', col:'#9933ff', type:'bind'      },
+  ];
+  const cw = W / specials.length;
+
+  function draw(ts) {
+    const t = ts*.001;
+    c.clearRect(0,0,W,H);
+
+    specials.forEach((sp, i) => {
+      const cx = cw*i+cw/2, cy = H*.43;
+      const active = Math.floor(t/3.2)%specials.length === i;
+      const ft = t%3.2;
+
+      // card border
+      c.strokeStyle = active?ha(sp.col,.5):'#0c1220';
+      c.lineWidth=1; c.beginPath();
+      c.roundRect(cw*i+6,8,cw-12,H-16,5); c.stroke();
+
+      // effect animation when active
+      if (active) {
+        if (sp.type==='explosion') {
+          for(let p=0;p<8;p++){
+            const pa=(p/8)*Math.PI*2+ft*3;
+            const pr=Math.min(ft*28,32);
+            c.beginPath(); c.arc(cx+Math.cos(pa)*pr,cy+Math.sin(pa)*pr,3,0,Math.PI*2);
+            c.fillStyle=ha(sp.col,Math.max(0,1-ft/3)); c.fill();
+          }
+        } else if (sp.type==='vortex') {
+          for(let p=0;p<12;p++){
+            const pa=(p/12)*Math.PI*2-ft*2.5;
+            const pr=8+(ft%1.2)*24;
+            c.beginPath(); c.arc(cx+Math.cos(pa)*pr,cy+Math.sin(pa)*pr,2.5,0,Math.PI*2);
+            c.fillStyle=ha(sp.col,.6); c.fill();
+          }
+        } else if (sp.type==='heal') {
+          const rise=ft*22;
+          c.font=`700 ${11+ft*3}px Orbitron, monospace`;
+          c.fillStyle=ha(sp.col,Math.max(0,1-ft/3));
+          c.textAlign='center'; c.textBaseline='middle';
+          c.fillText('+25', cx, cy-rise); c.textBaseline='alphabetic';
+          // green shimmer ring
+          c.beginPath(); c.arc(cx,cy,16+ft*8,0,Math.PI*2);
+          c.strokeStyle=ha(sp.col,Math.max(0,.5-ft*.15)); c.lineWidth=2; c.stroke();
+        } else if (sp.type==='bind') {
+          for(let r=0;r<2;r++){
+            const rr=18+(r*12)+ft*10;
+            c.beginPath(); c.arc(cx,cy,Math.min(rr,40),0,Math.PI*2);
+            c.strokeStyle=ha(sp.col,Math.max(0,.6-ft*.18-r*.15)); c.lineWidth=1.5; c.stroke();
+          }
+        }
+      }
+
+      blade(c,cx,cy,14,sp.col,sp.col,t*2.2);
+
+      // hold bar
+      const bp=Math.min(1,ft/2);
+      const bw=cw-28, bby=H-36;
+      c.fillStyle='#080e1c'; c.beginPath(); c.roundRect(cw*i+14,bby,bw,5,2); c.fill();
+      if(bp>0){
+        c.fillStyle=bp>.99?'#fff':ha(sp.col,.4+bp*.6);
+        c.beginPath(); c.roundRect(cw*i+14,bby,bw*bp,5,2); c.fill();
+      }
+
+      c.font='700 7px Orbitron, monospace';
+      c.fillStyle=active?sp.col:'#223'; c.textAlign='center';
+      c.fillText(sp.name, cx, H-18);
+      c.font='6px Share Tech Mono, monospace'; c.fillStyle='#334';
+      c.fillText(sp.desc, cx, H-8);
+    });
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ══════════════════════════════════════════════════
+// ARENA MINI-CANVASES
+// ══════════════════════════════════════════════════
+const arenaData = [
+  { rim:'#4488ff', glo:'#0055ff', bg0:'#0a1018', bg1:'#050810', edgeStr:.18, name:'stadium' },
+  { rim:'#ff5500', glo:'#ff2200', bg0:'#200800', bg1:'#100400', edgeStr:.36, name:'volcano', lava:true  },
+  { rim:'#00ff88', glo:'#00cc44', bg0:'#001810', bg1:'#000e08', edgeStr:.09, name:'cyber',   grid:true  },
+  { rim:'#88ccff', glo:'#4499cc', bg0:'#0a1828', bg1:'#050c14', edgeStr:.07, name:'tundra',  ice:true   },
+  { rim:'#cc44ff', glo:'#8800cc', bg0:'#120520', bg1:'#080110', edgeStr:.06, name:'shadow'             },
+];
+
+arenaData.forEach((a,i) => {
+  const cv=document.getElementById('cvA'+i);
+  if(!cv) return;
+  const c=cv.getContext('2d');
+  const W=cv.width,H=cv.height,CX=W/2,CY=H/2,R=W*.44;
+
+  function draw(ts) {
+    const t=ts*.001;
+    c.clearRect(0,0,W,H);
+    const bg=c.createRadialGradient(CX,CY,0,CX,CY,R);
+    bg.addColorStop(0,a.bg0); bg.addColorStop(1,a.bg1);
+    c.beginPath(); c.arc(CX,CY,R,0,Math.PI*2); c.fillStyle=bg; c.fill();
+
+    // grid lines
+    if(a.grid){
+      c.save(); c.beginPath(); c.arc(CX,CY,R,0,Math.PI*2); c.clip();
+      c.strokeStyle='rgba(0,255,140,.07)'; c.lineWidth=.5;
+      for(let x=0;x<W;x+=9){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+      for(let y=0;y<H;y+=9){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+      c.restore();
+    }
+    if(a.ice){
+      // frost lines
+      c.save(); c.beginPath(); c.arc(CX,CY,R,0,Math.PI*2); c.clip();
+      c.strokeStyle=ha('#aaddff',.04); c.lineWidth=1;
+      for(let i=0;i<5;i++){c.beginPath();c.moveTo(i*W/4,0);c.lineTo(i*W/4+20,H);c.stroke();}
+      c.restore();
+    }
+
+    // edge drain visualisation
+    if(a.edgeStr>.1){
+      const er=R*(1-a.edgeStr*.5);
+      const eg=c.createRadialGradient(CX,CY,er,CX,CY,R);
+      eg.addColorStop(0,'transparent');
+      eg.addColorStop(1,ha(a.lava?'#ff2200':'#ff3300',.2));
+      c.beginPath(); c.arc(CX,CY,R,0,Math.PI*2); c.fillStyle=eg; c.fill();
+    }
+
+    arenaRing(c,CX,CY,R,a.rim,a.glo);
+
+    // two orbiting mini blades
+    for(let j=0;j<2;j++){
+      const ang=(j/2)*Math.PI*2+t*(j===0?.4:-.3);
+      const br=R*.42;
+      blade(c,CX+Math.cos(ang)*br,CY+Math.sin(ang)*br,7,
+        j===0?'#00d4ff':'#ff4422',j===0?'#0077ff':'#cc2200',t*(j===0?2:-1.8));
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+});
+
+// ══════════════════════════════════════════════════
+// CLIMBER OBJECTIVE CANVAS
+// ══════════════════════════════════════════════════
+(function() {
+  const cv=document.getElementById('cvClimberObj');
+  const c=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const PW=80,PH=10;
+
+  const plats=[
+    {x:W*.12,y:H*.88,t:'normal'},{x:W*.48,y:H*.73,t:'normal'},
+    {x:W*.22,y:H*.57,t:'fragile'},{x:W*.62,y:H*.42,t:'boost'},
+    {x:W*.36,y:H*.22,t:'finish'},
+  ];
+  const stars=[{x:W*.58,y:H*.64},{x:W*.3,y:H*.49},{x:W*.72,y:H*.36}];
+  const PATH=[
+    {tx:W*.12+PW/2,ty:H*.88-16,t:0},
+    {tx:W*.48+PW/2,ty:H*.73-16,t:1.2},
+    {tx:W*.22+PW/2,ty:H*.57-16,t:2.4},
+    {tx:W*.62+PW/2,ty:H*.42-16,t:3.6},
+    {tx:W*.36+PW/2,ty:H*.22-16,t:5},
+    {tx:W*.12+PW/2,ty:H*.88-16,t:7},
+  ];
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function eio(p){return p<.5?2*p*p:1-2*(1-p)*(1-p);}
+
+  function draw(ts) {
+    const t=(ts*.001)%7;
+    c.clearRect(0,0,W,H);
+
+    // bg stars
+    for(let i=0;i<25;i++){
+      c.fillStyle=ha('#aabbff',.2+(i%3)*.1);
+      c.fillRect((i*137.5)%W,(i*83.7)%H,1,1);
+    }
+
+    // platforms
+    plats.forEach(p=>{
+      const pc=p.t==='finish'?'#00ff88':p.t==='boost'?'#ffcc00':p.t==='fragile'?'#ff6644':'#2a3d5a';
+      c.fillStyle=pc;
+      c.shadowColor=pc; c.shadowBlur=p.t==='finish'||p.t==='boost'?10:0;
+      c.beginPath(); c.roundRect(p.x,p.y,PW,PH,3); c.fill();
+      c.shadowBlur=0;
+      c.font='6px Share Tech Mono, monospace';
+      c.fillStyle=pc; c.textAlign='center';
+      c.fillText(p.t.toUpperCase(),p.x+PW/2,p.y-5);
+      if(p.t==='finish'){
+        c.font='12px monospace'; c.fillStyle='#00ff88';
+        c.fillText('🏁',p.x+PW/2,p.y-14);
+      }
+    });
+
+    // stars
+    stars.forEach(s=>{
+      const pulse=.55+.45*Math.sin(t*3+s.x);
+      c.font=`${11*pulse}px monospace`;
+      c.fillStyle=ha('#ffcc00',pulse); c.textAlign='center';
+      c.fillText('★',s.x,s.y);
+    });
+
+    // blade interpolation
+    let bx=PATH[0].tx,by=PATH[0].ty;
+    for(let i=0;i<PATH.length-1;i++){
+      const seg=PATH[i],nxt=PATH[i+1];
+      if(t>=seg.t&&t<nxt.t){
+        const p=eio((t-seg.t)/(nxt.t-seg.t));
+        bx=lerp(seg.tx,nxt.tx,p); by=lerp(seg.ty,nxt.ty,p);
+        break;
+      }
+    }
+    blade(c,bx,by,15,'#00d4ff','#0077ff',t*3);
+
+    // legend
+    c.font='700 8px Orbitron, monospace'; c.fillStyle='#1a2030'; c.textAlign='center';
+    c.fillText('CLIMB UP · COLLECT STARS ★ · REACH THE FINISH', W/2, H-8);
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ══════════════════════════════════════════════════
+// PLATFORM TYPE CANVASES
+// ══════════════════════════════════════════════════
+function makePlatCanvas(id, type) {
+  const cv=document.getElementById(id);
+  if(!cv) return;
+  const c=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const PW=80,PH=9;
+  const colors={normal:'#2a3d5a',fragile:'#ff6644',moving:'#00d4ff',boost:'#ffcc00',finish:'#00ff88'};
+  const col=colors[type];
+
+  function draw(ts) {
+    const t=ts*.001;
+    c.clearRect(0,0,W,H);
+    let px=(W-PW)/2, py=H*.72;
+
+    if(type==='moving') px=(W-PW)/2+Math.sin(t*1.4)*18;
+
+    // draw platform (fragile has break animation)
+    if(type==='fragile'){
+      const cyc=t%3.2;
+      if(cyc<2){
+        c.fillStyle=col;
+        c.beginPath(); c.roundRect(px,py,PW,PH,3); c.fill();
+        if(cyc>1.2){
+          // crack lines
+          const cp=(cyc-1.2)/.8;
+          c.strokeStyle=ha('#000',.5*cp); c.lineWidth=1;
+          c.beginPath();c.moveTo(px+22,py);c.lineTo(px+18,py+PH);c.stroke();
+          c.beginPath();c.moveTo(px+55,py);c.lineTo(px+60,py+PH);c.stroke();
+        }
+      } else {
+        const bp=(cyc-2)/1.2;
+        c.fillStyle=ha(col,1-bp);
+        c.beginPath(); c.roundRect(px-bp*12,py+bp*10,PW*.42,PH,2); c.fill();
+        c.beginPath(); c.roundRect(px+PW*.52+bp*12,py+bp*14,PW*.42,PH,2); c.fill();
+      }
+    } else {
+      if(type==='boost'||type==='finish'){c.shadowColor=col; c.shadowBlur=8;}
+      c.fillStyle=col;
+      c.beginPath(); c.roundRect(px,py,PW,PH,3); c.fill();
+      c.shadowBlur=0;
+    }
+
+    // boost upward arrow
+    if(type==='boost'){
+      const bt=t%1.4;
+      const ay=py-14-bt*18;
+      const al=Math.max(0,1-bt/1.4);
+      c.strokeStyle=ha(col,al); c.lineWidth=2;
+      c.shadowColor=col; c.shadowBlur=5;
+      c.beginPath();c.moveTo(W/2,ay+12);c.lineTo(W/2,ay);
+      c.moveTo(W/2,ay);c.lineTo(W/2-5,ay+7);
+      c.moveTo(W/2,ay);c.lineTo(W/2+5,ay+7);
+      c.stroke(); c.shadowBlur=0;
+    }
+
+    // moving arrows
+    if(type==='moving'){
+      c.strokeStyle=ha(col,.4); c.lineWidth=1.5;
+      [[W*.12,W*.04],[W*.88,W*.96]].forEach(([from,to])=>{
+        c.beginPath();c.moveTo(from,py+PH/2);c.lineTo(to,py+PH/2);c.stroke();
+      });
+    }
+
+    // finish glow text
+    if(type==='finish'){
+      c.font='14px monospace'; c.fillStyle=col;
+      c.shadowColor=col; c.shadowBlur=8;
+      c.textAlign='center'; c.fillText('🏁',W/2,py-10);
+      c.shadowBlur=0;
+    }
+
+    // blade on platform (fragile: only when solid)
+    const showBlade = type!=='fragile'||(t%3.2)<1.8;
+    if(showBlade){
+      const bpx=type==='moving'?px+PW/2:W/2;
+      blade(c,bpx,py-13,10,'#00d4ff','#0077ff',t*2.5);
+    }
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+makePlatCanvas('cvPN','normal');
+makePlatCanvas('cvPF','fragile');
+makePlatCanvas('cvPM','moving');
+makePlatCanvas('cvPB','boost');
+makePlatCanvas('cvPG','finish');
+
+// ══════════════════════════════════════════════════
+// STAGE CARDS
+// ══════════════════════════════════════════════════
+const STAGE_DATA=[
+  {n:1,name:'LAUNCH',  diff:.10,traits:'All normal platforms. Learn the controls.',stars:3, plats:7},
+  {n:2,name:'DRIFT',   diff:.20,traits:'First moving platforms appear.',            stars:4, plats:8},
+  {n:3,name:'STORM',   diff:.30,traits:'Fragile platforms introduced.',             stars:5, plats:9},
+  {n:4,name:'RUSH',    diff:.40,traits:'Moving + fragile combos begin.',            stars:5, plats:9},
+  {n:5,name:'QUAKE',   diff:.50,traits:'Boost platforms added!',                   stars:6, plats:10},
+  {n:6,name:'BLAZE',   diff:.60,traits:'Tighter spacing, more hazards.',           stars:6, plats:10},
+  {n:7,name:'VORTEX',  diff:.70,traits:'Dense moving platform sections.',          stars:7, plats:11},
+  {n:8,name:'THUNDER', diff:.80,traits:'Heavy fragile gauntlets.',                 stars:7, plats:11},
+  {n:9,name:'INFERNO', diff:.90,traits:'Extreme hazard density.',                  stars:8, plats:12},
+  {n:10,name:'DRAGOON',diff:1.0,traits:'The ultimate challenge. All types.',       stars:10,plats:13},
+];
+const grid=document.getElementById('stageGrid');
+STAGE_DATA.forEach(s=>{
+  const h=`hsl(${(1-s.diff)*115},65%,48%)`;
+  const el=document.createElement('div');
+  el.className='stage-card';
+  el.innerHTML=`<div class="stage-num">STAGE ${s.n}</div>
+<div class="stage-name">${s.name}</div>
+<div class="stage-bar"><div class="stage-fill" style="width:${s.diff*100}%;background:${h}"></div></div>
+<div class="stage-traits">${s.traits}<br>★ ${s.stars} stars · ${s.plats} platforms</div>`;
+  grid.appendChild(el);
+});
+
+// ══════════════════════════════════════════════════
+// BURST MECHANIC CANVAS — Shark Edge vs Phantom Orion
+// ══════════════════════════════════════════════════
+(function() {
+  const cv = document.getElementById('cvBurstMech');
+  if (!cv) return;
+  const c = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+
+  // Real character data
+  const PHANTOM = { col:'#c8d8f0', glo:'#66aaff', blades:5, atk:9,  def:13, sta:15, bst:15, label:'PHANTOM ORION',     sub:'TRANSCENDENT · STAMINA' };
+  const SHARK   = { col:'#00ffcc', glo:'#00aa88', blades:5, atk:10, def:2,  sta:2,  bst:1,  label:'SHARK EDGE',        sub:'ADVANCED · ATTACK' };
+
+  // Positions
+  const PX = W * .72, PY = H * .38;
+  const SX0 = W * .22, SY = H * .38;
+
+  // Cycle: 0-1.5 idle → 1.5-2.4 dash → 2.4-2.8 flash → 2.8-5 burst → 5-6 hold → 6-7 reset
+  const CYCLE = 7.5;
+
+  function statRow(ctx, lx, ly, label, val, maxVal, col) {
+    const BW = 54, BH = 5;
+    ctx.font = '6px Share Tech Mono,monospace';
+    ctx.fillStyle = '#334'; ctx.textAlign = 'right';
+    ctx.fillText(label, lx - 3, ly + 4);
+    ctx.fillStyle = '#0a1020';
+    ctx.beginPath(); ctx.roundRect(lx, ly, BW, BH, 2); ctx.fill();
+    if (val > 0) {
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.roundRect(lx, ly, BW * Math.min(val / 15, 1), BH, 2); ctx.fill();
+    }
+    ctx.font = '6px Share Tech Mono,monospace';
+    ctx.fillStyle = val === 15 ? '#00ff88' : val <= 2 ? '#ff4422' : col;
+    ctx.textAlign = 'left';
+    ctx.fillText(val === 15 ? 'MAX' : val, lx + BW + 4, ly + 4);
+  }
+
+  function drawCharStats(ctx, cx, cy, char, side) {
+    // side: 'left' means bars extend right from cx-24; 'right' means cx-24
+    const barsX = cx - 27;
+    const rows = [
+      { k:'ATK', v:char.atk, c:'#ff4422' },
+      { k:'DEF', v:char.def, c:'#4488ff' },
+      { k:'STA', v:char.sta, c:'#00ff88' },
+      { k:'BST', v:char.bst, c:'#ffcc00' },
+    ];
+    rows.forEach((r, i) => statRow(ctx, barsX, cy + 28 + i * 15, r.k, r.v, 15, r.c));
+  }
+
+  function draw(ts) {
+    const t = (ts * .001) % CYCLE;
+    c.clearRect(0, 0, W, H);
+
+    // ── phase ──
+    let sharkX = SX0, sharkAlive = true, burstP = 0, flashA = 0;
+    if (t < 1.5) {
+      sharkX = SX0;
+    } else if (t < 2.4) {
+      const p = (t - 1.5) / .9;
+      const ep = p < .5 ? 2*p*p : 1-2*(1-p)*(1-p);
+      sharkX = SX0 + (PX - 55 - SX0) * ep;
+    } else if (t < 2.8) {
+      sharkX = PX - 55;
+      flashA = 1 - (t - 2.4) / .4;
+    } else if (t < 5.5) {
+      sharkX = PX - 55;
+      burstP = Math.min(1, (t - 2.8) / 1.4);
+      sharkAlive = burstP < .45;
+    } else {
+      sharkX = SX0;
+      burstP = 0; sharkAlive = true;
+    }
+
+    // ── Phantom Orion ──
+    blade(c, PX, PY, 22, PHANTOM.col, PHANTOM.glo, ts * .0013, PHANTOM.blades);
+
+    // BST-15 shield ring (always pulsing)
+    const sp = .4 + .35 * Math.sin(ts * .003);
+    c.beginPath(); c.arc(PX, PY, 29, 0, Math.PI * 2);
+    c.strokeStyle = ha('#00ff88', sp * .3); c.lineWidth = 2.5; c.stroke();
+
+    // Phantom labels
+    c.font = '700 8px Orbitron,monospace'; c.fillStyle = '#aabbdd'; c.textAlign = 'center';
+    c.fillText(PHANTOM.label, PX, PY - 34);
+    c.font = '7px Share Tech Mono,monospace'; c.fillStyle = '#334';
+    c.fillText(PHANTOM.sub, PX, PY - 22);
+
+    // BST IMMUNE badge
+    c.font = '700 7px Orbitron,monospace'; c.fillStyle = ha('#00ff88', .7); c.textAlign = 'center';
+    c.fillText('BST 15 · BURST IMMUNE', PX, PY + 105);
+
+    // Phantom stats (visible when not mid-collision)
+    if (t < 1.8 || t > 4.8) drawCharStats(c, PX, PY, PHANTOM, 'right');
+
+    // ── Shark Edge ──
+    if (sharkAlive) {
+      blade(c, sharkX, SY, 14, SHARK.col, SHARK.glo, ts * .002, SHARK.blades);
+    }
+
+    // burst shards
+    if (burstP > 0 && !sharkAlive) {
+      for (let i = 0; i < 9; i++) {
+        const pa = (i / 9) * Math.PI * 2 + ts * .003;
+        const pr = burstP * 48;
+        c.beginPath(); c.arc(sharkX + Math.cos(pa) * pr, SY + Math.sin(pa) * pr, 3 * (1 - burstP), 0, Math.PI * 2);
+        c.fillStyle = ha(SHARK.col, Math.max(0, 1 - burstP * 1.4)); c.fill();
+      }
+    }
+
+    // Shark labels (idle phases)
+    if (t < 1.8 || t > 5) {
+      c.font = '700 8px Orbitron,monospace'; c.fillStyle = '#00ffcc'; c.textAlign = 'center';
+      c.fillText(SHARK.label, sharkX, SY - 34);
+      c.font = '7px Share Tech Mono,monospace'; c.fillStyle = '#334';
+      c.fillText(SHARK.sub, sharkX, SY - 22);
+      c.font = '700 7px Orbitron,monospace'; c.fillStyle = ha('#ff4422', .7); c.textAlign = 'center';
+      c.fillText('BST 1 · HIGH BURST RISK', sharkX, SY + 105);
+    }
+
+    if (t < 1.8 || t > 5) drawCharStats(c, sharkX, SY, SHARK, 'left');
+
+    // ── BURST text ──
+    if (burstP > .2) {
+      const fade = Math.max(0, 1 - (burstP - .2) / .8);
+      const rise = burstP * 44;
+      c.font = `700 ${12 + burstP * 5}px Orbitron,monospace`;
+      c.fillStyle = ha('#ff4422', fade);
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText('BURST!', sharkX, SY - 20 - rise);
+      c.textBaseline = 'alphabetic';
+    }
+
+    // ── "Phantom Orion unfazed" ──
+    if (t > 3.5 && t < 5.5) {
+      const fade = Math.min(1, (t - 3.5) / .5) * Math.max(0, 1 - (t - 5) / .5);
+      c.font = '700 8px Orbitron,monospace';
+      c.fillStyle = ha('#00ff88', fade);
+      c.textAlign = 'center';
+      c.fillText('PHANTOM ORION UNFAZED', PX, PY + 118);
+    }
+
+    // ── collision flash ──
+    if (flashA > 0) {
+      const mx = (sharkX + PX) / 2;
+      c.beginPath(); c.arc(mx, SY, 36 * flashA, 0, Math.PI * 2);
+      c.fillStyle = ha('#ffcc00', flashA * .5); c.fill();
+      c.fillStyle = ha('#ffffff', flashA * .25); c.fillRect(0, 0, W, H);
+    }
+
+    // ── dash arrow (approach phase) ──
+    if (t >= 1.5 && t < 2.4 && sharkAlive) {
+      const prog = (t - 1.5) / .9;
+      c.save();
+      c.strokeStyle = ha('#ffcc00', .5 * (1 - prog));
+      c.setLineDash([5, 4]); c.lineWidth = 1.2;
+      c.beginPath(); c.moveTo(SX0, SY); c.lineTo(sharkX - 16, SY);
+      c.stroke(); c.setLineDash([]); c.restore();
+    }
+
+    // ── bottom label ──
+    c.font = '7px Share Tech Mono,monospace'; c.fillStyle = '#172028'; c.textAlign = 'center';
+    c.fillText('LOW BST + worn stamina + high-ATK opponent = instant burst', W / 2, H - 6);
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

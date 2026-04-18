@@ -230,7 +230,20 @@
     #opp-grid { grid-template-columns: repeat(3, 1fr); }
   }
   .opp-card.selected-opp {
-    transform: translateY(-3px);
+    animation: cardPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .opp-card.selected-opp::after {
+    content: '✓';
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--c, #fff);
+    color: #05080f;
+    font-size: 12px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 10px var(--c, #fff);
+    z-index: 2;
   }
   .opp-card.disabled-opp {
     opacity: 0.3;
@@ -272,7 +285,10 @@
     position: relative;
   }
   .arena-card:hover { transform: translateY(-2px); }
-  .arena-card.selected { transform: translateY(-3px); }
+  .arena-card:active { transform: translateY(0) scale(0.98); }
+  .arena-card.selected {
+    animation: cardPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
   .arena-card canvas { display: block; width: 100%; height: 80px; }
   .arena-card-body { padding: 7px 8px 9px; }
   .arena-card-name {
@@ -323,8 +339,18 @@
     border-color: #334;
   }
 
+  .char-card:active {
+    transform: translateY(0) scale(0.98);
+    transition: transform 0.05s;
+  }
+
   .char-card.selected {
-    transform: translateY(-3px);
+    animation: cardPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .char-card.selected::before {
+    height: 5px;
+    box-shadow: 0 0 18px var(--c), 0 0 6px var(--c);
   }
 
   .char-card::before {
@@ -334,6 +360,12 @@
     height: 3px;
     background: var(--c);
     box-shadow: 0 0 10px var(--c);
+    transition: height 0.15s, box-shadow 0.15s;
+  }
+
+  @keyframes cardPop {
+    0%   { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-4px) scale(1.03); }
   }
 
   .char-card-name {
