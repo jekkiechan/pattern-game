@@ -98,6 +98,33 @@ function bladeCollide(a, b) {
   // Tectonic Stance: reflect stamina damage back, nullify own burst damage
   if (a.specialData.reflect) { b.stamina -= staDmgA; staDmgA = 0; burstDmgA = 0; }
   if (b.specialData.reflect) { a.stamina -= staDmgB; staDmgB = 0; burstDmgB = 0; }
+  // Foresight (ORACLE EYE): defender dodges entirely, consumes one charge, short teleport blip
+  if (a.specialData.foresight > 0 && (staDmgA > 0 || burstDmgA > 0)) {
+    staDmgA = 0; burstDmgA = 0;
+    a.specialData.foresight--;
+    const ang = Math.random() * Math.PI * 2, kick = 36;
+    a.x += Math.cos(ang) * kick; a.y += Math.sin(ang) * kick;
+    spawnHitParticles(a.x, a.y, '#ddbbff', '#aa66ff', 0.4);
+    if (a.specialData.foresight <= 0) endSpecial(a);
+  }
+  if (b.specialData.foresight > 0 && (staDmgB > 0 || burstDmgB > 0)) {
+    staDmgB = 0; burstDmgB = 0;
+    b.specialData.foresight--;
+    const ang = Math.random() * Math.PI * 2, kick = 36;
+    b.x += Math.cos(ang) * kick; b.y += Math.sin(ang) * kick;
+    spawnHitParticles(b.x, b.y, '#ddbbff', '#aa66ff', 0.4);
+    if (b.specialData.foresight <= 0) endSpecial(b);
+  }
+  // Thorn Armor (OBSIDIAN FANG): attacker takes 30% of the dmg they dealt
+  if (a.specialData.thornArmor) b.stamina -= staDmgB * 0.30;
+  if (b.specialData.thornArmor) a.stamina -= staDmgA * 0.30;
+  // Coil Drain (SERPENT COIL): attacker heals 50% of stamina dealt
+  if (a.specialData.coilDrain && staDmgB > 0) {
+    a.stamina = Math.min(a.maxStamina, a.stamina + staDmgB * 0.5);
+  }
+  if (b.specialData.coilDrain && staDmgA > 0) {
+    b.stamina = Math.min(b.maxStamina, b.stamina + staDmgA * 0.5);
+  }
 
   a.stamina -= staDmgA;
   b.stamina -= staDmgB;
