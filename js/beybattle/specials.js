@@ -503,6 +503,60 @@ function activateSpecial(blade) {
       break;
     }
 
+    case 'dragonEmperor': {
+      // Left-spin absorption: drain stamina from every foe, feed self,
+      // then enter a 4s rampage (+80% attack, boosted max speed toward nearest foe).
+      const foes = G.blades.filter(b => b !== blade && b.alive);
+      foes.forEach(foe => {
+        foe.stamina = Math.max(0, foe.stamina - 18);
+        foe.wobble  = Math.min(1, foe.wobble + 0.30);
+        const dx = foe.x - gx, dy = foe.y - gy, d = Math.hypot(dx, dy) || 1;
+        // Tether particles: draw streams from foes toward the dragon
+        for (let k = 0; k < 8; k++) {
+          const t = k / 8;
+          G.parts.push(new Particle(
+            foe.x - dx * t, foe.y - dy * t,
+            k % 2 ? '#ffcc44' : '#ff3344',
+            -dx * 0.6, -dy * 0.6, 1.8 + Math.random() * 1.4, 0.5 + Math.random() * 0.3
+          ));
+        }
+      });
+      blade.stamina = Math.min(blade.maxStamina, blade.stamina + Math.min(40, foes.length * 14));
+
+      blade.specialTimer = 4;
+      blade.specialData.savedAtkMult = blade.attackMult;
+      blade.attackMult *= 1.8;
+
+      // Hyper-lunge at nearest foe
+      const tgt = nearestAlive(blade);
+      if (tgt) {
+        const dx = tgt.x - gx, dy = tgt.y - gy, d = Math.hypot(dx, dy) || 1;
+        blade.vx = (dx / d) * MAX_SPEED * 1.5;
+        blade.vy = (dy / d) * MAX_SPEED * 1.5;
+      }
+
+      // Golden-crimson burst
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 12) {
+        const r = 26 + Math.random() * 22;
+        G.parts.push(new Particle(
+          gx + Math.cos(a) * r, gy + Math.sin(a) * r,
+          Math.random() < 0.5 ? '#ffcc44' : '#ff3344',
+          Math.cos(a) * (60 + Math.random() * 50),
+          Math.sin(a) * (60 + Math.random() * 50),
+          2.4 + Math.random() * 2, 0.8 + Math.random() * 0.4
+        ));
+      }
+      spawnSpecialParticles(gx, gy, '#ff4455', 24, 5, 1.1);
+      G.shakeX = (Math.random() - 0.5) * 20;
+      G.shakeY = (Math.random() - 0.5) * 20;
+      G.shakeT = 0.4;
+
+      G.popups = G.popups || [];
+      G.popups.push({ x: gx, y: gy - 36, text: 'DRAGON EMPEROR',
+        color: '#ffcc44', timer: 1.4, maxTimer: 1.4 });
+      break;
+    }
+
     case 'fatesHand': {
       const roll = Math.random();
       if (roll < 0.25) {

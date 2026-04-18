@@ -146,6 +146,12 @@ function drawBladeToCanvas(cfg, previewCanvas) {
     else if (cfg.shape === 'nemesis') drawNemesisBlade(R);
     else if (cfg.shape === 'orion')   drawOrionBlade(R);
     else if (cfg.shape === 'pegasis') drawPegasisBlade(R);
+    else if (cfg.shape === 'unknown') drawUnknownBlade(R);
+    else if (cfg.shape === 'titan')   drawTitanBlade(R);
+    else if (cfg.shape === 'abyss')   drawAbyssBlade(R);
+    else if (cfg.shape === 'oracle')  drawOracleBlade(R);
+    else if (cfg.shape === 'obsidian')drawObsidianBlade(R);
+    else if (cfg.shape === 'ldrago')  drawLdragoBlade(R);
     else drawBladeShape(cfg.shape, R, cfg.color);
     ctx.restore();
   }
@@ -161,6 +167,12 @@ function drawBladeToCanvas(cfg, previewCanvas) {
   else if (cfg.shape === 'nemesis') drawNemesisHub(R);
   else if (cfg.shape === 'orion')   drawOrionHub(R);
   else if (cfg.shape === 'pegasis') drawPegasisHub(R);
+  else if (cfg.shape === 'unknown') drawUnknownHub(R);
+  else if (cfg.shape === 'titan')   drawTitanHub(R);
+  else if (cfg.shape === 'abyss')   drawAbyssHub(R);
+  else if (cfg.shape === 'oracle')  drawOracleHub(R);
+  else if (cfg.shape === 'obsidian')drawObsidianHub(R);
+  else if (cfg.shape === 'ldrago')  drawLdragoHub(R);
   else {
     const hub = ctx.createRadialGradient(-R*0.18, -R*0.18, 0, 0, 0, R*0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -181,6 +193,23 @@ function drawBladeToCanvas(cfg, previewCanvas) {
 }
 
 // ── CHARACTER SELECT SCREEN ──
+// Returns a readable name color: picks the brighter of color/glow and lightens
+// toward white if still too dim for the dark card background.
+function displayColor(cfg) {
+  const parse = h => { const x = h.replace('#',''); return [parseInt(x.slice(0,2),16), parseInt(x.slice(2,4),16), parseInt(x.slice(4,6),16)]; };
+  const lum = (c) => 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2];
+  const a = parse(cfg.color), b = parse(cfg.glow);
+  const pick = lum(a) > lum(b) ? a : b;
+  const L = lum(pick);
+  const TARGET = 155;
+  let out = pick;
+  if (L < TARGET) {
+    const t = (TARGET - L) / (255 - L);
+    out = pick.map(v => Math.min(255, Math.round(v + (255 - v) * t)));
+  }
+  return '#' + out.map(v => v.toString(16).padStart(2,'0')).join('');
+}
+
 const TYPE_COLORS = { ATTACK:'#ff4422', DEFENSE:'#4488ff', STAMINA:'#00ff88', BALANCE:'#ffcc00', '???':'#aa66ff' };
 const TIER_COLORS = {
   NOVICE:        '#778899',
@@ -238,9 +267,10 @@ function buildSelectScreen() {
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
     const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
+    const nameC = displayColor(cfg);
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
-      <div class="char-card-name" style="color:${cfg.color}">${cfg.name}</div>
+      <div class="char-card-name" style="color:${nameC};text-shadow:0 0 6px ${cfg.glow}66">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
         <div class="char-tier-badge${tierClass}" style="background:${tierColor}22;color:${tierColor}">${cfg.tier}</div>
@@ -268,8 +298,10 @@ function selectChar(i, rebuild = true) {
   const tc  = TYPE_COLORS[cfg.type] || '#fff';
 
   const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-  document.getElementById('detail-name').textContent  = cfg.name;
-  document.getElementById('detail-name').style.color  = cfg.color;
+  const dn = document.getElementById('detail-name');
+  dn.textContent  = cfg.name;
+  dn.style.color  = displayColor(cfg);
+  dn.style.textShadow = `0 0 14px ${cfg.glow}66`;
   document.getElementById('detail-type').textContent  = cfg.type;
   document.getElementById('detail-type').style.color  = tc;
   const tierEl = document.getElementById('detail-tier');
@@ -406,9 +438,10 @@ function buildOpponentsScreen() {
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
     const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
+    const nameC = sel ? displayColor(cfg) : '#667';
     card.innerHTML = `
       <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
-      <div class="char-card-name" style="color:${sel ? cfg.color : '#445'}">${cfg.name}</div>
+      <div class="char-card-name" style="color:${nameC};${sel ? `text-shadow:0 0 6px ${cfg.glow}66` : ''}">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
         <div class="char-tier-badge${tierClass}" style="background:${tierColor}22;color:${tierColor}">${cfg.tier}</div>

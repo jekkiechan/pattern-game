@@ -173,13 +173,13 @@ const CONFIGS = [
     atkR:6, defR:6, staR:9, spdR:7, bstR:7, tier:'ELITE',
     special:{ name:'Coil Drain', desc:'Lifesteal 50% of dmg dealt for 3s', effect:'coilDrain' } },
 
-  { name:'ORACLE EYE',     type:'BALANCE', color:'#aa66ff', glow:'#ddbbff', blades:4, shape:'wing',
+  { name:'ORACLE EYE',     type:'BALANCE', color:'#aa66ff', glow:'#ddbbff', blades:4, shape:'oracle',
     maxStamina:130, mass:1.18, defense:0.65, attackMult:1.28, burstResist:0.70, personality:'defensive',
     desc:'Seer-blade that reads every attack before it lands. Visions whisper the path of each strike.',
     atkR:7, defR:7, staR:7, spdR:8, bstR:7, tier:'CHAMPION',
     special:{ name:'Foresight', desc:'Dodge next 2 incoming hits entirely', effect:'foresight' } },
 
-  { name:'OBSIDIAN FANG',  type:'DEFENSE', color:'#221133', glow:'#8844ff', blades:4, shape:'fang',
+  { name:'OBSIDIAN FANG',  type:'DEFENSE', color:'#221133', glow:'#8844ff', blades:4, shape:'obsidian',
     maxStamina:175, mass:1.90, defense:0.32, attackMult:0.95, burstResist:0.98, personality:'defensive',
     desc:'Volcanic glass blade crowned with thorned fangs. Every hit it takes carves the attacker in return.',
     atkR:5, defR:10, staR:9, spdR:4, bstR:10, tier:'MYTHICAL',
@@ -202,6 +202,12 @@ const CONFIGS = [
     desc:'A kraken coiled from the blackest trench. Its pressure wave cripples anything that still breathes.',
     atkR:6, defR:8, staR:10, spdR:6, bstR:9, tier:'LEGENDARY',
     special:{ name:'Depth Charge', desc:'Slow foes 60% & +3s to their specials (4s)', effect:'depthCharge' } },
+
+  { name:'L-DRAGO DESTROY', type:'BALANCE', color:'#6a0018', glow:'#ff3344', blades:4, shape:'ldrago',
+    maxStamina:210, mass:2.08, defense:0.20, attackMult:2.10, burstResist:0.97, personality:'aggressive',
+    desc:'The Dragon Emperor. Left-spin absorbs the rotational energy of every foe it strikes — every clash feeds the dragon. Gold-engraved scales forged in anti-matter flame; the longer the battle rages, the more unstoppable it becomes.',
+    atkR:14, defR:8, staR:11, spdR:12, bstR:10, tier:'TRANSCENDENT',
+    special:{ name:'Dragon Emperor', desc:'Drain 18 sta from all foes · +80% atk & +speed (4s)', effect:'dragonEmperor' } },
 
   { name:'THE UNKNOWN',         type:'???',     color:'#8844cc', glow:'#cc66ff', blades:3, shape:'unknown',
     maxStamina:160, mass:1.55, defense:0.46, attackMult:1.80, burstResist:0.72, personality:'chaotic',

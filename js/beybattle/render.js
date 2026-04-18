@@ -142,6 +142,9 @@ function drawBlade(b) {
     else if (b.shape === 'unknown') drawUnknownBlade(R);
     else if (b.shape === 'titan')   drawTitanBlade(R);
     else if (b.shape === 'abyss')   drawAbyssBlade(R);
+    else if (b.shape === 'oracle')  drawOracleBlade(R);
+    else if (b.shape === 'obsidian')drawObsidianBlade(R);
+    else if (b.shape === 'ldrago')  drawLdragoBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -161,6 +164,9 @@ function drawBlade(b) {
   else if (b.shape === 'unknown') { drawUnknownHub(R); }
   else if (b.shape === 'titan')   { drawTitanHub(R); }
   else if (b.shape === 'abyss')   { drawAbyssHub(R); }
+  else if (b.shape === 'oracle')  { drawOracleHub(R); }
+  else if (b.shape === 'obsidian'){ drawObsidianHub(R); }
+  else if (b.shape === 'ldrago')  { drawLdragoHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -1481,6 +1487,371 @@ function drawLavaPools() {
     ctx.lineWidth   = 1.5;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 0.92, 0, Math.PI * 2); ctx.stroke();
   });
+  ctx.restore();
+}
+
+function drawOracleBlade(R) {
+  // Feathered oracle-eye wing: elongated lens-shape with engraved iris detail
+  ctx.beginPath();
+  ctx.moveTo(R * 0.08, -R * 0.10);
+  ctx.bezierCurveTo(R * 0.28, -R * 0.56, R * 0.88, -R * 0.50, R * 1.30, -R * 0.14);
+  ctx.bezierCurveTo(R * 1.38,  R * 0.08, R * 1.10,  R * 0.30, R * 0.82,  R * 0.30);
+  ctx.bezierCurveTo(R * 0.44,  R * 0.30, R * 0.18,  R * 0.14, R * 0.08, -R * 0.10);
+  ctx.closePath();
+
+  const bg = ctx.createLinearGradient(0, -R * 0.5, R * 1.3, R * 0.3);
+  bg.addColorStop(0,    '#1a0a38');
+  bg.addColorStop(0.4,  '#5a2cb0');
+  bg.addColorStop(0.75, '#aa66ff');
+  bg.addColorStop(1,    '#f0d8ff');
+  ctx.fillStyle   = bg;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#ddbbff';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(230,200,255,0.70)';
+  ctx.lineWidth   = 0.9;
+  ctx.stroke();
+
+  // Vertical pupil slit running the length of the blade
+  ctx.beginPath();
+  ctx.ellipse(R * 0.72, R * 0.04, R * 0.42, R * 0.08, 0, 0, Math.PI * 2);
+  const ir = ctx.createRadialGradient(R * 0.72, R * 0.04, 0, R * 0.72, R * 0.04, R * 0.42);
+  ir.addColorStop(0,   '#ffffff');
+  ir.addColorStop(0.35,'#ddbbff');
+  ir.addColorStop(0.8, '#5522aa');
+  ir.addColorStop(1,   'rgba(30,0,60,0)');
+  ctx.fillStyle = ir;
+  ctx.shadowBlur = 0;
+  ctx.fill();
+
+  // Rune tick marks along top edge — seer script
+  ctx.strokeStyle = 'rgba(255,240,255,0.70)';
+  ctx.lineWidth   = 1.2;
+  ctx.shadowBlur  = 6;
+  ctx.shadowColor = '#ddbbff';
+  for (let i = 0; i < 4; i++) {
+    const t = 0.28 + i * 0.20;
+    const x = R * (0.22 + t * 0.95);
+    const y = -R * (0.30 - Math.sin(t * Math.PI) * 0.18);
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + R * 0.04, y - R * 0.10); ctx.stroke();
+  }
+}
+
+function drawOracleHub(R) {
+  // Concentric arcane sigil — all-seeing eye
+  const ring = ctx.createRadialGradient(-R * 0.14, -R * 0.14, 0, 0, 0, R * 0.62);
+  ring.addColorStop(0,    '#3a1870');
+  ring.addColorStop(0.5,  '#1a0840');
+  ring.addColorStop(1,    '#000010');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.62, 0, Math.PI * 2);
+  ctx.fillStyle   = ring;
+  ctx.shadowBlur  = 20;
+  ctx.shadowColor = '#ddbbff';
+  ctx.fill();
+
+  // Counter-rotating sigil ring + eye
+  ctx.save();
+  ctx.rotate(-Date.now() * 0.0016);
+
+  // Rune arc ticks
+  ctx.strokeStyle = 'rgba(220,187,255,0.80)';
+  ctx.lineWidth   = 1.3;
+  ctx.shadowBlur  = 8;
+  ctx.shadowColor = '#cc99ff';
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const r1 = R * 0.48, r2 = R * (i % 3 === 0 ? 0.58 : 0.54);
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+    ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+    ctx.stroke();
+  }
+
+  // Eye-shaped iris (horizontal lens)
+  ctx.beginPath();
+  ctx.ellipse(0, 0, R * 0.40, R * 0.22, 0, 0, Math.PI * 2);
+  const sc = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.40);
+  sc.addColorStop(0,    '#ffffff');
+  sc.addColorStop(0.45, '#ddbbff');
+  sc.addColorStop(1,    '#2a0a58');
+  ctx.fillStyle  = sc;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = '#cc99ff';
+  ctx.fill();
+
+  // Pupil
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.10, 0, Math.PI * 2);
+  ctx.fillStyle = '#0a0020';
+  ctx.shadowBlur = 0;
+  ctx.fill();
+
+  // Glint
+  ctx.beginPath();
+  ctx.arc(R * 0.04, -R * 0.04, R * 0.035, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawObsidianBlade(R) {
+  // Jagged volcanic-glass blade with hooked thorn barbs
+  ctx.beginPath();
+  ctx.moveTo(R * 0.06, -R * 0.14);
+  ctx.lineTo(R * 0.38, -R * 0.54);  // inner thorn
+  ctx.lineTo(R * 0.62, -R * 0.30);
+  ctx.lineTo(R * 0.96, -R * 0.70);  // main fang tip
+  ctx.lineTo(R * 1.26, -R * 0.34);
+  ctx.lineTo(R * 1.36,  R * 0.04);
+  ctx.lineTo(R * 1.18,  R * 0.30);
+  ctx.lineTo(R * 0.88,  R * 0.12);  // notched back
+  ctx.lineTo(R * 0.68,  R * 0.34);
+  ctx.lineTo(R * 0.32,  R * 0.20);
+  ctx.closePath();
+
+  // Obsidian body: near-black with deep violet sheen
+  const body = ctx.createLinearGradient(0, -R * 0.7, R * 1.4, R * 0.3);
+  body.addColorStop(0,    '#050008');
+  body.addColorStop(0.40, '#1a0628');
+  body.addColorStop(0.80, '#2a0f50');
+  body.addColorStop(1,    '#0a0220');
+  ctx.fillStyle   = body;
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#8844ff';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(136,68,255,0.85)';
+  ctx.lineWidth   = 1.1;
+  ctx.stroke();
+
+  // Inner fractured facet — mirror-glint highlight
+  ctx.beginPath();
+  ctx.moveTo(R * 0.46, -R * 0.28);
+  ctx.lineTo(R * 0.92, -R * 0.52);
+  ctx.lineTo(R * 1.14, -R * 0.16);
+  ctx.lineTo(R * 0.72, -R * 0.06);
+  ctx.closePath();
+  const facet = ctx.createLinearGradient(R * 0.4, -R * 0.4, R * 1.1, -R * 0.1);
+  facet.addColorStop(0,   'rgba(180,120,255,0.55)');
+  facet.addColorStop(0.5, 'rgba(220,180,255,0.35)');
+  facet.addColorStop(1,   'rgba(80,30,140,0.0)');
+  ctx.fillStyle  = facet;
+  ctx.shadowBlur = 0;
+  ctx.fill();
+
+  // Glowing violet runes along spine — three slashes
+  ctx.save();
+  ctx.strokeStyle = 'rgba(200,150,255,0.80)';
+  ctx.lineWidth   = 1.3;
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#bb66ff';
+  ctx.beginPath(); ctx.moveTo(R * 0.50, -R * 0.12); ctx.lineTo(R * 0.66, -R * 0.22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(R * 0.80, -R * 0.10); ctx.lineTo(R * 0.98, -R * 0.22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(R * 1.02,  R * 0.00); ctx.lineTo(R * 1.20, -R * 0.10); ctx.stroke();
+  ctx.restore();
+
+  // Thorn-tip ember glow at main fang
+  ctx.beginPath();
+  ctx.arc(R * 0.96, -R * 0.68, R * 0.09, 0, Math.PI * 2);
+  const em = ctx.createRadialGradient(R * 0.96, -R * 0.68, 0, R * 0.96, -R * 0.68, R * 0.09);
+  em.addColorStop(0, 'rgba(255,220,255,0.95)');
+  em.addColorStop(1, 'rgba(136,68,255,0)');
+  ctx.fillStyle = em;
+  ctx.fill();
+}
+
+function drawObsidianHub(R) {
+  // Cracked glass dome with violet core
+  const rim = ctx.createRadialGradient(-R * 0.14, -R * 0.14, 0, 0, 0, R * 0.62);
+  rim.addColorStop(0,    '#3a1860');
+  rim.addColorStop(0.35, '#180838');
+  rim.addColorStop(0.9,  '#040010');
+  rim.addColorStop(1,    '#000000');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.62, 0, Math.PI * 2);
+  ctx.fillStyle   = rim;
+  ctx.shadowBlur  = 22;
+  ctx.shadowColor = '#8844ff';
+  ctx.fill();
+
+  // Violet core
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.38);
+  core.addColorStop(0,    '#ffffff');
+  core.addColorStop(0.2,  '#ddbbff');
+  core.addColorStop(0.6,  '#6622cc');
+  core.addColorStop(1,    '#120028');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.38, 0, Math.PI * 2);
+  ctx.fillStyle   = core;
+  ctx.shadowBlur  = 16;
+  ctx.shadowColor = '#bb66ff';
+  ctx.fill();
+
+  // Cracks radiating from the core — fractured glass
+  ctx.save();
+  ctx.strokeStyle = 'rgba(220,180,255,0.70)';
+  ctx.lineWidth   = 0.9;
+  ctx.shadowBlur  = 6;
+  ctx.shadowColor = '#aa66ff';
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + 0.3;
+    const len = R * (0.52 + (i % 2) * 0.08);
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * R * 0.14, Math.sin(a) * R * 0.14);
+    const mx = Math.cos(a) * len * 0.6 + Math.cos(a + 0.6) * R * 0.05;
+    const my = Math.sin(a) * len * 0.6 + Math.sin(a + 0.6) * R * 0.05;
+    ctx.lineTo(mx, my);
+    ctx.lineTo(Math.cos(a - 0.12) * len, Math.sin(a - 0.12) * len);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawLdragoBlade(R) {
+  // L-DRAGO DESTROY — left-spin dragon head with serrated jaw and trailing horns
+  ctx.save();
+  ctx.scale(-1, 1); // mirror to convey left-spin asymmetry
+  ctx.beginPath();
+  ctx.moveTo(R * 0.06, -R * 0.18);
+  // Upper jaw — pointed forward with a backward-swept horn
+  ctx.lineTo(R * 0.38, -R * 0.58);
+  ctx.lineTo(R * 0.62, -R * 0.40);
+  ctx.lineTo(R * 0.92, -R * 0.80);  // horn tip
+  ctx.lineTo(R * 1.20, -R * 0.44);
+  ctx.lineTo(R * 1.48, -R * 0.06);  // snout tip
+  ctx.lineTo(R * 1.32,  R * 0.22);
+  // Jaw teeth (saw edge)
+  ctx.lineTo(R * 1.12,  R * 0.12);
+  ctx.lineTo(R * 1.00,  R * 0.28);
+  ctx.lineTo(R * 0.84,  R * 0.14);
+  ctx.lineTo(R * 0.72,  R * 0.30);
+  ctx.lineTo(R * 0.56,  R * 0.16);
+  ctx.lineTo(R * 0.30,  R * 0.26);
+  ctx.closePath();
+
+  // Black-red scaled body
+  const body = ctx.createLinearGradient(0, -R * 0.7, R * 1.5, R * 0.3);
+  body.addColorStop(0,    '#10000a');
+  body.addColorStop(0.35, '#3a0510');
+  body.addColorStop(0.70, '#88112a');
+  body.addColorStop(1,    '#ff3355');
+  ctx.fillStyle   = body;
+  ctx.shadowBlur  = 22;
+  ctx.shadowColor = '#ff2244';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,80,100,0.85)';
+  ctx.lineWidth   = 1.2;
+  ctx.stroke();
+
+  // Gold accent ridge along the brow
+  ctx.beginPath();
+  ctx.moveTo(R * 0.18, -R * 0.26);
+  ctx.bezierCurveTo(R * 0.46, -R * 0.48, R * 0.98, -R * 0.58, R * 1.36, -R * 0.18);
+  ctx.strokeStyle = 'rgba(255,220,120,0.95)';
+  ctx.lineWidth   = 1.8;
+  ctx.shadowBlur  = 12;
+  ctx.shadowColor = '#ffcc44';
+  ctx.stroke();
+
+  // Dragon eye — glowing crimson slit
+  ctx.beginPath();
+  ctx.ellipse(R * 0.92, -R * 0.28, R * 0.10, R * 0.05, Math.PI * 0.1, 0, Math.PI * 2);
+  const eye = ctx.createRadialGradient(R * 0.92, -R * 0.28, 0, R * 0.92, -R * 0.28, R * 0.12);
+  eye.addColorStop(0,    '#fff8c8');
+  eye.addColorStop(0.35, '#ff4455');
+  eye.addColorStop(1,    'rgba(80,0,10,0)');
+  ctx.fillStyle  = eye;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = '#ff4455';
+  ctx.fill();
+
+  // Backward-curling horn highlight
+  ctx.strokeStyle = 'rgba(255,180,80,0.65)';
+  ctx.lineWidth   = 0.9;
+  ctx.shadowBlur  = 6;
+  ctx.shadowColor = '#ffaa44';
+  ctx.beginPath();
+  ctx.moveTo(R * 0.70, -R * 0.50);
+  ctx.lineTo(R * 0.88, -R * 0.74);
+  ctx.stroke();
+
+  // Left-spin arrow glyph — small engraved curve near the base
+  ctx.strokeStyle = 'rgba(255,230,180,0.75)';
+  ctx.lineWidth   = 1.1;
+  ctx.shadowBlur  = 5;
+  ctx.shadowColor = '#ffcc88';
+  ctx.beginPath();
+  ctx.arc(R * 0.34, R * 0.04, R * 0.12, -Math.PI * 0.2, Math.PI * 1.1);
+  ctx.stroke();
+  // arrow head
+  ctx.beginPath();
+  ctx.moveTo(R * 0.22, R * 0.02);
+  ctx.lineTo(R * 0.16, R * 0.08);
+  ctx.lineTo(R * 0.24, R * 0.12);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawLdragoHub(R) {
+  // Dragon Emperor core: gold outer ring, dark crimson inner, pulsing core
+  const outer = ctx.createRadialGradient(-R * 0.16, -R * 0.16, 0, 0, 0, R * 0.66);
+  outer.addColorStop(0,    '#ffe88a');
+  outer.addColorStop(0.35, '#cc8822');
+  outer.addColorStop(0.75, '#553311');
+  outer.addColorStop(1,    '#1a0500');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.64, 0, Math.PI * 2);
+  ctx.fillStyle   = outer;
+  ctx.shadowBlur  = 28;
+  ctx.shadowColor = '#ffaa44';
+  ctx.fill();
+
+  // Gold engraved ring
+  ctx.strokeStyle = 'rgba(255,220,120,0.90)';
+  ctx.lineWidth   = 1.8;
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#ffcc66';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.56, 0, Math.PI * 2); ctx.stroke();
+
+  // Eight dragon-scale pips around the ring
+  ctx.save();
+  ctx.rotate(-Date.now() * 0.0018);
+  for (let i = 0; i < 8; i++) {
+    const a  = (i / 8) * Math.PI * 2;
+    const px = Math.cos(a) * R * 0.48, py = Math.sin(a) * R * 0.48;
+    const g  = ctx.createRadialGradient(px, py, 0, px, py, R * 0.08);
+    g.addColorStop(0,   '#fff0a8');
+    g.addColorStop(0.5, '#ff4455');
+    g.addColorStop(1,   'rgba(40,0,10,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(px, py, R * 0.08, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+
+  // Molten core — crimson with white heart
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.38);
+  core.addColorStop(0,    '#ffffff');
+  core.addColorStop(0.18, '#ffcc66');
+  core.addColorStop(0.45, '#ff3322');
+  core.addColorStop(0.85, '#330008');
+  core.addColorStop(1,    '#000000');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.38, 0, Math.PI * 2);
+  ctx.fillStyle   = core;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#ff3344';
+  ctx.fill();
+
+  // Dragon emperor "L" rune — left-spin glyph at the center
+  ctx.save();
+  ctx.font         = `bold ${Math.round(R * 0.42)}px 'Orbitron', monospace`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle    = 'rgba(255,250,220,0.95)';
+  ctx.shadowBlur   = 10;
+  ctx.shadowColor  = '#ffddaa';
+  ctx.scale(-1, 1); // flipped L for left-spin
+  ctx.fillText('L', 0, R * 0.04);
   ctx.restore();
 }
 
