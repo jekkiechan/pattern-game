@@ -232,12 +232,13 @@ function buildSelectScreen() {
 
   CONFIGS.forEach((cfg, i) => {
     const tc   = TYPE_COLORS[cfg.type] || '#fff';
+    const dc   = displayColor(cfg);
     const card = document.createElement('div');
     card.className = 'char-card' + (i === G.selectedChar ? ' selected' : '');
-    card.style.setProperty('--c', cfg.color);
+    card.style.setProperty('--c', dc);
     if (i === G.selectedChar) {
-      card.style.borderColor = cfg.color;
-      card.style.boxShadow   = `0 0 14px ${cfg.color}55`;
+      card.style.borderColor = dc;
+      card.style.boxShadow   = `0 0 14px ${dc}55`;
     }
 
     const statBars = STAT_KEYS.map((k, si) => {
@@ -254,7 +255,7 @@ function buildSelectScreen() {
       const overMax = val > 10;
       const w = overMax ? 100 : val * 10;
       const fillClass = overMax ? ' stat-fill-overflow' : '';
-      const fillStyle = overMax ? '' : `background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88`;
+      const fillStyle = overMax ? '' : `background:${dc};box-shadow:0 0 4px ${dc}88`;
       const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
       return `
       <div class="stat-row">
@@ -267,9 +268,9 @@ function buildSelectScreen() {
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
     const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
-    const nameC = displayColor(cfg);
+    const nameC = dc;
     card.innerHTML = `
-      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
+      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
       <div class="char-card-name" style="color:${nameC};text-shadow:0 0 6px ${cfg.glow}66">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
@@ -312,12 +313,13 @@ function selectChar(i, rebuild = true) {
   document.getElementById('detail-special').innerHTML =
     `<span class="special-name">◆ ${cfg.special.name}</span>  ${cfg.special.desc}`;
 
+  const detailDc = displayColor(cfg);
   document.getElementById('detail-stats').innerHTML = STAT_KEYS.map((k, si) => {
     const val = cfg[k];
     const valHtml = val === '???'
       ? `<span class="tier-unknown" style="font-size:inherit">???</span>`
       : val;
-    const valStyle = val === '???' ? '' : `color:${cfg.color};text-shadow:0 0 12px ${cfg.color}`;
+    const valStyle = val === '???' ? '' : `color:${detailDc};text-shadow:0 0 12px ${detailDc}`;
     return `
     <div class="big-stat">
       <div class="big-stat-val" style="${valStyle}">${valHtml}</div>
@@ -400,13 +402,14 @@ function buildOpponentsScreen() {
     if (i === G.selectedChar) return; // can't pick yourself
 
     const tc   = TYPE_COLORS[cfg.type] || '#fff';
+    const dc   = displayColor(cfg);
     const sel  = G.selectedOpponents.includes(i);
     const card = document.createElement('div');
     card.className = 'char-card opp-card' + (sel ? ' selected-opp' : '');
-    card.style.setProperty('--c', sel ? cfg.color : '#333');
+    card.style.setProperty('--c', sel ? dc : '#333');
     if (sel) {
-      card.style.borderColor = cfg.color;
-      card.style.boxShadow   = `0 0 14px ${cfg.color}55`;
+      card.style.borderColor = dc;
+      card.style.boxShadow   = `0 0 14px ${dc}55`;
     } else {
       card.style.borderColor = '#1a1f2e';
     }
@@ -425,7 +428,7 @@ function buildOpponentsScreen() {
       const overMax = val > 10;
       const w = overMax ? 100 : val * 10;
       const fillClass = overMax ? ' stat-fill-overflow' : '';
-      const fillStyle = overMax ? '' : `background:${cfg.color};box-shadow:0 0 4px ${cfg.color}88`;
+      const fillStyle = overMax ? '' : `background:${dc};box-shadow:0 0 4px ${dc}88`;
       const valLabel  = overMax ? `<span style="font-size:9px;color:#aaddff;margin-left:2px">${val}</span>` : '';
       return `
       <div class="stat-row">
@@ -438,9 +441,9 @@ function buildOpponentsScreen() {
 
     const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
     const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
-    const nameC = sel ? displayColor(cfg) : '#667';
+    const nameC = sel ? dc : '#667';
     card.innerHTML = `
-      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${cfg.color}33"></canvas>
+      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
       <div class="char-card-name" style="color:${nameC};${sel ? `text-shadow:0 0 6px ${cfg.glow}66` : ''}">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
