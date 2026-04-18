@@ -78,6 +78,13 @@ function update(dt) {
       const cbCap = MAX_SPEED * 0.4;
       if (cbSpd > cbCap) { b.vx *= cbCap/cbSpd; b.vy *= cbCap/cbSpd; }
     }
+    // ── Depth slow (applied by ABYSS LEVIATHAN) ──
+    if (b.specialData.depthSlow > 0) {
+      b.specialData.depthSlow -= dt;
+      const dsSpd = Math.hypot(b.vx, b.vy);
+      const dsCap = MAX_SPEED * 0.6;
+      if (dsSpd > dsCap) { b.vx *= dsCap/dsSpd; b.vy *= dsCap/dsSpd; }
+    }
     // ── Active special per-frame effects ──
     if (b.specialActive && b.specialTimer > 0) {
       b.specialTimer -= dt;
@@ -97,8 +104,31 @@ function update(dt) {
           if (Math.hypot(other.x - b.x, other.y - b.y) < 95) { other.vx *= 0.97; other.vy *= 0.97; }
         });
       }
-      // Tectonic Stance: keep frozen in place
+      // Tectonic Stance / Meteor Fall rise: keep frozen in place
       if (b.specialData.frozen) { b.vx = 0; b.vy = 0; }
+      // Meteor Fall: levitate visual — spawn rising embers while charging
+      if (b.specialData.meteorPending) {
+        if (Math.random() < 0.5) {
+          G.parts.push(new Particle(b.x + (Math.random() - 0.5) * 22,
+            b.y + (Math.random() - 0.5) * 10, '#ffaa33',
+            (Math.random() - 0.5) * 30, -60 - Math.random() * 60,
+            1.8 + Math.random() * 1.2, 0.4 + Math.random() * 0.3));
+        }
+      }
+      // Eruption: drop lava pools along the path
+      if (b.specialData.eruption) {
+        b.specialData.lavaTick = (b.specialData.lavaTick || 0) + dt;
+        if (b.specialData.lavaTick >= 0.22) {
+          b.specialData.lavaTick = 0;
+          G.lavaPools = G.lavaPools || [];
+          G.lavaPools.push({ x: b.x, y: b.y, r: 22 + Math.random() * 6, life: 2.0, maxLife: 2.0, owner: b });
+          for (let k = 0; k < 4; k++) {
+            const a = Math.random() * Math.PI * 2;
+            G.parts.push(new Particle(b.x, b.y, '#ff6600',
+              Math.cos(a) * 40, Math.sin(a) * 40, 2 + Math.random() * 1.5, 0.6));
+          }
+        }
+      }
       // Dran Rush: skip max-speed cap this frame (already boosted above MAX_SPEED)
       if (b.specialData.frictionOverride) {
         const rushSpd = Math.hypot(b.vx, b.vy);
@@ -108,8 +138,12 @@ function update(dt) {
       if (b.specialData.immuneDrain) {
         b.stamina = Math.min(b.maxStamina, b.stamina + dt * 3.5);
       }
-      if (b.specialTimer <= 0) endSpecial(b);
+      if (b.specialTimer <= 0) {
+        if (b.specialData.meteorPending) meteorSlam(b);
+        endSpecial(b);
+      }
     } else if (b.specialActive) {
+      if (b.specialData.meteorPending) meteorSlam(b);
       endSpecial(b);
     }
 
@@ -149,6 +183,25 @@ function update(dt) {
       const a = G.blades[i], b = G.blades[j];
       if (a.alive && b.alive && a.launched && b.launched) bladeCollide(a, b);
     }
+  }
+
+  // Lava pools (Inferno Titan / Eruption)
+  if (G.lavaPools && G.lavaPools.length) {
+    G.lavaPools = G.lavaPools.filter(p => p.life > 0);
+    G.lavaPools.forEach(p => {
+      p.life -= dt;
+      G.blades.forEach(foe => {
+        if (!foe.alive || foe === p.owner) return;
+        if (Math.hypot(foe.x - p.x, foe.y - p.y) < p.r + foe.radius) {
+          foe.stamina = Math.max(0, foe.stamina - 4 * dt);
+          if (Math.random() < 0.25) {
+            G.parts.push(new Particle(foe.x, foe.y, '#ff6600',
+              (Math.random() - 0.5) * 60, -30 - Math.random() * 40,
+              1.5 + Math.random(), 0.4 + Math.random() * 0.3));
+          }
+        }
+      });
+    });
   }
 
   // Particles

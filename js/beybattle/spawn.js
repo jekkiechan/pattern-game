@@ -8,6 +8,7 @@ function startRound() {
   G.parts         = [];
   G.blades        = [];
   G.popups        = [];
+  G.lavaPools     = [];
   G.clashTimer    = 0;
   G.activeTime    = 0;
   G.arenaRCurrent = r;

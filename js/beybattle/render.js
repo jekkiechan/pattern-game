@@ -140,6 +140,8 @@ function drawBlade(b) {
     else if (b.shape === 'orion')   drawOrionBlade(R);
     else if (b.shape === 'pegasis') drawPegasisBlade(R);
     else if (b.shape === 'unknown') drawUnknownBlade(R);
+    else if (b.shape === 'titan')   drawTitanBlade(R);
+    else if (b.shape === 'abyss')   drawAbyssBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -157,6 +159,8 @@ function drawBlade(b) {
   else if (b.shape === 'orion')   { drawOrionHub(R); }
   else if (b.shape === 'pegasis') { drawPegasisHub(R); }
   else if (b.shape === 'unknown') { drawUnknownHub(R); }
+  else if (b.shape === 'titan')   { drawTitanHub(R); }
+  else if (b.shape === 'abyss')   { drawAbyssHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -1274,6 +1278,212 @@ function drawUnknownHub(R) {
   ctx.restore();
 }
 
+function drawTitanBlade(R) {
+  // Jagged volcanic plate: chunky asymmetric wedge with notched trailing edge
+  ctx.beginPath();
+  ctx.moveTo(R * 0.10, -R * 0.22);
+  ctx.lineTo(R * 0.56, -R * 0.72);
+  ctx.lineTo(R * 1.10, -R * 0.40);
+  ctx.lineTo(R * 1.38, -R * 0.06);
+  ctx.lineTo(R * 1.22,  R * 0.28);
+  ctx.lineTo(R * 0.88,  R * 0.16);  // notch in
+  ctx.lineTo(R * 0.70,  R * 0.42);
+  ctx.lineTo(R * 0.34,  R * 0.18);
+  ctx.closePath();
+
+  // Obsidian body with molten crack glow underneath
+  const body = ctx.createLinearGradient(0, -R * 0.6, R * 1.4, R * 0.4);
+  body.addColorStop(0,    '#120300');
+  body.addColorStop(0.55, '#2a0a00');
+  body.addColorStop(1,    '#3a1002');
+  ctx.fillStyle   = body;
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#ff5500';
+  ctx.fill();
+  ctx.strokeStyle = '#552200';
+  ctx.lineWidth   = 1.1;
+  ctx.stroke();
+
+  // Magma veins — three bright cracks
+  ctx.save();
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#ff9900';
+  ctx.strokeStyle = '#ff7722';
+  ctx.lineWidth   = 1.8;
+  ctx.beginPath(); ctx.moveTo(R * 0.32, -R * 0.18); ctx.lineTo(R * 0.72, -R * 0.50); ctx.lineTo(R * 0.96, -R * 0.22); ctx.stroke();
+  ctx.strokeStyle = '#ffaa33';
+  ctx.lineWidth   = 1.2;
+  ctx.beginPath(); ctx.moveTo(R * 0.48,  R * 0.02); ctx.lineTo(R * 0.88, -R * 0.08); ctx.lineTo(R * 1.18,  R * 0.10); ctx.stroke();
+  ctx.strokeStyle = '#ffcc66';
+  ctx.lineWidth   = 0.9;
+  ctx.beginPath(); ctx.moveTo(R * 0.50,  R * 0.18); ctx.lineTo(R * 0.82,  R * 0.30); ctx.stroke();
+  ctx.restore();
+
+  // Inner ember glow pool
+  ctx.beginPath();
+  ctx.arc(R * 0.82, -R * 0.18, R * 0.12, 0, Math.PI * 2);
+  const em = ctx.createRadialGradient(R * 0.82, -R * 0.18, 0, R * 0.82, -R * 0.18, R * 0.12);
+  em.addColorStop(0, 'rgba(255,220,120,0.95)');
+  em.addColorStop(1, 'rgba(255,100,0,0.0)');
+  ctx.fillStyle = em;
+  ctx.fill();
+}
+
+function drawTitanHub(R) {
+  // Black crater rim
+  const rim = ctx.createRadialGradient(-R * 0.14, -R * 0.14, 0, 0, 0, R * 0.64);
+  rim.addColorStop(0,    '#4a1800');
+  rim.addColorStop(0.45, '#1a0500');
+  rim.addColorStop(1,    '#000000');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.62, 0, Math.PI * 2);
+  ctx.fillStyle   = rim;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#ff6600';
+  ctx.fill();
+
+  // Molten core
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.40);
+  core.addColorStop(0,    '#ffffcc');
+  core.addColorStop(0.25, '#ffbb33');
+  core.addColorStop(0.70, '#ff4400');
+  core.addColorStop(1,    '#440800');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.40, 0, Math.PI * 2);
+  ctx.fillStyle   = core;
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#ffaa00';
+  ctx.fill();
+
+  // Counter-rotating molten ring detail (static — spin is on the blade layer)
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,180,60,0.55)';
+  ctx.lineWidth   = 1.0;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.52, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawAbyssBlade(R) {
+  // Serpentine tentacle: sinuous double-S curve tapering outward
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(R * 0.30, -R * 0.42, R * 0.62, -R * 0.32, R * 0.78, -R * 0.02);
+  ctx.bezierCurveTo(R * 0.92,  R * 0.24, R * 1.18,  R * 0.22, R * 1.32,  R * 0.00);
+  ctx.bezierCurveTo(R * 1.22, -R * 0.16, R * 1.10, -R * 0.10, R * 1.00,  R * 0.06);
+  ctx.bezierCurveTo(R * 0.86,  R * 0.26, R * 0.60,  R * 0.36, R * 0.30,  R * 0.16);
+  ctx.bezierCurveTo(R * 0.12,  R * 0.08, R * 0.04,  R * 0.04, 0, 0);
+  ctx.closePath();
+
+  // Deep indigo body with cyan bioluminescent edge
+  const body = ctx.createLinearGradient(0, -R * 0.3, R * 1.3, R * 0.3);
+  body.addColorStop(0,    '#0a0220');
+  body.addColorStop(0.5,  '#1a0840');
+  body.addColorStop(1,    '#2a1060');
+  ctx.fillStyle   = body;
+  ctx.shadowBlur  = 12;
+  ctx.shadowColor = '#00ddff';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,221,255,0.75)';
+  ctx.lineWidth   = 1.0;
+  ctx.stroke();
+
+  // Bioluminescent suction-cup dots trailing along the tentacle
+  ctx.save();
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#00ddff';
+  const dots = [
+    [0.32, -0.12, 0.08], [0.58, -0.04, 0.09], [0.82,  0.06, 0.08],
+    [1.04, -0.02, 0.07], [1.20, -0.04, 0.06],
+  ];
+  for (const [dx, dy, r] of dots) {
+    ctx.beginPath();
+    ctx.arc(R * dx, R * dy, R * r, 0, Math.PI * 2);
+    const d = ctx.createRadialGradient(R * dx, R * dy, 0, R * dx, R * dy, R * r);
+    d.addColorStop(0,   '#ccffff');
+    d.addColorStop(0.5, '#00ddff');
+    d.addColorStop(1,   'rgba(0,80,140,0)');
+    ctx.fillStyle = d;
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawAbyssHub(R) {
+  // Dark indigo outer ring
+  const ring = ctx.createRadialGradient(-R * 0.1, -R * 0.1, 0, 0, 0, R * 0.60);
+  ring.addColorStop(0,    '#3a1870');
+  ring.addColorStop(0.5,  '#150540');
+  ring.addColorStop(1,    '#000000');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.60, 0, Math.PI * 2);
+  ctx.fillStyle   = ring;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#00ddff';
+  ctx.fill();
+
+  // Counter-rotating iris so the eye tracks independently of the spin
+  ctx.save();
+  ctx.rotate(-Date.now() * 0.0012);
+
+  // Vertical eye-slit — sclera
+  ctx.beginPath();
+  ctx.ellipse(0, 0, R * 0.42, R * 0.22, Math.PI / 2, 0, Math.PI * 2);
+  const sc = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.42);
+  sc.addColorStop(0,   '#e8f8ff');
+  sc.addColorStop(0.7, '#88cce0');
+  sc.addColorStop(1,   '#224455');
+  ctx.fillStyle = sc;
+  ctx.shadowBlur = 6;
+  ctx.shadowColor = '#00ddff';
+  ctx.fill();
+
+  // Vertical slit pupil
+  ctx.beginPath();
+  ctx.ellipse(0, 0, R * 0.10, R * 0.28, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#020008';
+  ctx.shadowBlur = 0;
+  ctx.fill();
+
+  // Cyan highlight glint
+  ctx.beginPath();
+  ctx.arc(R * 0.04, -R * 0.14, R * 0.05, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(200,255,255,0.95)';
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawLavaPools() {
+  if (!G.lavaPools || !G.lavaPools.length) return;
+  ctx.save();
+  G.lavaPools.forEach(p => {
+    const frac = Math.max(0, p.life / p.maxLife);
+    const a    = 0.25 + 0.55 * frac;
+    // Glow halo
+    const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.8);
+    halo.addColorStop(0,    `rgba(255,150,30,${a * 0.55})`);
+    halo.addColorStop(0.55, `rgba(255,80,0,${a * 0.25})`);
+    halo.addColorStop(1,    'rgba(255,40,0,0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 1.8, 0, Math.PI * 2); ctx.fill();
+
+    // Magma pool
+    const pool = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+    pool.addColorStop(0,    `rgba(255,230,140,${a})`);
+    pool.addColorStop(0.35, `rgba(255,120,30,${a})`);
+    pool.addColorStop(0.85, `rgba(200,50,0,${a * 0.9})`);
+    pool.addColorStop(1,    'rgba(60,10,0,0)');
+    ctx.fillStyle = pool;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+
+    // Cracked obsidian edge
+    ctx.strokeStyle = `rgba(40,10,0,${Math.min(1, a * 1.6)})`;
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 0.92, 0, Math.PI * 2); ctx.stroke();
+  });
+  ctx.restore();
+}
+
 function drawBladeShape(shape, R, color) {
   ctx.beginPath();
   if (shape === 'wing') {
@@ -1528,6 +1738,7 @@ function render() {
 
   drawArena();
   drawShrinkWarning();
+  drawLavaPools();
   G.parts.forEach(p => p.draw());
   G.blades.forEach(b => drawBlade(b));
   drawLaunchPad(G.blades[0]);

@@ -161,6 +161,48 @@ const CONFIGS = [
     atkR:15, defR:5, staR:10, spdR:14, bstR:8, tier:'TRANSCENDENT',
     special:{ name:'Final Drive', desc:'Slam all foes & double attack power (4s)', effect:'finalDrive' } },
 
+  { name:'METEOR FORGE',   type:'ATTACK',  color:'#ff7722', glow:'#ffcc66', blades:4, shape:'claw',
+    maxStamina:150, mass:1.70, defense:0.40, attackMult:1.75, burstResist:0.75, personality:'aggressive',
+    desc:'Celestial iron forged in a dying star. Rises before its strike — gravity follows its descent.',
+    atkR:10, defR:7, staR:7, spdR:7, bstR:8, tier:'LEGENDARY',
+    special:{ name:'Meteor Fall', desc:'Rise invuln 1s, then crash down for massive dmg', effect:'meteorFall' } },
+
+  { name:'SERPENT COIL',   type:'STAMINA', color:'#44cc88', glow:'#88ff99', blades:3, shape:'fang',
+    maxStamina:155, mass:1.22, defense:0.58, attackMult:1.15, burstResist:0.72, personality:'aggressive',
+    desc:'Ophidian stamina-type that feeds on every strike it lands. The more it hits, the longer it lives.',
+    atkR:6, defR:6, staR:9, spdR:7, bstR:7, tier:'ELITE',
+    special:{ name:'Coil Drain', desc:'Lifesteal 50% of dmg dealt for 3s', effect:'coilDrain' } },
+
+  { name:'ORACLE EYE',     type:'BALANCE', color:'#aa66ff', glow:'#ddbbff', blades:4, shape:'wing',
+    maxStamina:130, mass:1.18, defense:0.65, attackMult:1.28, burstResist:0.70, personality:'defensive',
+    desc:'Seer-blade that reads every attack before it lands. Visions whisper the path of each strike.',
+    atkR:7, defR:7, staR:7, spdR:8, bstR:7, tier:'CHAMPION',
+    special:{ name:'Foresight', desc:'Dodge next 2 incoming hits entirely', effect:'foresight' } },
+
+  { name:'OBSIDIAN FANG',  type:'DEFENSE', color:'#221133', glow:'#8844ff', blades:4, shape:'fang',
+    maxStamina:175, mass:1.90, defense:0.32, attackMult:0.95, burstResist:0.98, personality:'defensive',
+    desc:'Volcanic glass blade crowned with thorned fangs. Every hit it takes carves the attacker in return.',
+    atkR:5, defR:10, staR:9, spdR:4, bstR:10, tier:'MYTHICAL',
+    special:{ name:'Thorn Armor', desc:'5s: foes hitting you take 30% dmg back', effect:'thornArmor' } },
+
+  { name:'VOID REAPER',    type:'???',     color:'#334455', glow:'#66ffaa', blades:3, shape:'unknown',
+    maxStamina:165, mass:1.50, defense:0.48, attackMult:1.65, burstResist:0.78, personality:'aggressive',
+    desc:'A scythe that harvests the faltering. The weaker the prey, the hungrier the blade.',
+    atkR:9, defR:6, staR:7, spdR:8, bstR:7, tier:'LEGENDARY',
+    special:{ name:'Soul Harvest', desc:'Drain 30 stamina from weakest; execute if <20%', effect:'soulHarvest' } },
+
+  { name:'INFERNO TITAN',  type:'ATTACK',  color:'#2a0a00', glow:'#ff6600', blades:4, shape:'titan',
+    maxStamina:160, mass:1.85, defense:0.38, attackMult:1.80, burstResist:0.82, personality:'aggressive',
+    desc:'Obsidian plates cracked with living magma. Leaves the arena floor burning in its wake.',
+    atkR:10, defR:7, staR:8, spdR:6, bstR:8, tier:'LEGENDARY',
+    special:{ name:'Eruption', desc:'Leave magma pools (5s) that burn foes', effect:'eruption' } },
+
+  { name:'ABYSS LEVIATHAN', type:'STAMINA', color:'#1a0840', glow:'#00ddff', blades:6, shape:'abyss',
+    maxStamina:185, mass:1.55, defense:0.52, attackMult:0.95, burstResist:0.85, personality:'passive',
+    desc:'A kraken coiled from the blackest trench. Its pressure wave cripples anything that still breathes.',
+    atkR:6, defR:8, staR:10, spdR:6, bstR:9, tier:'LEGENDARY',
+    special:{ name:'Depth Charge', desc:'Slow foes 60% & +3s to their specials (4s)', effect:'depthCharge' } },
+
   { name:'THE UNKNOWN',         type:'???',     color:'#8844cc', glow:'#cc66ff', blades:3, shape:'unknown',
     maxStamina:160, mass:1.55, defense:0.46, attackMult:1.80, burstResist:0.72, personality:'chaotic',
     desc:"No origin. No records. No name. It appeared in the arena without warning — and no blade that has faced it has ever accurately described the encounter.",

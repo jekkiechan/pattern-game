@@ -19,6 +19,52 @@ function spawnSpecialParticles(x, y, color, count, speed, life) {
   }
 }
 
+function meteorSlam(blade) {
+  // Phase 2 of Meteor Fall — teleport onto the target and explode.
+  const tgt = (blade.specialData.meteorTargetId >= 0) ? G.blades[blade.specialData.meteorTargetId] : null;
+  const living = tgt && tgt.alive ? tgt : nearestAlive(blade);
+  if (living) {
+    blade.x = living.x;
+    blade.y = living.y;
+  }
+  const gx = blade.x, gy = blade.y;
+
+  // Impact AOE: massive stamina damage + knockback to all in range
+  G.blades.forEach(foe => {
+    if (foe === blade || !foe.alive) return;
+    const dx = foe.x - gx, dy = foe.y - gy, d = Math.hypot(dx, dy) || 1;
+    if (d < 160) {
+      foe.stamina = Math.max(0, foe.stamina - 50);
+      foe.wobble  = Math.min(1, foe.wobble + 0.55);
+      foe.vx += (dx / d) * 14;
+      foe.vy += (dy / d) * 14;
+    }
+  });
+
+  // Radial shockwave particles
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 14) {
+    const r = 28 + Math.random() * 20;
+    G.parts.push(new Particle(
+      gx + Math.cos(a) * r, gy + Math.sin(a) * r,
+      Math.random() < 0.4 ? '#ffffff' : '#ffaa33',
+      Math.cos(a) * (180 + Math.random() * 120),
+      Math.sin(a) * (180 + Math.random() * 120),
+      3 + Math.random() * 2, 0.9 + Math.random() * 0.4
+    ));
+  }
+  spawnSpecialParticles(gx, gy, '#ff7722', 26, 5, 1.2);
+
+  G.shakeX = (Math.random() - 0.5) * 30;
+  G.shakeY = (Math.random() - 0.5) * 30;
+  G.shakeT = 0.55;
+
+  G.popups = G.popups || [];
+  G.popups.push({ x: gx, y: gy - 36, text: 'METEOR IMPACT!',
+    color: '#ffcc66', timer: 1.4, maxTimer: 1.4 });
+
+  playLaunch();
+}
+
 function endSpecial(b) {
   // Restore any mutated base stats
   if (b.specialData.savedAtkMult !== undefined) b.attackMult = b.specialData.savedAtkMult;
@@ -350,6 +396,110 @@ function activateSpecial(blade) {
       }
       spawnSpecialParticles(gx, gy, '#aaddff', 24, 5, 1.2);
       G.shakeX = (Math.random() - 0.5) * 22; G.shakeY = (Math.random() - 0.5) * 22; G.shakeT = 0.45;
+      break;
+    }
+
+    case 'meteorFall': {
+      // Phase 1: freeze + invuln for 1s, picking a target; phase 2 (in update) slams.
+      const tgt = nearestAlive(blade);
+      blade.specialTimer = 1.0;
+      blade.specialData.immune = true;
+      blade.specialData.frozen = true;
+      blade.specialData.meteorPending = true;
+      blade.specialData.meteorTargetId = tgt ? G.blades.indexOf(tgt) : -1;
+      blade.vx = 0; blade.vy = 0;
+      spawnSpecialParticles(gx, gy, '#ffcc66', 18, 3, 0.9);
+      // Rising glow column
+      for (let i = 0; i < 14; i++) {
+        G.parts.push(new Particle(gx + (Math.random() - 0.5) * 24, gy + Math.random() * 14,
+          '#ffaa33', 0, -60 - Math.random() * 80, 2.5 + Math.random() * 2, 0.8 + Math.random() * 0.4));
+      }
+      break;
+    }
+
+    case 'coilDrain': {
+      blade.specialTimer = 3.0;
+      blade.specialData.coilDrain = true;
+      spawnSpecialParticles(gx, gy, '#88ff99', 16, 3, 0.9);
+      break;
+    }
+
+    case 'foresight': {
+      blade.specialTimer = 6.0;               // window to consume dodges
+      blade.specialData.foresight = 2;        // two hits dodged
+      spawnSpecialParticles(gx, gy, '#ddbbff', 14, 2, 1.0);
+      break;
+    }
+
+    case 'thornArmor': {
+      blade.specialTimer = 5.0;
+      blade.specialData.thornArmor = true;
+      spawnSpecialParticles(gx, gy, '#8844ff', 20, 3, 1.1);
+      // Radiating thorn ring
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 10) {
+        const r = 30 + Math.random() * 12;
+        G.parts.push(new Particle(gx + Math.cos(a) * r, gy + Math.sin(a) * r,
+          '#8844ff', Math.cos(a) * 60, Math.sin(a) * 60, 2 + Math.random() * 1.5, 0.7));
+      }
+      break;
+    }
+
+    case 'soulHarvest': {
+      // Find foe with lowest current stamina ratio
+      let victim = null, worst = Infinity;
+      G.blades.forEach(b => {
+        if (b === blade || !b.alive) return;
+        const r = b.stamina / b.maxStamina;
+        if (r < worst) { worst = r; victim = b; }
+      });
+      if (victim) {
+        const ratio = victim.stamina / victim.maxStamina;
+        if (ratio < 0.20) {
+          // Execute
+          victim.stamina = 0;
+          victim.wobble  = 1;
+          spawnSpecialParticles(victim.x, victim.y, '#66ffaa', 26, 5, 1.2);
+          G.popups = G.popups || [];
+          G.popups.push({ x: victim.x, y: victim.y - 30,
+            text: 'HARVESTED', color: '#66ffaa', timer: 1.4, maxTimer: 1.4 });
+        } else {
+          victim.stamina = Math.max(0, victim.stamina - 30);
+          victim.wobble  = Math.min(1, victim.wobble + 0.35);
+          spawnSpecialParticles(victim.x, victim.y, '#66ffaa', 16, 4, 1.0);
+        }
+        blade.stamina = Math.min(blade.maxStamina, blade.stamina + 15);
+      }
+      spawnSpecialParticles(gx, gy, '#66ffaa', 16, 3, 1.0);
+      blade.specialActive = false;
+      break;
+    }
+
+    case 'eruption': {
+      blade.specialTimer = 5.0;
+      blade.specialData.eruption = true;
+      blade.specialData.lavaTick = 0;
+      G.lavaPools = G.lavaPools || [];
+      spawnSpecialParticles(gx, gy, '#ff6600', 20, 4, 1.0);
+      G.shakeX = (Math.random() - 0.5) * 12;
+      G.shakeY = (Math.random() - 0.5) * 12;
+      G.shakeT = 0.25;
+      break;
+    }
+
+    case 'depthCharge': {
+      G.blades.forEach(b => {
+        if (b === blade || !b.alive) return;
+        b.specialData = b.specialData || {};
+        b.specialData.depthSlow = 4.0;
+        b.specialCooldown = Math.min(SPECIAL_COOLDOWN, b.specialCooldown + 3.0);
+      });
+      spawnSpecialParticles(gx, gy, '#00ddff', 22, 3, 1.1);
+      // Expanding pressure ring
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 14) {
+        G.parts.push(new Particle(gx, gy, '#00ddff',
+          Math.cos(a) * 220, Math.sin(a) * 220, 2.5 + Math.random() * 1.5, 1.0));
+      }
+      blade.specialActive = false;
       break;
     }
 
