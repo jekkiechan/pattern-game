@@ -14,15 +14,11 @@ class Particle {
   }
   draw() {
     const a = Math.max(0, this.life / this.maxLife);
-    ctx.save();
-    ctx.globalAlpha    = a;
-    ctx.fillStyle      = this.color;
-    ctx.shadowBlur     = 8;
-    ctx.shadowColor    = this.color;
+    ctx.globalAlpha = a;
+    ctx.fillStyle   = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size * (0.4 + a * 0.6), 0, Math.PI * 2);
     ctx.fill();
-    ctx.restore();
   }
 }
 

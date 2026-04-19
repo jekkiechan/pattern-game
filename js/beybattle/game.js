@@ -1,10 +1,22 @@
 // ═══════════════════════════════════════════════════════════
 // GAME LOOP
 // ═══════════════════════════════════════════════════════════
+const FIXED_DT  = 1 / 60;
+const MAX_STEPS = 4;
+let   physAcc   = 0;
 function loop(ts) {
-  const dt = Math.min((ts - G.lastTime) / 1000, 0.05);
+  const frame = Math.min((ts - G.lastTime) / 1000, 0.25);
   G.lastTime = ts;
-  if (G.state === 'ready' || G.state === 'active') update(dt);
+  if (G.state === 'ready' || G.state === 'active') {
+    physAcc += frame;
+    let steps = 0;
+    while (physAcc >= FIXED_DT && steps < MAX_STEPS) {
+      update(FIXED_DT);
+      physAcc -= FIXED_DT;
+      steps++;
+    }
+    if (steps === MAX_STEPS) physAcc = 0;
+  }
   render();
   requestAnimationFrame(loop);
 }

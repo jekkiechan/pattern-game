@@ -107,18 +107,15 @@ function drawBlade(b) {
   ctx.beginPath(); ctx.arc(0, 0, auraR, 0, Math.PI * 2); ctx.fill();
 
   // ── Motion trail ──
-  ctx.save();
+  ctx.fillStyle = b.color;
   b.trail.forEach(t => {
     const a = 1 - t.age / 0.22;
-    ctx.globalAlpha    = a * 0.35;
-    ctx.fillStyle      = b.color;
-    ctx.shadowBlur     = 6;
-    ctx.shadowColor    = b.glow;
+    ctx.globalAlpha = a * 0.35;
     ctx.beginPath();
-    ctx.arc(t.x - dx + 0, t.y - dy + 0, R * 0.55 * a, 0, Math.PI * 2);
+    ctx.arc(t.x - dx, t.y - dy, R * 0.55 * a, 0, Math.PI * 2);
     ctx.fill();
   });
-  ctx.restore();
+  ctx.globalAlpha = 1;
 
   // Spinning blades
   ctx.rotate(b.angle);
@@ -2110,7 +2107,9 @@ function render() {
   drawArena();
   drawShrinkWarning();
   drawLavaPools();
+  ctx.save();
   G.parts.forEach(p => p.draw());
+  ctx.restore();
   G.blades.forEach(b => drawBlade(b));
   drawLaunchPad(G.blades[0]);
   drawAimGuide();
