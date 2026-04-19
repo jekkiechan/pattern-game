@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 // TOURNAMENT MODE
 // ═══════════════════════════════════════════════════════════
-const TIER_ORDER = [
+const TIER_RANK = [
   'NOVICE','APPRENTICE','ADVANCED','ELITE','CHAMPION',
   'LEGENDARY','MYTHICAL','TRANSCENDENT','UNKNOWN'
 ];
@@ -29,7 +29,7 @@ function tTrophyCount() {
 
 // Build a 3-round bracket of opponent indices, scaling with player tier.
 function tGenerateBracket(playerIdx) {
-  const playerTier = TIER_ORDER.indexOf(CONFIGS[playerIdx].tier);
+  const playerTier = TIER_RANK.indexOf(CONFIGS[playerIdx].tier);
   const pool = CONFIGS.map((_, i) => i).filter(i => i !== playerIdx);
   const used = new Set();
 
@@ -52,7 +52,7 @@ function tGenerateBracket(playerIdx) {
     return picks;
   };
 
-  const tierOf = c => TIER_ORDER.indexOf(c.tier);
+  const tierOf = c => TIER_RANK.indexOf(c.tier);
   const round1 = pick(3, c => tierOf(c) <= Math.max(2, playerTier - 1));
   const round2 = pick(3, c => Math.abs(tierOf(c) - playerTier) <= 1);
   const round3 = pick(3, c => tierOf(c) >= playerTier);
