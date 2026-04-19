@@ -210,7 +210,7 @@ const CONFIGS = [
     special:{ name:'Dragon Emperor', desc:'Drain 18 sta from all foes · +80% atk & +speed (4s)', effect:'dragonEmperor' } },
 
   { name:'THE UNKNOWN',         type:'???',     color:'#8844cc', glow:'#cc66ff', blades:3, shape:'unknown',
-    maxStamina:160, mass:1.55, defense:0.46, attackMult:1.80, burstResist:0.72, personality:'chaotic',
+    maxStamina:175, mass:1.90, defense:0.38, attackMult:1.92, burstResist:0.90, personality:'chaotic',
     desc:"No origin. No records. No name. It appeared in the arena without warning — and no blade that has faced it has ever accurately described the encounter.",
     atkR:'???', defR:'???', staR:'???', spdR:'???', bstR:'???', tier:'UNKNOWN',
     special:{ name:"Fate's Hand", desc:'Chaos — one of four random effects fires', effect:'fatesHand' } },

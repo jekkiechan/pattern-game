@@ -22,7 +22,7 @@ const G = {
   clashY:         0,
   clashAlpha:     0,
   selectedChar:      0,
-  selectedOpponents: [1, 2, 3],
+  selectedOpponents: [],
   selectedArena:     0,
   activeTime:     0,
   boostCooldown:  0,

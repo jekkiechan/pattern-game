@@ -673,6 +673,32 @@
   }
   .btn-secondary:hover { border-color: #00d4ff; color: #00d4ff; }
 
+  .btn-randomize-top {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 8px auto 12px;
+    padding: 12px 32px;
+    background: transparent;
+    border: 2px solid #334;
+    color: #556;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: border-color 0.2s, color 0.2s;
+    position: relative;
+    overflow: hidden;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .btn-randomize-top:hover, .btn-randomize-top:active {
+    border-color: #00d4ff;
+    color: #00d4ff;
+  }
+
   .affinity-row {
     font-family: 'Share Tech Mono', monospace;
     font-size: 9px;
