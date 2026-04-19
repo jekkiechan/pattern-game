@@ -557,6 +557,42 @@ function activateSpecial(blade) {
       break;
     }
 
+    case 'patternRecognition': {
+      // 4s window: dodge next 3 hits, reflect 40% dmg taken, +60% atk, drain-immune
+      blade.specialTimer = 4.0;
+      blade.specialData.patternDodge   = 3;
+      blade.specialData.patternReflect = 0.40;
+      blade.specialData.immuneDrain    = true;
+      blade.specialData.savedAtkMult   = blade.attackMult;
+      blade.attackMult *= 1.6;
+
+      // Hexagonal shockwave: 6-pointed radial burst of prismatic particles
+      const HEX_COLORS = ['#ffee88', '#ffaaff', '#aaccff', '#88ffcc', '#ccaaff', '#ffffff'];
+      for (let ring = 0; ring < 3; ring++) {
+        const spread = 32 + ring * 18;
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2 + ring * 0.18;
+          G.parts.push(new Particle(
+            gx + Math.cos(a) * spread, gy + Math.sin(a) * spread,
+            HEX_COLORS[(i + ring) % HEX_COLORS.length],
+            Math.cos(a) * (120 + ring * 60),
+            Math.sin(a) * (120 + ring * 60),
+            3 + Math.random() * 2, 0.85 + Math.random() * 0.35
+          ));
+        }
+      }
+      spawnSpecialParticles(gx, gy, '#ffee88', 24, 4, 1.1);
+      G.shakeX = (Math.random() - 0.5) * 18;
+      G.shakeY = (Math.random() - 0.5) * 18;
+      G.shakeT = 0.35;
+
+      G.popups = G.popups || [];
+      G.popups.push({ x: gx, y: gy - 36, text: 'PATTERN RECOGNIZED',
+        color: '#ffee88', timer: 1.4, maxTimer: 1.4 });
+      playLaunch();
+      break;
+    }
+
     case 'fatesHand': {
       const roll = Math.random();
       if (roll < 0.25) {

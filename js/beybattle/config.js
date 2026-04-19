@@ -209,6 +209,12 @@ const CONFIGS = [
     atkR:14, defR:8, staR:11, spdR:12, bstR:10, tier:'TRANSCENDENT',
     special:{ name:'Dragon Emperor', desc:'Drain 18 sta from all foes · +80% atk & +speed (4s)', effect:'dragonEmperor' } },
 
+  { name:'THE PATTERN',    type:'???',     color:'#ddbbff', glow:'#ffee88', blades:6, shape:'pattern',
+    maxStamina:250, mass:2.20, defense:0.20, attackMult:2.10, burstResist:1.00, personality:'chaotic',
+    desc:"A prismatic blade of interlocking hexagons that reads every pattern it sees. Attack, defense, stamina, speed — it has already solved yours. Forged by a young mind that saw what no veteran Blader could: the pattern behind every pattern. No foe has ever hit it twice the same way.",
+    atkR:15, defR:15, staR:15, spdR:15, bstR:15, tier:'GOD',
+    special:{ name:'Pattern Recognition', desc:'4s: dodge next 3 hits, reflect 40%, +60% atk, drain-immune', effect:'patternRecognition' } },
+
   { name:'THE UNKNOWN',         type:'???',     color:'#8844cc', glow:'#cc66ff', blades:3, shape:'unknown',
     maxStamina:175, mass:1.90, defense:0.38, attackMult:1.92, burstResist:0.90, personality:'chaotic',
     desc:"No origin. No records. No name. It appeared in the arena without warning — and no blade that has faced it has ever accurately described the encounter.",

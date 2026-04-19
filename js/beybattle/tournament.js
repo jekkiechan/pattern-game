@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════
 const TIER_RANK = [
   'NOVICE','APPRENTICE','ADVANCED','ELITE','CHAMPION',
-  'LEGENDARY','MYTHICAL','TRANSCENDENT','UNKNOWN'
+  'LEGENDARY','MYTHICAL','TRANSCENDENT','GOD','UNKNOWN'
 ];
 
 const TOURNAMENT_ROUNDS = 3;

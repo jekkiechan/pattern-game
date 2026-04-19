@@ -490,6 +490,22 @@
     letter-spacing: 0.03em;
   }
 
+  @keyframes godShimmer {
+    0%   { color: #ffee88; text-shadow: 0 0 16px #ffee88ff, 0 0 32px #ffaa00cc, 0 0 48px #ff44aa88; }
+    16%  { color: #ff88ff; text-shadow: 0 0 16px #ff88ffff, 0 0 32px #cc44ffcc, 0 0 48px #8844ff88; }
+    33%  { color: #88ffff; text-shadow: 0 0 18px #88ffffff, 0 0 36px #00ccffcc, 0 0 52px #4488ff88; }
+    50%  { color: #ffffff; text-shadow: 0 0 22px #ffffffff, 0 0 44px #ffddaacc, 0 0 60px #ffccaaaa; }
+    66%  { color: #88ff88; text-shadow: 0 0 16px #88ff88ff, 0 0 32px #00ff88cc, 0 0 48px #44ffcc88; }
+    83%  { color: #ffaaff; text-shadow: 0 0 16px #ffaaffff, 0 0 32px #ff44cccc, 0 0 48px #cc44ff88; }
+    100% { color: #ffee88; text-shadow: 0 0 16px #ffee88ff, 0 0 32px #ffaa00cc, 0 0 48px #ff44aa88; }
+  }
+
+  .tier-god {
+    animation: godShimmer 1.6s linear infinite;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+  }
+
   @keyframes unknownShimmer {
     0%   { color: #cc44ff; text-shadow: 0 0 8px #cc44ff88; }
     20%  { color: #aa22dd; text-shadow: 0 0 6px #aa22dd66; }

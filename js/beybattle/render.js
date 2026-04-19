@@ -142,6 +142,7 @@ function drawBlade(b) {
     else if (b.shape === 'oracle')  drawOracleBlade(R);
     else if (b.shape === 'obsidian')drawObsidianBlade(R);
     else if (b.shape === 'ldrago')  drawLdragoBlade(R);
+    else if (b.shape === 'pattern') drawPatternBlade(R);
     else drawBladeShape(b.shape, R, b.color);
     ctx.restore();
   }
@@ -164,6 +165,7 @@ function drawBlade(b) {
   else if (b.shape === 'oracle')  { drawOracleHub(R); }
   else if (b.shape === 'obsidian'){ drawObsidianHub(R); }
   else if (b.shape === 'ldrago')  { drawLdragoHub(R); }
+  else if (b.shape === 'pattern') { drawPatternHub(R); }
   else {
     const hub = ctx.createRadialGradient(-R * 0.18, -R * 0.18, 0, 0, 0, R * 0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -1849,6 +1851,157 @@ function drawLdragoHub(R) {
   ctx.shadowColor  = '#ffddaa';
   ctx.scale(-1, 1); // flipped L for left-spin
   ctx.fillText('L', 0, R * 0.04);
+  ctx.restore();
+}
+
+function drawPatternBlade(R) {
+  // THE PATTERN — geometric hexagonal wedge with fractal interior, prismatic gradient
+  const t = Date.now() * 0.0012;
+
+  // Outer hex wedge path (6-sided asymmetric shard)
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(R * 0.26, -R * 0.42);
+  ctx.lineTo(R * 0.78, -R * 0.52);
+  ctx.lineTo(R * 1.22, -R * 0.12);
+  ctx.lineTo(R * 1.22,  R * 0.12);
+  ctx.lineTo(R * 0.78,  R * 0.52);
+  ctx.lineTo(R * 0.26,  R * 0.42);
+  ctx.closePath();
+
+  // Prismatic gradient that shifts across the wedge
+  const gr = ctx.createLinearGradient(0, -R * 0.5, R * 1.25, R * 0.5);
+  const phase = (Math.sin(t) + 1) * 0.5;
+  gr.addColorStop(0,                  '#ddbbff');
+  gr.addColorStop(0.25 + phase * 0.1, '#ffaaff');
+  gr.addColorStop(0.5,                '#ffee88');
+  gr.addColorStop(0.75 - phase * 0.1, '#aaffee');
+  gr.addColorStop(1,                  '#aaccff');
+  ctx.fillStyle   = gr;
+  ctx.strokeStyle = 'rgba(255,255,255,0.80)';
+  ctx.lineWidth   = 1.2;
+  ctx.shadowBlur  = 18;
+  ctx.shadowColor = '#ffee88';
+  ctx.fill();
+  ctx.stroke();
+
+  // Inner fractal triangle — nested geometric engraving
+  ctx.beginPath();
+  ctx.moveTo(R * 0.42, -R * 0.22);
+  ctx.lineTo(R * 0.96, -R * 0.04);
+  ctx.lineTo(R * 0.42,  R * 0.22);
+  ctx.closePath();
+  ctx.fillStyle   = 'rgba(20, 4, 44, 0.55)';
+  ctx.strokeStyle = 'rgba(255,230,160,0.90)';
+  ctx.lineWidth   = 0.9;
+  ctx.shadowBlur  = 8;
+  ctx.shadowColor = '#ffddaa';
+  ctx.fill();
+  ctx.stroke();
+
+  // Smallest inner triangle — a prismatic jewel tip
+  ctx.beginPath();
+  ctx.moveTo(R * 0.58, -R * 0.10);
+  ctx.lineTo(R * 0.82,  0);
+  ctx.lineTo(R * 0.58,  R * 0.10);
+  ctx.closePath();
+  const jewel = ctx.createLinearGradient(R * 0.58, 0, R * 0.82, 0);
+  jewel.addColorStop(0, '#ffffff');
+  jewel.addColorStop(1, '#ff88ff');
+  ctx.fillStyle  = jewel;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = '#ffaaff';
+  ctx.fill();
+}
+
+function drawPatternHub(R) {
+  // THE PATTERN — nested hexagons, counter-rotating, prismatic core
+  const t = Date.now() * 0.001;
+
+  // Outer hub disc — deep violet with golden rim
+  const outer = ctx.createRadialGradient(-R * 0.16, -R * 0.16, 0, 0, 0, R * 0.66);
+  outer.addColorStop(0,    '#fff0c0');
+  outer.addColorStop(0.22, '#ddbbff');
+  outer.addColorStop(0.65, '#44226a');
+  outer.addColorStop(1,    '#0a0318');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.64, 0, Math.PI * 2);
+  ctx.fillStyle   = outer;
+  ctx.shadowBlur  = 24;
+  ctx.shadowColor = '#ffee88';
+  ctx.fill();
+
+  // Golden ring
+  ctx.strokeStyle = 'rgba(255,220,140,0.90)';
+  ctx.lineWidth   = 1.6;
+  ctx.shadowBlur  = 12;
+  ctx.shadowColor = '#ffddaa';
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.56, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Outer hexagon (rotating CCW)
+  ctx.save();
+  ctx.rotate(t);
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const x = Math.cos(a) * R * 0.48, y = Math.sin(a) * R * 0.48;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(255,240,180,0.85)';
+  ctx.lineWidth   = 1.4;
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#ffee88';
+  ctx.stroke();
+  ctx.restore();
+
+  // Inner hexagon (rotating CW, opposite direction)
+  ctx.save();
+  ctx.rotate(-t * 1.6);
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
+    const x = Math.cos(a) * R * 0.34, y = Math.sin(a) * R * 0.34;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(220,180,255,0.85)';
+  ctx.lineWidth   = 1.2;
+  ctx.shadowBlur  = 8;
+  ctx.shadowColor = '#ddbbff';
+  ctx.stroke();
+  ctx.restore();
+
+  // Prismatic core — shifting rainbow radial
+  const hueShift = (Math.sin(t * 1.4) + 1) * 0.5;
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.32);
+  core.addColorStop(0,                  '#ffffff');
+  core.addColorStop(0.25,               hueShift < 0.5 ? '#ffee88' : '#aaffee');
+  core.addColorStop(0.55,               hueShift < 0.5 ? '#ffaaff' : '#aaccff');
+  core.addColorStop(1,                  '#220844');
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.32, 0, Math.PI * 2);
+  ctx.fillStyle   = core;
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#ffaaff';
+  ctx.fill();
+
+  // Central mark — small hexagon glyph
+  ctx.save();
+  ctx.rotate(t * 2.2);
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const x = Math.cos(a) * R * 0.12, y = Math.sin(a) * R * 0.12;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle   = 'rgba(255,255,255,0.95)';
+  ctx.shadowBlur  = 10;
+  ctx.shadowColor = '#ffffff';
+  ctx.fill();
   ctx.restore();
 }
 

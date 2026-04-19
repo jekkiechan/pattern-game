@@ -115,6 +115,23 @@ function bladeCollide(a, b) {
     spawnHitParticles(b.x, b.y, '#ddbbff', '#aa66ff', 0.4);
     if (b.specialData.foresight <= 0) endSpecial(b);
   }
+  // Pattern Recognition (THE PATTERN): dodge next N hits, then reflect % of remaining damage taken
+  if (a.specialData.patternDodge > 0 && (staDmgA > 0 || burstDmgA > 0)) {
+    staDmgA = 0; burstDmgA = 0;
+    a.specialData.patternDodge--;
+    const ang = Math.random() * Math.PI * 2, kick = 28;
+    a.x += Math.cos(ang) * kick; a.y += Math.sin(ang) * kick;
+    spawnHitParticles(a.x, a.y, '#ffee88', '#ddbbff', 0.5);
+  }
+  if (b.specialData.patternDodge > 0 && (staDmgB > 0 || burstDmgB > 0)) {
+    staDmgB = 0; burstDmgB = 0;
+    b.specialData.patternDodge--;
+    const ang = Math.random() * Math.PI * 2, kick = 28;
+    b.x += Math.cos(ang) * kick; b.y += Math.sin(ang) * kick;
+    spawnHitParticles(b.x, b.y, '#ffee88', '#ddbbff', 0.5);
+  }
+  if (a.specialData.patternReflect > 0) b.stamina -= staDmgA * a.specialData.patternReflect;
+  if (b.specialData.patternReflect > 0) a.stamina -= staDmgB * b.specialData.patternReflect;
   // Thorn Armor (OBSIDIAN FANG): attacker takes 30% of the dmg they dealt
   if (a.specialData.thornArmor) b.stamina -= staDmgB * 0.30;
   if (b.specialData.thornArmor) a.stamina -= staDmgA * 0.30;

@@ -164,6 +164,7 @@ function drawBladeToCanvas(cfg, previewCanvas) {
     else if (cfg.shape === 'oracle')  drawOracleBlade(R);
     else if (cfg.shape === 'obsidian')drawObsidianBlade(R);
     else if (cfg.shape === 'ldrago')  drawLdragoBlade(R);
+    else if (cfg.shape === 'pattern') drawPatternBlade(R);
     else drawBladeShape(cfg.shape, R, cfg.color);
     ctx.restore();
   }
@@ -185,6 +186,7 @@ function drawBladeToCanvas(cfg, previewCanvas) {
   else if (cfg.shape === 'oracle')  drawOracleHub(R);
   else if (cfg.shape === 'obsidian')drawObsidianHub(R);
   else if (cfg.shape === 'ldrago')  drawLdragoHub(R);
+  else if (cfg.shape === 'pattern') drawPatternHub(R);
   else {
     const hub = ctx.createRadialGradient(-R*0.18, -R*0.18, 0, 0, 0, R*0.58);
     hub.addColorStop(0,    '#ffffff');
@@ -232,12 +234,13 @@ const TIER_COLORS = {
   LEGENDARY:     '#ff3311',
   MYTHICAL:      '#ff88ff',
   TRANSCENDENT:  '#ffffff',
+  GOD:           '#ffee88',
   UNKNOWN:       '#cc44ff',
 };
 const STAT_KEYS   = ['atkR','defR','staR','spdR','bstR'];
 const STAT_LABELS = ['ATK','DEF','STA','SPD','BST'];
 
-const TIER_ORDER  = ['UNKNOWN','TRANSCENDENT','MYTHICAL','LEGENDARY','CHAMPION','ELITE','ADVANCED','APPRENTICE','NOVICE'];
+const TIER_ORDER  = ['UNKNOWN','GOD','TRANSCENDENT','MYTHICAL','LEGENDARY','CHAMPION','ELITE','ADVANCED','APPRENTICE','NOVICE'];
 const ALL_TYPES   = ['ATTACK','DEFENSE','STAMINA','BALANCE','???'];
 const charFilter  = { types: new Set(ALL_TYPES) };
 
@@ -298,7 +301,7 @@ function makeCharCardHTML(cfg, dc, tc) {
   }).join('');
 
   const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
-  const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
+  const tierClass = cfg.tier === 'MYTHICAL' ? ' tier-mythical' : cfg.tier === 'TRANSCENDENT' ? ' tier-transcendent' : cfg.tier === 'GOD' ? ' tier-god' : cfg.tier === 'UNKNOWN' ? ' tier-unknown' : '';
   return { tierColor, tierClass, statBars };
 }
 
@@ -387,7 +390,7 @@ function selectChar(i, rebuild = true) {
   const tierEl = document.getElementById('detail-tier');
   tierEl.textContent = cfg.tier;
   tierEl.style.color = tierColor;
-  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : cfg.tier === 'TRANSCENDENT' ? 'tier-transcendent' : cfg.tier === 'UNKNOWN' ? 'tier-unknown' : '';
+  tierEl.className   = cfg.tier === 'MYTHICAL' ? 'tier-mythical' : cfg.tier === 'TRANSCENDENT' ? 'tier-transcendent' : cfg.tier === 'GOD' ? 'tier-god' : cfg.tier === 'UNKNOWN' ? 'tier-unknown' : '';
   document.getElementById('detail-desc').textContent  = cfg.desc;
   document.getElementById('detail-special').innerHTML =
     `<span class="special-name">◆ ${cfg.special.name}</span>  ${cfg.special.desc}`;
