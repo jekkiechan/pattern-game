@@ -22,6 +22,7 @@ export async function createTrainerAccounts(){
  }
  const enabled=document.querySelector('meta[name="trainer-service"]')?.content==='enabled';
  const cached=enabled?localRead(ACTIVE):null;
+ let bootstrap=null;
  const apiURL=path=>new URL(`api/${path}`,document.baseURI);
  async function api(path,body,method=body?'POST':'GET',owner=user?.id){
   const response=await fetch(apiURL(path),{method,credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(8000),
@@ -32,7 +33,7 @@ export async function createTrainerAccounts(){
  }
  try{
   if(!enabled)throw new Error('Guest host');
-  const session=await api('auth/get-session');user=session?.user?{id:session.user.id,name:session.user.name,username:session.user.username}:null;
+  bootstrap=await api('trainer/bootstrap');user=bootstrap.user?{id:bootstrap.user.id,name:bootstrap.user.name,username:bootstrap.user.username}:null;
   localWrite(ACTIVE,user);
  }catch{available=false;user=cached;}
  const owner=user?.id||null;
@@ -41,8 +42,7 @@ export async function createTrainerAccounts(){
  const envelope=slot=>saves.get(slot);
  function setStatus(message){status=message;document.getElementById('trainer-status').textContent=message;dialog.querySelector('[data-sync-status]')?.replaceChildren(document.createTextNode(message));}
  function storeEnvelope(slot,value){saves.set(slot,clone(value));localWrite(key(slot),value);}
- async function pull(){
-  const remote=await api('trainer/progress',null,'GET',owner);
+ function applyRemote(remote){
   for(const slot of SLOTS){
    const saved=envelope(slot),cloud=remote.saves[slot]||{data:null,revision:0};
    if(saved.dirty){
@@ -51,7 +51,10 @@ export async function createTrainerAccounts(){
    }else storeEnvelope(slot,{...cloud,dirty:false});
   }
  }
- if(owner){try{await pull();status=conflicts.size?'Choose which progress to keep':available?'Progress saved to your trainer':'Offline · saved on this device';}catch{available=false;status='Offline · saved on this device';}}
+ if(owner){
+  if(bootstrap){applyRemote(bootstrap);status=conflicts.size?'Choose which progress to keep':'Progress saved to your trainer';}
+  else status='Offline · saved on this device';
+ }
  function read(slot,fallback){
   if(!owner)return guestRead(slot,fallback);
   if(!SLOTS.includes(slot))return fallback; // Never inherit guest settings or trophies.

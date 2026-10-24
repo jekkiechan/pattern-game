@@ -38,7 +38,9 @@ def synced(page):page.wait_for_function('document.querySelector("#trainer-status
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-webgl'])
  context=browser.new_context(viewport={'width':1280,'height':900});page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+ account_requests=[];page.on('request',lambda request:account_requests.append((request.method,request.url)) if '/api/' in request.url else None)
  page.goto(BASE+'/');ready(page)
+ assert account_requests==[('GET',BASE+'/api/trainer/bootstrap')],account_requests
  assert page.locator('#create-trainer').is_visible() and page.locator('#sign-in-trainer').is_visible()
  page.click('#play-guest');assert page.locator('#games-heading').evaluate('(el)=>el===document.activeElement')
  page.evaluate('localStorage.setItem("beybattleSave",JSON.stringify({wins:2}));localStorage.setItem("climberSkybound",JSON.stringify({version:1,medals:[3],blade:"volt"}))');page.reload();ready(page)

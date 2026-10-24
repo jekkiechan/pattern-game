@@ -84,7 +84,9 @@ saves remain compatible. Signing in alone cannot read another site's localStorag
 Without the server variables/schema, guest play still works and account actions
 explain that the service is unavailable. Only `build:site` enables the account
 client on every published page; the committed Pages HTML does not probe an API that
-Pages cannot serve. API responses are never cached. Progress endpoints use the
+Pages cannot serve. The client loads the current trainer and all three save slots
+with one `/api/trainer/bootstrap` request before starting a game. API responses
+are never cached. Progress endpoints use the
 authenticated session, expected trainer ID, parameterized SQL and optimistic
 revisions; another user's ID in the payload cannot select their save.
 

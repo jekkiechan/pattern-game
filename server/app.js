@@ -60,6 +60,11 @@ export function createApp({database,auth,recovery,baseURL}){
     return json({recoveryCode:code});
    }
    const session=await auth.api.getSession({headers:request.headers});
+   if(path==='/api/trainer/bootstrap'&&request.method==='GET'){
+    if(!session)return json({user:null,saves:{}});
+    const result=await database.query('SELECT slot,data,revision FROM trainer_progress WHERE user_id=$1',[session.user.id]);
+    return json({user:publicUser(session.user),saves:Object.fromEntries(result.rows.map(row=>[row.slot,{data:row.data,revision:row.revision}]))});
+   }
    if(!session)return json({error:'Sign in to save your trainer.'},401);
    // Reject a delayed request from a different trainer/tab, even if its cookie changed.
    if(request.headers.get('x-trainer-id')!==session.user.id)return json({error:'Trainer changed. Reload to continue.'},409);
