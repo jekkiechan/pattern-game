@@ -22,9 +22,13 @@ with sync_playwright() as p:
  timing=page.evaluate('''()=>{const raf=requestAnimationFrame;window.requestAnimationFrame=()=>0;const out=[];for(const hz of [30,60,120]){startStage(0);lastTick=0;accumulator=0;loop(1000);for(let i=1;i<=hz*2;i++)loop(1000+i*1000/hz);out.push({frames:run.frames,x:player.x,y:player.y});}window.requestAnimationFrame=raf;return out;}''')
  assert max(t['frames'] for t in timing)-min(t['frames'] for t in timing)<=1
  assert max(t['y'] for t in timing)-min(t['y'] for t in timing)<10
+ # Every authored landing needs a finite position, including the portal.
+ geometry=page.evaluate('''()=>STAGES.map((cfg,stage)=>{buildStage(stage);return {stage:stage+1,aligned:cfg.route.length===cfg.x.length,finite:platforms.every(p=>[p.x,p.y,p.w].every(Number.isFinite))&&collectStars.every(s=>[s.x,s.y].every(Number.isFinite))};})''')
+ assert all(g['aligned'] and g['finite'] for g in geometry),geometry
  # Real steering through all 30 stage/loadout combinations. No teleporting, extra
- # energy or weakened physics: this catches unreachable routes and broken portals.
- routes=page.evaluate('''()=>{const out=[];for(const blade of BLADES){progress.blade=blade.id;for(let stage=0;stage<10;stage++){startStage(stage);let target=0;for(let frame=0;frame<12000&&state==='playing';frame++){const p=platforms[target],dx=p.x+p.w/2-player.x-player.vx*5;keys.ArrowRight=dx>3;keys.ArrowLeft=dx< -3;const before=run.landings;update();if(run.landings>before){const landed=platforms.find(p=>Math.abs(player.y+player.radius-p.y)<.1);if(landed)target=Math.min(landed.i+1,platforms.length-1);}}out.push({blade:blade.id,stage:stage+1,finished:state==='clear',stars:starsCollected,total:starsTotal,rescues:run.rescues,seconds:Math.round(run.frames/60)});}}return out;}''')
+ # energy or weakened physics. Draw every frame too: invalid portal coordinates
+ # can pass collision comparisons but throw in Canvas and stop the animation loop.
+ routes=page.evaluate('''()=>{const out=[];for(const blade of BLADES){progress.blade=blade.id;for(let stage=0;stage<10;stage++){startStage(stage);let target=0;for(let frame=0;frame<12000&&state==='playing';frame++){const p=platforms[target],dx=p.x+p.w/2-player.x-player.vx*5;keys.ArrowRight=dx>3;keys.ArrowLeft=dx< -3;const before=run.landings;update();drawBg();drawWorld();if(run.landings>before){const landed=platforms.find(p=>Math.abs(player.y+player.radius-p.y)<.1);if(landed)target=Math.min(landed.i+1,platforms.length-1);}}out.push({blade:blade.id,stage:stage+1,finished:state==='clear',stars:starsCollected,total:starsTotal,rescues:run.rescues,seconds:Math.round(run.frames/60)});}}return out;}''')
  assert all(r['finished'] and r['rescues']==0 for r in routes),routes
  assert all(r['stars']==r['total'] for r in routes if r['stage']==1)
  assert page.locator('#result-dialog').is_visible();page.screenshot(path=str(OUT/'result.png'))
@@ -34,7 +38,7 @@ with sync_playwright() as p:
  # Real touch and responsive controls, including cancellation of a held direction.
  phone=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
  mobile=phone.new_page();mobile.on('pageerror',lambda e:errors.append(str(e)));mobile.goto(BASE+'/beyblade-climber.html');mobile.screenshot(path=str(OUT/'home-mobile.png'),full_page=True);mobile.tap('#continue-button')
- mobile.tap('#burst-button');assert mobile.evaluate('run.bursts')==1
+ mobile.tap('#burst-button');mobile.wait_for_function('run.bursts===1')
  mobile.evaluate("document.getElementById('right-button').dispatchEvent(new PointerEvent('pointercancel',{pointerId:1}))");assert mobile.evaluate('held.right') is False
  for w,h in [(390,844),(320,568),(844,390),(768,1024)]:
   mobile.set_viewport_size({'width':w,'height':h});mobile.wait_for_timeout(100)
@@ -46,5 +50,5 @@ with sync_playwright() as p:
  # Storage failure must not prevent a playable session.
  restricted=browser.new_page();restricted.add_init_script("Storage.prototype.setItem=function(){throw new Error('Storage disabled')}");restricted.goto(BASE+'/beyblade-climber.html');restricted.click('[data-blade="volt"]');restricted.click('#continue-button');assert restricted.evaluate('state')=='playing'
  assert not errors,errors
- report={'routes':routes,'timing':timing,'recovery':recovery,'javascriptErrors':errors,'checks':['30 real-input route completions','fixed-step timing','checkpoint recovery','tier and medal persistence','replay preservation','keyboard/touch burst','pause and tab blur','4 responsive layouts','blocked storage']}
+ report={'geometry':geometry,'routes':routes,'timing':timing,'recovery':recovery,'javascriptErrors':errors,'checks':['30 real-input route completions','fixed-step timing','checkpoint recovery','tier and medal persistence','replay preservation','keyboard/touch burst','pause and tab blur','4 responsive layouts','blocked storage']}
  (OUT/'report.json').write_text(json.dumps(report,indent=2));print(json.dumps(report));browser.close()

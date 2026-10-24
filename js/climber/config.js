@@ -24,12 +24,12 @@ const STAGES = [
  {name:'Star Trail',route:'nnnbncnnnnn',x:[220,280,225,165,110,165,225,280,225,165,210],gap:80,hint:'Land in a platform’s bright center to charge your burst.'},
  {name:'Cloud Cruise',route:'nnmnncmnnmn',x:[150,205,265,220,160,110,165,225,285,235,180],gap:81,hint:'Blue platforms drift. Aim where they are going.'},
  {name:'Spring Garden',route:'nbnmncbnmnnb',x:[205,145,100,165,225,280,225,165,110,170,230,185],gap:82,hint:'Gold springs send you higher. Steer gently on the way down.'},
- {name:'Ember Steps',route:'nnfnncfnbnnfn',x:[170,110,165,225,285,230,170,110,165,225,280,220],gap:84,hint:'Pink platforms crumble after a bounce, then return.'},
- {name:'Sunset Sprint',route:'nmfnbcnmnfnbnn',x:[230,285,225,165,110,165,225,280,225,165,110,170,225],gap:85,hint:'Chain new center landings. Three clean landings refill a burst.'},
- {name:'Aurora Drift',route:'nmnbncmmnfnbnn',x:[155,110,170,230,285,230,170,115,175,235,285,225,170],gap:87,hint:'A gentle crosswind comes in waves. Watch the sky arrows.'},
- {name:'Prism Passage',route:'nfmnbcnmfbnmnfn',x:[225,280,225,165,110,165,225,280,225,170,110,165,225,180],gap:88,hint:'Save a burst for a tricky landing. Stars recharge it too.'},
- {name:'Orbit Run',route:'nmbnfcnmnbfnmnn',x:[155,105,165,225,285,225,165,110,170,230,280,220,160,210],gap:90,hint:'Read the wind, follow the stars, and choose your next landing.'},
- {name:'The Sky Crown',route:'nmfbncnmfbnmnfnnn',x:[225,280,225,165,110,165,225,280,220,160,110,170,230,280,225,180],gap:91,hint:'Your final climb. Every skill has a moment to shine.'}
+ {name:'Ember Steps',route:'nnfnncfnbnnfn',x:[170,110,165,225,285,230,170,110,165,225,280,220,165],gap:84,hint:'Pink platforms crumble after a bounce, then return.'},
+ {name:'Sunset Sprint',route:'nmfnbcnmnfnbnn',x:[230,285,225,165,110,165,225,280,225,165,110,170,225,180],gap:85,hint:'Chain new center landings. Three clean landings refill a burst.'},
+ {name:'Aurora Drift',route:'nmnbncmmnfnbnn',x:[155,110,170,230,285,230,170,115,175,235,285,225,170,225],gap:87,hint:'A gentle crosswind comes in waves. Watch the sky arrows.'},
+ {name:'Prism Passage',route:'nfmnbcnmfbnmnfn',x:[225,280,225,165,110,165,225,280,225,170,110,165,225,180,230],gap:88,hint:'Save a burst for a tricky landing. Stars recharge it too.'},
+ {name:'Orbit Run',route:'nmbnfcnmnbfnmnn',x:[155,105,165,225,285,225,165,110,170,230,280,220,160,210,165],gap:90,hint:'Read the wind, follow the stars, and choose your next landing.'},
+ {name:'The Sky Crown',route:'nmfbncnmfbnmnfnnn',x:[225,280,225,165,110,165,225,280,220,160,110,170,230,280,225,180,230],gap:91,hint:'Your final climb. Every skill has a moment to shine.'}
 ];
 STAGES.forEach((s,i)=>{s.world=Math.floor(i/2);s.width=i<2?100:i<6?90:82;s.stars=5+Math.floor(i/2);});
 function rankFor(cleared){return CLIMB_TIERS.filter(t=>cleared>=t.at).at(-1);}
