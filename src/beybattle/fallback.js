@@ -31,7 +31,7 @@ export class CanvasDisplay {
  if(this.match.arena==='rail'){x.strokeStyle='#57d9ca88';x.lineWidth=.15;x.beginPath();x.arc(0,0,5.1,0,TAU);x.stroke();}
  if(this.match.arena==='volcano'&&this.match.time%10>7){x.strokeStyle=this.match.time%10>8?'#f58a5680':'#f58a5630';x.lineWidth=1.4;x.beginPath();x.arc(0,0,this.match.radius*.83,0,TAU);x.stroke();}
  if(this.match.time>32||this.match.arena==='void'){x.strokeStyle='#d4b0ff88';x.lineWidth=.07;x.setLineDash([.25,.2]);x.beginPath();x.arc(0,0,this.match.radius,0,TAU);x.stroke();x.setLineDash([]);}
- x.fillStyle='#bacbdf44';x.textAlign='center';x.font='italic 900 .5px Arial';x.fillText('BEYBATTLE',0,.1);x.restore();
+ x.fillStyle='#bacbdf44';x.textAlign='center';x.font='500 .5px "Noto Serif", serif';x.fillText('BEYBATTLE',0,.1);x.restore();
  this.match.blades.forEach((b,i)=>{const p=this.project(b.px+(b.x-b.px)*alpha,b.pz+(b.z-b.pz)*alpha);x.save();x.translate(p.x,p.y);x.strokeStyle=b.counterReady>0?'#f5df87':b.guard>0?'#e0f5ff':b.warning>0?'#ff7748':i?'#ff9b75':'#82c9ff';x.lineWidth=b.counterReady>0||b.guard>0?3:2;x.beginPath();x.ellipse(0,0,this.unit*.85,this.unit*.7,0,0,TAU);x.stroke();x.scale(1,.8);x.rotate(b.prevAngle+(b.angle-b.prevAngle)*alpha);x.drawImage(this.sprite(b.id),-this.unit,-this.unit,this.unit*2,this.unit*2);x.restore();});}
  stats(){return {backend:'canvas2d',textures:this.sprites.size};}
 }

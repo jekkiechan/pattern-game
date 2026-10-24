@@ -1,0 +1,38 @@
+/* Pattern's shared type and material palette. All font files are served locally. */
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('../assets/fonts/noto-sans-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Serif';
+  src: url('../assets/fonts/noto-serif-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+}
+:root {
+  color-scheme: dark;
+  --font-ui: 'Noto Sans', 'Segoe UI', sans-serif;
+  --font-display: 'Noto Serif', Georgia, serif;
+  --font-numeric: var(--font-ui);
+  --premium-bg: #0d171b;
+  --premium-panel: #152126;
+  --premium-raised: #1c2b30;
+  --premium-text: #f3ede1;
+  --premium-muted: #aab7b7;
+  --premium-gold: #cbb589;
+  --premium-red: #d07864;
+  --premium-line: #bda77940;
+}
+html { font-family: var(--font-ui); text-rendering: optimizeLegibility; }
+body { -webkit-font-smoothing: antialiased; }
+button, input, select, summary { font-family: var(--font-ui); }
+button, a, input, select, summary { -webkit-tap-highlight-color: transparent; }
+button, a, input, select, summary, canvas { outline-color: var(--premium-gold); }
+::selection { background: #cbb589; color: #0d171b; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
