@@ -56,3 +56,25 @@ for(const a of ARENAS){
  const m=new Match(0,1,{practice:true});m.launch();run(m,34);assert.equal(m.events.filter(e=>e.type==='finalspin').length,1);
 }
 console.log('Engine checks passed: cooldowns, 33 specials, 6 arenas, deterministic simulation, practice, collision, rail, launch energy, perfect guards, counters, fair AI tiers.');
+
+// Animation cues must describe real hits, without inventing hits on activation.
+{
+ const m=fresh(),[a,b]=m.blades;a.energy=100;m.events=[];m.special(0);
+ assert.equal(m.events.filter(e=>e.type==='special').length,1);
+ assert.equal(m.events.filter(e=>e.type==='special-impact').length,0,'a rush has to connect first');
+ a.x=-.5;b.x=.5;a.z=b.z=0;a.vx=5;b.vx=-5;a.vz=b.vz=0;m.step();
+ let hits=m.events.filter(e=>e.type==='special-impact');assert.equal(hits.length,1);
+ assert.equal(hits[0].kind,'rush');assert.equal(hits[0].target,1);assert(hits[0].amount>0);
+ run(m,.4);assert.equal(m.events.filter(e=>e.type==='special-impact'&&e.kind==='rush').length,1);
+ for(const kind of ['wave','drain']){
+  const id=ROSTER.find(c=>c.special===kind).id,n=new Match(id,1);n.launch();n.guard(1);n.blades[0].energy=100;n.events=[];n.special(0);
+  const cue=n.events.find(e=>e.type==='special-impact');assert.equal(n.events[0].type,'special');assert.equal(cue.kind,kind);assert(cue.blocked);assert(cue.amount>0);assert.equal(cue.x,n.blades[1].x);assert.equal(cue.z,n.blades[1].z);
+ }
+ const n=new Match(4,1);n.launch();n.blades[0].energy=100;n.special(0);n.events=[];
+ const spin=n.blades[1].spin;n.damage(0,10,1);
+ const reflect=n.events.find(e=>e.type==='special-impact');assert.equal(reflect.kind,'counter');assert.equal(reflect.i,0);assert.equal(reflect.target,1);assert(Math.abs(reflect.amount-(spin-n.blades[1].spin))<1e-9);
+ const chaos=new Match(32,1);chaos.launch();chaos.blades[0].energy=100;chaos.special(0);
+ assert.equal(chaos.events.find(e=>e.type==='special').kind,chaos.blades[0].specialType);
+ assert.notEqual(chaos.blades[0].specialType,'chaos','effects use the resolved wild-card move');
+}
+console.log('Special effect cues passed: actual rush hits, blocked wave/drain, reflected counters and resolved chaos.');

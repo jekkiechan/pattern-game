@@ -39,13 +39,14 @@ export class Match {
   b.energy=0;b.stats.specials++;
   const type=b.cfg.special==='chaos'?['rush','wave','guard','mend'][Math.floor(b.random()*4)]:b.cfg.special;
   b.specialType=type;b.specialTime=SPECIALS[type].duration;b.specialHit=false;
+  this.emit('special',{i,name:b.cfg.specialName,kind:type});
   if(type==='rush'){b.rush=1.5;const d=Math.hypot(foe.x-b.x,foe.z-b.z)||1;b.vx=(foe.x-b.x)/d*11;b.vz=(foe.z-b.z)/d*11;}
   if(type==='wave'){this.damage(1-i,14*b.specialPower,i,'special');const d=Math.hypot(foe.x-b.x,foe.z-b.z)||1;foe.vx+=(foe.x-b.x)/d*4;foe.vz+=(foe.z-b.z)/d*4;}
   if(type==='guard')b.spin=Math.min(100,b.spin+7*b.specialPower);
   if(type==='counter')b.spin=Math.min(100,b.spin+4*b.specialPower);
   if(type==='mend')b.spin=Math.min(100,b.spin+15*b.specialPower);
   if(type==='drain'){const taken=this.damage(1-i,8*b.specialPower,i,'special');b.spin=Math.min(100,b.spin+taken);}
-  this.emit('special',{i,name:b.cfg.specialName,kind:type});return true;
+  return true;
  }
  damage(i,amount,source,kind='hit') {
   const b=this.blades[i],attacker=this.blades[source];
@@ -59,11 +60,12 @@ export class Match {
    }
   }
   if(b.specialTime>0&&b.specialType==='guard')value*=1-.65*b.specialPower;
-  if(b.specialTime>0&&b.specialType==='counter'){value*=1-.35*b.specialPower;attacker.spin=Math.max(0,attacker.spin-value*.2*b.specialPower);}
+  if(b.specialTime>0&&b.specialType==='counter'){value*=1-.35*b.specialPower;const reflected=Math.min(attacker.spin,value*.2*b.specialPower);attacker.spin=Math.max(0,attacker.spin-value*.2*b.specialPower);if(reflected>0)this.emit('special-impact',{i,target:source,kind:'counter',x:attacker.x,z:attacker.z,amount:reflected,blocked:false});}
   value=Math.min(b.spin,value);b.spin=Math.max(0,b.spin-value);b.hitFlash=.16;
   if(b.spin<=0&&(kind==='special'||attacker.rush>0))b.finishBurst=true;
   attacker.stats.damage+=value;attacker.energy=clamp(attacker.energy+value*.6,0,100);b.energy=clamp(b.energy+value*.35,0,100);
   b.burst=clamp(b.burst+value*(kind==='special'?1.2:.9),0,100);
+  if(kind==='special'&&value>0)this.emit('special-impact',{i:source,target:i,kind:attacker.specialType,x:b.x,z:b.z,amount:value,blocked:b.guard>0||b.specialTime>0&&['guard','counter'].includes(b.specialType)});
   return value;
  }
  ai(i,dt) {

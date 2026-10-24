@@ -20,7 +20,7 @@ export class CanvasDisplay {
  this.sprites.set(id,c);return c;}
  snapshot(id){return this.sprite(id).toDataURL('image/webp',.85);}
  point(cx,cy){const r=this.canvas.getBoundingClientRect();return {x:(cx-r.left-this.width/2)/this.unit,z:(cy-r.top-this.height/2)/(this.unit*.8)};}
- project(x,z){return {x:this.width/2+x*this.unit,y:this.height/2+z*this.unit*.8};}
+ project(x,z,height=.4){return {x:this.width/2+x*this.unit,y:this.height/2+z*this.unit*.8-(height-.4)*this.unit};}
  event(){}
  render(dt,alpha=1){const x=this.ctx,w=this.width,h=this.height;x.clearRect(0,0,w,h);
  if(this.mode==='studio'){if(this.motion)this.hero.rotation.y+=dt*.16;const size=Math.min(w*.93,h*.93);x.save();x.translate(w/2,h/2);x.scale(1,.78);x.rotate(this.hero.rotation.y);x.shadowColor='#0008';x.shadowBlur=25;x.shadowOffsetY=20;x.drawImage(this.sprite(this.hero.userData.cfg.id),-size/2,-size/2,size,size);x.restore();return;}

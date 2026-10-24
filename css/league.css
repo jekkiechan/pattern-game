@@ -128,6 +128,42 @@ h1 > i { font: 500 10px var(--font-ui); color: #b8c2ba; letter-spacing: .24em; m
 .action.special { background: linear-gradient(#3a382a, #262d26); border-color: #cbb58990; }.action.special.ready { background: linear-gradient(#575039, #3b3f2d); border-color: #e5cc93; }
 .action.counter-ready { background: #50462c; border-color: #f0d37f; }.action.incoming { border-color: #ffbf88; box-shadow: 0 0 0 2px #ffb47945; background: #3b302d; }
 .battle-announcement { font-family: var(--font-display); font-weight: 500; font-style: normal; }.steer-hint { color: #98b1b1; }
+
+/* Signature moves stay inside the stadium and never intercept battle input. */
+.arena-view { overflow:clip; }
+#special-effects { position:absolute; inset:0; width:100%; height:100%; z-index:2; pointer-events:none; }
+.special-callout { position:absolute; top:2px; left:12px; z-index:3; display:flex; align-items:center; gap:12px; width:min(300px,42%); padding:12px 15px; pointer-events:none; overflow:hidden; color:#fff7dd; background:linear-gradient(115deg,#101e25f5,#142c32e8); border:1px solid color-mix(in srgb,var(--special-color) 55%,transparent); border-left:3px solid var(--special-color); border-radius:3px 14px 3px 3px; box-shadow:0 8px 25px #0004; }
+.special-callout[hidden] { display:none; }
+.special-callout.rival { left:auto; right:12px; border-radius:14px 3px 3px 3px; }
+.special-crest { flex:none; color:var(--special-color); font:700 34px/1 sans-serif; text-shadow:0 0 18px var(--special-color); }
+.special-callout>div { min-width:0; }
+.special-callout small { display:block; font:700 8px var(--mono); letter-spacing:1.5px; color:#cedbd9; }
+.special-callout strong { display:block; margin:5px 0 3px; font:600 clamp(12px,1.6vw,20px)/1.15 var(--font-display); overflow-wrap:anywhere; }
+.special-kind { display:block; color:var(--special-color); font:500 10px var(--mono); }
+.special-callout>i { position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--special-color); transform-origin:left; }
+@media(max-width:600px) {
+ .special-callout { top:40px; left:0; width:47%; padding:9px 8px; gap:6px; }
+ .special-callout.rival { right:0; }
+ .special-crest { font-size:22px; }
+ .special-callout small { font-size:6px; letter-spacing:.6px; }
+ .special-callout strong { font-size:12px; margin:4px 0; }
+ .special-kind { font-size:8px; }
+ .arena-view:has(.special-callout:not([hidden])) .battle-announcement { top:108px; }
+}
+@media(max-height:540px) and (orientation:landscape) {
+ .special-callout { top:70px; left:2px; width:180px; padding:7px 10px; gap:7px; }
+ .special-callout.rival { right:2px; }
+ .special-crest { font-size:22px; }
+ .special-callout strong { font-size:13px; }
+ .special-kind { font-size:8px; }
+}
+@media(max-width:600px) and (max-height:650px) and (orientation:portrait) {
+ .special-callout { top:36px; padding:7px 6px; }
+ .special-crest { display:none; }
+ .special-callout strong { font-size:11px; }
+ .special-kind { font-size:7px; }
+ .arena-view:has(.special-callout:not([hidden])) .battle-announcement { top:94px; }
+}
 .launch-panel { background: #13232af7; border-color: #cbb58980; border-radius: 4px; }.launch-panel h3 { font: 500 25px/1.3 var(--font-display); }
 .launch-panel > p:not(.eyebrow) { color: #bacac8; }.launch-meter { border-radius: 2px; }.coach { background: #172f36; border-radius: 4px; border-color: #89b4b060; }
 .result-card, dialog { background: radial-gradient(ellipse at 50% 0, #3b443b66, var(--premium-panel) 60%); border-color: #cbb58965; border-radius: 4px; }

@@ -68,16 +68,17 @@ export class Display {
   this.finishClock=0;this.impact=0;this.particles.forEach(p=>p.life=0);this.effects.forEach(e=>e.life=0);this.resize();this.trimModels();
  }
  point(clientX,clientY){const r=this.canvas.getBoundingClientRect();this.mouse.set((clientX-r.left)/r.width*2-1,-(clientY-r.top)/r.height*2+1);this.ray.setFromCamera(this.mouse,this.camera);this.ray.ray.intersectPlane(this.plane,this.vec);return {x:this.vec.x,z:this.vec.z};}
- project(x,z){this.vec.set(x,.9,z).project(this.camera);return {x:(this.vec.x*.5+.5)*this.width,y:(-.5*this.vec.y+.5)*this.height};}
+ project(x,z,height=.9){this.vec.set(x,height,z).project(this.camera);return {x:(this.vec.x*.5+.5)*this.width,y:(-.5*this.vec.y+.5)*this.height};}
  event(e){
   if(e.type==='launch'&&this.motion){for(const b of this.match.blades)this.ringFX(b.x,b.z,'#d5edff',.65,2.3);}
   if(e.type==='dash'&&this.motion){const b=this.match.blades[e.i];this.ringFX(b.x,b.z,e.i?'#ffa77c':'#9ddaff',.3,1.4);}
   if(e.type==='finish')this.finishClock=0;
-  if(e.type==='clash'&&this.motion){this.impact=Math.min(.065,e.power*.003);
+  if(e.type==='special-impact'&&this.motion)this.impact=Math.max(this.impact,e.blocked?.04:.12);
+  if(e.type==='clash'&&this.motion){this.impact=Math.max(this.impact,Math.min(.065,e.power*.003));
    let n=this.low?10:24;const tint=new T.Color('#ffd899');for(const p of this.particles){if(p.life>0)continue;const a=Math.random()*TAU;p.life=.25+Math.random()*.35;p.x=e.x;p.y=.45;p.z=e.z;const s=1+Math.random()*4;p.vx=Math.cos(a)*s;p.vz=Math.sin(a)*s;p.vy=2+Math.random()*2;p.color=tint;if(--n<=0)break;}
    this.ringFX(e.x,e.z,'#ffd7a0',.4,1.4);
   }
-  if(['special','block','rail','perfect','counter'].includes(e.type)){const b=this.match.blades[e.i];this.ringFX(b.x,b.z,['perfect','counter'].includes(e.type)?'#f5df87':e.type==='block'?'#91d7ff':b.cfg.accent,.8,3);}
+  if(['block','rail','perfect','counter'].includes(e.type)){const b=this.match.blades[e.i];this.ringFX(b.x,b.z,['perfect','counter'].includes(e.type)?'#f5df87':e.type==='block'?'#91d7ff':b.cfg.accent,.8,3);}
  }
  ringFX(x,z,color,life,size){if(!this.motion)return;const fx=this.effects.find(e=>e.life<=0)||this.effects[0];fx.life=fx.max=life;fx.size=size;fx.mesh.position.set(x,.06,z);fx.mesh.material.color.set(color);}
  render(dt,alpha=1){
@@ -96,8 +97,9 @@ export class Display {
    this.boundary.scale.setScalar(this.match.radius);this.boundary.material.opacity=this.match.time>32?.5:0;
    this.heat.material.opacity=this.match.arena==='volcano'&&this.match.time%10>7?(this.match.time%10>8?.3:.12):0;
    const a=this.particleGeo.attributes.position,c=this.particleGeo.attributes.color;
+   this.points.visible=this.motion;
    this.particles.forEach((p,i)=>{p.life-=dt;if(p.life>0){p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vy-=9*dt;a.setXYZ(i,p.x,p.y,p.z);c.setXYZ(i,p.life*2,p.life*1.6,p.life*.9);}else a.setXYZ(i,0,-5,0);});a.needsUpdate=c.needsUpdate=true;
-   this.effects.forEach(e=>{e.life-=dt;e.mesh.visible=e.life>0;if(e.life>0){const t=1-e.life/e.max;e.mesh.scale.setScalar(.5+t*e.size);e.mesh.material.opacity=(1-t)*.65;}});
+   this.effects.forEach(e=>{e.life-=dt;e.mesh.visible=this.motion&&e.life>0;if(e.life>0){const t=1-e.life/e.max;e.mesh.scale.setScalar(.5+t*e.size);e.mesh.material.opacity=(1-t)*.65;}});
   }
   this.renderer.render(this.scene,this.camera);
  }
