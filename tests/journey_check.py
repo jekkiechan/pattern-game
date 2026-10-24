@@ -1,7 +1,7 @@
 """Journey navigation/persistence integration. Battle results use the existing engine test surface.
 Run against python -m http.server 8000. Engine and tactics tests cover real battle rules.
 """
-import os
+import os, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 BASE=os.environ.get('GAME_URL','http://127.0.0.1:8000')
@@ -22,7 +22,7 @@ def win_round(page,winner):
  page.evaluate('(winner)=>{const m=__bey.match;m.blades[1-winner].spin=0;m.step();}',winner)
  page.wait_for_function('__bey.screen==="result"')
 with sync_playwright() as p:
- browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'])
+ browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'])
  page=browser.new_page(viewport={'width':1440,'height':1000})
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.on('response',lambda r:bad.append(r.url) if r.status>=400 else None)

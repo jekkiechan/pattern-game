@@ -1,11 +1,11 @@
 """Climber gameplay regression: serve repository on port 8000, then run with Python Playwright."""
-import json, os
+import json, os, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 BASE=os.environ.get('GAME_URL','http://127.0.0.1:8000')
 OUT=Path(os.environ.get('QA_OUTPUT','/tmp/pattern-climber-qa'));OUT.mkdir(parents=True,exist_ok=True)
 with sync_playwright() as p:
- browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox'])
  page=browser.new_page(viewport={'width':1440,'height':1000});errors=[]
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(BASE+'/beyblade-climber.html');assert page.locator('[data-stage]').count()==10

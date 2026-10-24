@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and gameplay tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Verify the published bundle matches source
+        run: git diff --exit-code -- assets/beybattle.js
+      - run: npm test
+
+  browser:
+    name: Browser / ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [browser_check, climber_check, journey_check]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+      - run: python -m pip install -r tests/requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Serve and test the committed game
+        env:
+          QA_OUTPUT: ${{ runner.temp }}/qa-${{ matrix.suite }}
+          SUITE: ${{ matrix.suite }}
+        run: |
+          python -m http.server 8000 --bind 127.0.0.1 > "$RUNNER_TEMP/game-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8000/beybattle.html > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8000/beybattle.html > /dev/null
+          python "tests/$SUITE.py"
+      - name: Upload screenshots and test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-${{ matrix.suite }}
+          path: |
+            ${{ runner.temp }}/qa-${{ matrix.suite }}
+            ${{ runner.temp }}/game-server.log
+          retention-days: 14
+
+  ci-passed:
+    name: CI passed
+    if: always()
+    needs: [build-and-test, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every test job to succeed
+        env:
+          BUILD_RESULT: ${{ needs.build-and-test.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          test "$BUILD_RESULT" = success
+          test "$BROWSER_RESULT" = success
