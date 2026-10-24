@@ -65,7 +65,7 @@ with sync_playwright() as p:
  page.keyboard.press('e');assert page.evaluate('__bey.match.blades[0].guardCD')>0
  page.evaluate('__bey.match.blades[0].energy=100');page.keyboard.press('Space');assert page.evaluate('__bey.match.blades[0].stats.specials')==1
  page.click('#help-button');before=page.evaluate('__bey.match.time');page.click('#lesson-next');page.wait_for_timeout(100);assert page.evaluate('__bey.match.time')==before
- page.keyboard.press('Escape');assert not page.evaluate('__bey.paused')
+ page.keyboard.press('Escape');page.wait_for_function('!__bey.paused && !document.querySelector("dialog[open]")')
  page.click('#pause-button');before=page.evaluate('__bey.match.time');page.wait_for_timeout(200);assert page.evaluate('__bey.match.time')==before
  page.click('#resume-button');page.evaluate("window.dispatchEvent(new Event('blur'))");assert page.evaluate('__bey.paused');page.click('#resume-button')
  page.evaluate("document.getElementById('scene').dispatchEvent(new PointerEvent('pointercancel',{pointerId:1}))");assert page.evaluate('__bey.match.blades[0].steer') is None
@@ -112,6 +112,8 @@ with sync_playwright() as p:
    mobile.tap(f'[data-lesson="{i}"]')
    assert mobile.locator('#help-dialog').evaluate('(el)=>el.scrollWidth<=el.clientWidth'),f'Help overflow at {w}'
    assert mobile.locator(f'[data-lesson="{i}"]').bounding_box()['height']>=44
+  mobile.locator('#help-dialog').evaluate('(el)=>el.scrollTop=0')
+  box=mobile.locator('#help-practice').bounding_box();assert box['y']+box['height']<=h+1,('Tutorial practice action',w,h,box)
   mobile.screenshot(path=str(OUT/f'tutorial-{w}x{h}.png'))
   mobile.locator('#help-practice').scroll_into_view_if_needed();assert mobile.locator('#help-practice').is_visible()
   mobile.locator('#help-dialog .dialog-close').tap()
