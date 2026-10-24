@@ -1,0 +1,203 @@
+/* Visual learning and quieter surfaces. Scoped to Beybattle. */
+.home-screen { padding-top: 42px; align-content: center; }
+.home-copy h1 { font-size: clamp(70px, 7.2vw, 96px); margin: 18px 0; }
+.home-intro { margin-bottom: 26px; font-size: 17px; }
+.home-play { max-width: 360px; }
+.home-play > .button { width: 100%; justify-content: space-between; }
+.home-play .learn-link { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; font-size: 12px; min-height: 44px; }
+.learn-link > span { font-size: 22px; color: var(--premium-gold); }
+.home-copy .league-preview { max-width: 360px; background: none; border: 0; padding: 18px 0; margin: 6px 0; }
+.home-alternatives { max-width: 360px; border-top: 1px solid var(--line); }
+.home-alternatives .journey-entry { width: 100%; max-width: none; margin: 0; padding: 16px 0; background: none; border: 0; border-bottom: 1px solid var(--line); }
+.home-alternatives .journey-entry strong { font-size: 20px; }
+.home-alternatives .journey-entry small { font-size: 8px; letter-spacing: .12em; }
+.home-alternatives .other-modes { display: flex; flex-direction: row; max-width: none; margin: 0; gap: 20px; }
+.home-alternatives .other-modes button { padding: 10px 0; border: 0; min-height: 48px; }
+.home-alternatives .other-modes button:hover, .home-alternatives .journey-entry:hover { background: none; color: var(--premium-gold); }
+.home-alternatives .other-modes .mode-icon { font-size: 20px; }
+.home-display { max-height: 650px; }
+.home-display #home-view { min-height: 360px; }
+.home-display .display-grid { border: 0; }
+.home-footer { margin-top: 24px; padding-top: 16px; }
+.home-footer > span { font-size: 11px; letter-spacing: 0; }
+.blade-details { margin-top: 15px; border-top: 1px solid var(--line); }
+.blade-details summary, .help-details summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; cursor: pointer; color: #bccbc7; font-size: 12px; }
+.blade-details summary span { font-size: 20px; }
+.blade-details[open] summary span { transform: rotate(45deg); }
+.blade-details p { font-size: 12px; line-height: 1.65; color: #b0c0bf; margin: 0 0 12px; }
+.fair-badge { border: 0; }
+/* One demonstration at a time. The captions also explain the static version. */
+#help-dialog { width: 540px; max-width: calc(100vw - 24px); padding: 28px; }
+#help-dialog h2 { font-size: 30px; margin: 10px 0; padding-right: 12px; }
+#help-dialog .help-goal { margin: 0 0 22px; font-size: 12px; color: #a9bbb7; }
+.lesson-tabs { display: flex; gap: 6px; }
+.lesson-tabs button { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 46px; font-size: 12px; border: 1px solid transparent; border-bottom-color: var(--line); background: transparent; color: #a9bbb7; }
+.lesson-tabs button > span { font-size: 20px; }
+.lesson-tabs button[aria-pressed=true] { color: #f0e4c9; border-bottom-color: var(--premium-gold); background: #cbb5890c; }
+.move-scene { --demo-duration: 2.6s; height: 218px; position: relative; overflow: hidden; isolation: isolate; }
+.demo-arena { position: absolute; inset: 20px 10% 28px; border: 1px solid #a4cad52b; border-radius: 50%; background: radial-gradient(ellipse, #a4cad511, transparent 70%); }
+.demo-arena::after { content: ''; position: absolute; inset: 18%; border: 1px solid #a4cad515; border-radius: 50%; }
+.demo-path { position: absolute; left: 31%; right: 26%; top: 42%; border-bottom: 1px dashed #a4cad57a; color: var(--blue); text-align: right; font-size: 23px; line-height: 10px; }
+.demo-label { position: absolute; top: -15px; width: 100%; text-align: center; font-size: 9px; letter-spacing: .12em; color: var(--blue); }
+.demo-you-label { left: 0; }
+.demo-rival-label { left: 0; color: var(--orange); }
+.demo-blade { position: absolute; top: 57px; width: 22%; aspect-ratio: 1.2; display: grid; place-items: center; }
+.demo-player { left: 14%; z-index: 2; }
+.demo-rival { left: 65%; }
+.demo-blade img { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 7px 7px #0006); }
+.demo-shield { display: none; position: absolute; inset: -10%; border: 2px solid var(--blue); border-radius: 50%; background: #a4cad521; font-size: 22px; color: var(--blue); text-align: center; }
+.demo-wave { display: none; position: absolute; inset: 5%; border: 2px solid var(--premium-gold); border-radius: 50%; }
+.demo-impact { position: absolute; left: 62%; top: 79px; font-size: 35px; color: var(--premium-gold); }
+.demo-energy { display: none; position: absolute; left: 20%; right: 20%; bottom: 40px; align-items: center; gap: 9px; color: var(--premium-gold); font-size: 9px; }
+.demo-energy > i { flex: 1; height: 5px; background: #cbb58929; overflow: hidden; }
+.demo-energy b { display: block; height: 100%; background: var(--premium-gold); transform-origin: left; }
+.move-guard .demo-path { text-align: left; color: var(--orange); }
+.move-guard .demo-shield { display: block; }
+.move-guard .demo-impact { left: 34%; color: var(--blue); }
+.move-special .demo-wave, .move-special .demo-energy { display: flex; }
+.move-special .demo-path, .move-special .demo-impact { display: none; }
+.move-special .demo-blade { top: 45px; }
+.lesson-caption { text-align: center; min-height: 64px; }
+.lesson-caption h3 { font: 400 25px/1.3 var(--font-display); color: var(--text); }
+#help-dialog .lesson-caption p { font-size: 12px; color: #bacac6; margin: 8px 0 0; line-height: 1.5; }
+.lesson-navigation { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; gap: 8px; }
+.lesson-navigation .text-button { min-height: 44px; font-size: 11px; }
+#lesson-count { font-size: 10px; color: #a4b5b1; font-variant-numeric: tabular-nums; }
+#help-dialog .button { width: 100%; }
+.help-details { margin-top: 12px; border-top: 1px solid var(--line); }
+.help-details summary { display: list-item; align-content: center; font-size: 11px; }
+#help-dialog .help-details p { font-size: 12px; line-height: 1.65; margin: 8px 0 14px; }
+.help-details a { display: inline-block; padding: 12px 0; font-size: 12px; color: var(--premium-gold); }
+.dialog-close { min-width: 44px; min-height: 44px; }
+@keyframes demo-dash { 0%,25% { transform: translateX(0); } 52%,100% { transform: translateX(145%); } }
+@keyframes demo-recoil { 0%,52% { transform: translateX(0); } 65%,100% { transform: translateX(20%); } }
+@keyframes demo-rush { 0%,25% { transform: translateX(0); } 52% { transform: translateX(-130%); } 76%,100% { transform: translateX(-105%); } }
+@keyframes demo-shield { 0%,24% { opacity: .15; transform: scale(.75); } 40%,100% { opacity: 1; transform: scale(1); } }
+@keyframes demo-impact { 0%,48% { opacity: 0; transform: scale(.5); } 60%,100% { opacity: 1; transform: scale(1); } }
+@keyframes demo-energy { 0% { transform: scaleX(.12); } 60%,100% { transform: scaleX(1); } }
+@keyframes demo-wave { 0%,55% { opacity: 0; transform: scale(.7); } 70% { opacity: .8; } 100% { opacity: .25; transform: scale(2.1); } }
+body:not(.reduced-motion):not(.performance-mode) .move-dash .demo-player { animation: demo-dash var(--demo-duration) ease-in-out both; }
+body:not(.reduced-motion):not(.performance-mode) .move-dash .demo-rival { animation: demo-recoil var(--demo-duration) ease-out both; }
+body:not(.reduced-motion):not(.performance-mode) .move-guard .demo-rival { animation: demo-rush var(--demo-duration) ease-in-out both; }
+body:not(.reduced-motion):not(.performance-mode) .demo-shield { animation: demo-shield var(--demo-duration) ease-out both; }
+body:not(.reduced-motion):not(.performance-mode) .demo-impact { animation: demo-impact var(--demo-duration) ease-out both; }
+body:not(.reduced-motion):not(.performance-mode) .demo-energy b { animation: demo-energy var(--demo-duration) ease-out both; }
+body:not(.reduced-motion):not(.performance-mode) .demo-wave { animation: demo-wave var(--demo-duration) ease-out both; }
+body.page-hidden .move-scene *, body.tutorial-paused .coach-demo * { animation-play-state: paused !important; }
+/* Practice keeps the real arena and its highlighted action in view. */
+.coach { max-width: 680px; padding: 8px 12px; gap: 14px; margin-bottom: 8px; background: #15252b; border: 0; border-left: 2px solid var(--premium-gold); border-radius: 0; }
+.coach-demo { width: 126px; flex-shrink: 0; }
+.coach-demo .move-scene { height: 74px; }
+.coach-demo .demo-arena { inset: 5px 0; }
+.coach-demo .demo-blade { top: 19px; width: 28%; }
+.coach-demo .demo-player { left: 5%; }
+.coach-demo .demo-rival { left: 68%; }
+.coach-demo .demo-impact { top: 24px; font-size: 20px; }
+.coach-demo .demo-path { top: 42%; left: 28%; right: 23%; font-size: 15px; }
+.coach-demo .demo-label, .coach-demo .demo-energy { display: none; }
+.coach-demo .move-special .demo-energy { display: flex; bottom: 4px; left: 15%; right: 15%; }
+.coach-demo .demo-energy > span { display: none; }
+.coach-progress { display: flex; gap: 5px; margin-bottom: 5px; }
+.coach-progress span { width: 24px; height: 4px; border-radius: 2px; background: #54665e; }
+.coach-progress .complete { background: var(--premium-gold); }
+.coach-progress .current { background: var(--blue); }
+.coach-instruction { flex: 1; min-width: 0; }
+.coach strong { font-size: 14px; font-weight: 500; }
+.coach p { color: #b5c8c3; font-size: 11px; }
+.coach .text-button { font-size: 11px; min-width: 44px; min-height: 44px; }
+.in-practice #battle-hint, .in-practice .steer-hint { display: none; }
+.action.coach-focus { outline-color: var(--premium-gold); }
+.action.coach-focus::after { content: '↓'; position: absolute; right: 9px; top: 3px; font-size: 13px; color: var(--premium-gold); }
+.launch-panel { padding: 22px; }
+.launch-panel h3 { font: 400 25px/1.2 var(--font-display); margin: 0 0 18px; }
+.launch-target { display: flex; flex-direction: column; align-items: center; color: var(--blue); font-size: 11px; gap: 3px; }
+.launch-target span:last-child { font-size: 18px; }
+.launch-meter { margin: 6px 0 20px; height: 18px; border-radius: 2px; }
+.sweet-spot { background: #7fb9ce; }
+.launch-meter i { background: #fff; box-shadow: none; width: 3px; }
+.fighter-card { background: transparent; border: 0; padding-left: 0; padding-right: 0; }
+@media (max-width: 680px) {
+ .home-screen { padding: 24px 22px; }
+ .home-copy h1 { font-size: clamp(48px, 12vw, 72px); margin: 8px 0; line-height: 1.1; letter-spacing: -.06em; }
+ .home-intro { font-size: 14px; margin: 0; }
+ .home-display { margin: 0 -8px; min-height: 236px; }
+ .home-display #home-view { height: 178px; min-height: 178px; }
+ .home-display .featured-info { border: 0; padding: 0 8px; }
+ .home-display .featured-info .eyebrow { display: none; }
+ .home-play { order: 4; max-width: none; width: 100%; margin-top: 16px; }
+ .home-play .button { min-height: 48px; }
+ .home-copy .league-preview { order: 5; max-width: none; width: 100%; padding: 12px 0; margin: 0; }
+ .home-alternatives { order: 6; max-width: none; }
+ .home-copy .record-line { order: 7; margin-top: 8px; }
+ .home-footer { margin-top: 16px; flex-wrap: nowrap; }
+ .home-footer a { width: auto; margin: 0 0 0 auto; }
+ .blade-inspector { grid-template-columns: 38% 62%; }
+ .blade-details p { font-size: 11px; }
+ #help-dialog { padding: 22px 18px 14px; }
+ #help-dialog h2 { font-size: 25px; padding-right: 15px; }
+ #help-dialog .help-goal { font-size: 11px; margin-bottom: 14px; }
+ .move-scene { height: 190px; }
+ .demo-blade { top: 62px; }
+ .demo-impact { top: 70px; }
+ .lesson-caption h3 { font-size: 23px; }
+ .coach { gap: 8px; padding: 7px 8px; }
+ .coach-demo { width: 90px; }
+ .coach strong { font-size: 12px; }
+ .coach p { font-size: 10px; }
+ .coach-demo .demo-blade { top: 24px; }
+}
+@media (max-width: 370px) {
+ .coach-demo { width: 64px; }
+ .coach strong { font-size: 11px; }
+ .coach p { font-size: 9px; }
+ .coach-demo .demo-blade { top: 29px; }
+ #help-dialog h2 { font-size: 22px; }
+ .lesson-tabs button { font-size: 11px; }
+}
+@media (max-height: 700px) and (orientation: portrait) {
+ #help-dialog { padding: 18px 16px 12px; }
+ #help-dialog h2 { font-size: 22px; margin: 6px 0; }
+ #help-dialog .help-goal { margin-bottom: 10px; }
+ #help-dialog .move-scene { height: 130px; }
+ #help-dialog .demo-arena { inset: 8px 8% 10px; }
+ #help-dialog .demo-blade { top: 36px; }
+ #help-dialog .demo-impact { top: 38px; }
+ #help-dialog .demo-energy { bottom: 9px; }
+ .lesson-caption { min-height: 56px; }
+ .lesson-caption h3 { font-size: 21px; }
+ .lesson-navigation { margin: 4px 0; }
+ #help-dialog .button { min-height: 44px; padding: 12px; font-size: 11px; }
+}
+@media (max-height: 540px) and (orientation: landscape) {
+ #help-dialog { width: 720px; max-height: calc(100dvh - 16px); padding: 16px 22px; }
+ #help-dialog[open] { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
+ #help-dialog > form { position: absolute; top: 0; right: 0; }
+ #help-dialog > .eyebrow, #help-dialog h2, #help-dialog .help-goal { grid-column: 1 / -1; }
+ #help-dialog h2 { font-size: 22px; margin: 4px 0; }
+ #help-dialog .help-goal { margin-bottom: 8px; }
+ #help-dialog .lesson-tabs { grid-column: 1; grid-row: 4; }
+ #lesson-scene { grid-column: 1; grid-row: 5 / 8; }
+ #help-dialog .lesson-caption { grid-column: 2; grid-row: 4; min-height: 56px; }
+ #help-dialog .lesson-caption h3 { font-size: 22px; }
+ #help-dialog .lesson-caption p { font-size: 11px; }
+ #help-dialog .lesson-navigation { grid-column: 2; grid-row: 5; margin: 2px 0; }
+ #help-practice { grid-column: 2; grid-row: 6; }
+ #help-dialog .help-details { grid-column: 2; grid-row: 7; margin-top: 8px; }
+ #help-dialog .move-scene { height: 140px; }
+ #help-dialog .demo-blade { width: 17%; top: 30px; }
+ #help-dialog .demo-label { top: -15px; }
+ #help-dialog .demo-impact { top: 40px; }
+ .coach { position: absolute; bottom: 72px; left: 16px; width: 170px; padding: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+ .coach-demo { display: none; }
+ .coach strong { font-size: 11px; }
+ .coach p { font-size: 10px; }
+ .coach .text-button { display: block; padding: 2px; min-width: 44px; }
+ .launch-panel { top: 42%; width: 270px; padding: 12px 18px; }
+ .launch-panel h3 { font-size: 20px; margin: 0 0 5px; }
+ .launch-target { flex-direction: row; justify-content: center; gap: 8px; font-size: 10px; }
+ .launch-meter { margin: 5px 0 10px; }
+ .launch-panel .practice-tip { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+ .move-scene * { animation: none !important; }
+}
