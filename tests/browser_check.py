@@ -97,7 +97,10 @@ with sync_playwright() as p:
  page.locator('#result-screen .back-home').click();page.click('#play-practice');page.locator('#match-settings summary').click() if not page.locator('#match-settings').evaluate('(el)=>el.open') else None;page.click('[data-difficulty="rookie"]');page.click('#start-match');launch(page);page.click('#dash-button')
  for attempt in range(20):
   if page.evaluate('__bey.match.blades[0].stats.guards')>0:break
-  page.wait_for_function("document.getElementById('guard-button').classList.contains('incoming') && __bey.match.blades[0].guardCD<=0",timeout=20000)
+  # The hit can land after click() returns. Stop on a real block even if it
+  # arrives while waiting for the next cue, rather than waiting another rush.
+  page.wait_for_function("__bey.match.blades[0].stats.guards>0 || (document.getElementById('guard-button').classList.contains('incoming') && __bey.match.blades[0].guardCD<=0)",timeout=20000)
+  if page.evaluate('__bey.match.blades[0].stats.guards')>0:break
   page.click('#guard-button');page.wait_for_timeout(1100)
  assert page.evaluate('__bey.match.blades[0].stats.guards')>0,'Practice guard instruction must be usable'
  page.wait_for_function('!document.getElementById("special-button").disabled');page.click('#special-button');screen(page,'result')
