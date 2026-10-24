@@ -43,6 +43,14 @@ replaces the other. A session that expires must sign in again to upload pending
 progress. Storage-blocked browsers can still play, but should keep the tab open
 until cloud saving succeeds.
 
+On a returning visit, the arcade home shows the last saved trainer and progress
+from this device while it checks the session and fetches the latest cloud saves.
+The home updates if the trainer or progress changed. Games wait for that check
+before loading or writing trainer saves.
+Vercel lets browsers reuse the home page's versioned scripts and styles for a day;
+account API responses remain uncached. Bump a changed asset's `?v=` value when
+publishing it.
+
 Guest progress is never assigned automatically. After signing in, choose
 **Import guest progress**, review the summary, select individual saves and confirm. This
 affects only the current trainer. The guest save remains available. Browser saves
