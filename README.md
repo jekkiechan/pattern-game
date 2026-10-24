@@ -20,6 +20,12 @@ Both games and the arcade share self-hosted Noto Sans/Noto Serif typography, an 
 
 Serve this directory with `python -m http.server 8000`. The committed bundle runs without installing packages or contacting a CDN. To change Beybattle source, run `npm ci` and `npm run build` (Node 20+). Commit the rebuilt `assets/beybattle.js` alongside source changes. GitHub Pages publishes the repository root of `main`.
 
+## Visual learning
+
+Choose **Learn in 3 moves** on the home screen (or **?** anywhere) for short Dash, Guard and Special demonstrations using the blade artwork. Switch moves at your own pace or replay an animation; detailed controls and counter timing are under **Controls & timing tips**. **Try it in practice** opens the safe arena, where a miniature demonstration, three-step progress indicator and highlighted action teach each move. Guard advances only after an actual blocked hit. Finishing practice returns you to your duel or league setup.
+
+Demonstrations play once per selection, use no extra 3D renderer, and become static diagrams with reduced motion or performance mode. Practice demonstrations pause with the battle. The home screen prioritizes play and learning; story, practice and championship stay available. Blade descriptions and signature mechanics are under **Blade details** in the loadout. The launch target shows where to time your tap for the energy bonus.
+
 ## Controls and mobile
 
 - Launch: press Launch in the blue zone / Space for 14 starting energy, or skip timing for a standard launch.
@@ -31,7 +37,7 @@ Serve this directory with `python -m http.server 8000`. The committed bundle run
 
 ## Architecture and rendering
 
-`src/beybattle/engine.js` is a deterministic simulation independent of the UI and renderer. `roster.js` contains blade roles, visual motifs, normalized special strengths and arena rules. `app.js` owns screens, input and persistence; `progression.js` owns tier unlocks, skill goals and saved best stars. `models.js` builds layered metal/resin blades with cutouts, gear teeth, bolts and crest textures. `renderer.js` renders the same Three.js models in previews and battle; `fallback.js` provides playable Canvas 2D compatibility. `audio.js` synthesizes short sounds. `css/league.css` owns the responsive interface.
+`src/beybattle/engine.js` is a deterministic simulation independent of the UI and renderer. `roster.js` contains blade roles, visual motifs, normalized special strengths and arena rules. `tutorial.js` owns the visual help demonstrations; `app.js` owns screens, input and persistence; `progression.js` owns tier unlocks, skill goals and saved best stars. `models.js` builds layered metal/resin blades with cutouts, gear teeth, bolts and crest textures. `renderer.js` renders the same Three.js models in previews and battle; `fallback.js` provides playable Canvas 2D compatibility. `audio.js` synthesizes short sounds. `css/league.css` owns the responsive interface.
 
 Simulation runs at 120 Hz with interpolated rendering. Rendering caps device pixel ratio at 1.7 (1 in performance mode), limits live model cache to eight, merges repeated geometry, uses instanced stadium details, and pools 128 sparks / ten rings. The collection uses compact pre-rendered images of the actual models, avoiding 33 model builds while browsing. Menus render at half display rate. Sustained slow frames enable performance mode. Launch ripples, dash trails, impact sparks, special pulses and finish celebrations communicate the action. Reduced motion disables optional movement effects. No downloaded model or texture packages are needed. The Three.js bundle is self-hosted; its MIT notice is in `THIRD_PARTY_NOTICES.txt`.
 

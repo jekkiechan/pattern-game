@@ -21,8 +21,37 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'])
  page=browser.new_page(viewport={'width':1440,'height':1000});observe(page);load(page)
  page.screenshot(path=str(OUT/'desktop-home.png'))
+ print('Visual learning',flush=True)
+ page.click('#learn-button')
+ assert page.locator('#help-dialog').is_visible()
+ for i,move in enumerate(['dash','guard','special']):
+  page.locator(f'[data-lesson="{i}"]').focus();page.keyboard.press('Enter')
+  assert page.locator(f'[data-lesson="{i}"]').get_attribute('aria-pressed')=='true'
+  assert page.locator('#lesson-count').inner_text()==f'{i+1} / 3'
+  assert page.locator(f'#lesson-scene .move-{move}').count()==1
+  assert page.locator('#lesson-copy').inner_text()
+  assert page.locator('.help-details').evaluate('(el)=>!el.open')
+  assert page.locator('#lesson-scene').evaluate('(el)=>el.getAnimations({subtree:true}).every(a=>a.effect.getTiming().iterations===1)')
+ page.click('#lesson-replay');assert page.locator('#lesson-count').inner_text()=='3 / 3'
+ page.click('#lesson-next');assert page.locator('#lesson-count').inner_text()=='1 / 3'
+ page.emulate_media(reduced_motion='reduce')
+ assert page.locator('#lesson-scene .demo-player').evaluate('(el)=>getComputedStyle(el).animationName')=='none'
+ assert page.locator('#lesson-copy').is_visible()
+ page.emulate_media(reduced_motion='no-preference')
+ page.locator('.help-details summary').click();assert page.locator('.help-details').evaluate('(el)=>el.open')
+ page.keyboard.press('Escape');assert not page.locator('#help-dialog').is_visible()
+ assert page.locator('#learn-button').evaluate('(el)=>el===document.activeElement')
+ # Both saved settings provide static demonstrations without hiding their meaning.
+ for setting in ['motion-setting','quality-setting']:
+  page.click('#settings-button');page.locator('#'+setting).check();page.locator('#settings-dialog .dialog-close').click()
+  page.click('#help-button');page.click('[data-lesson="1"]')
+  assert page.locator('#lesson-scene .demo-rival').evaluate('(el)=>getComputedStyle(el).animationName')=='none'
+  page.keyboard.press('Escape');page.click('#settings-button');page.locator('#'+setting).uncheck();page.locator('#settings-dialog .dialog-close').click()
  print('Roster and duel flow',flush=True)
  page.click('#play-duel');assert page.locator('.blade-card').count()==4
+ assert not page.locator('#special-desc').is_visible()
+ page.locator('.blade-details summary').click();assert page.locator('#special-desc').is_visible()
+ page.locator('.blade-details summary').click()
  page.click('[data-filter="all"]');assert page.locator('.blade-card').count()==33
  page.fill('#blade-search','not a blade');assert page.locator('#empty-search').is_visible()
  page.fill('#blade-search','the pattern');assert page.locator('.blade-card').count()==1
@@ -35,6 +64,8 @@ with sync_playwright() as p:
  page.keyboard.press('q');assert page.evaluate('__bey.match.blades[0].stats.dashes')==1
  page.keyboard.press('e');assert page.evaluate('__bey.match.blades[0].guardCD')>0
  page.evaluate('__bey.match.blades[0].energy=100');page.keyboard.press('Space');assert page.evaluate('__bey.match.blades[0].stats.specials')==1
+ page.click('#help-button');before=page.evaluate('__bey.match.time');page.click('#lesson-next');page.wait_for_timeout(100);assert page.evaluate('__bey.match.time')==before
+ page.keyboard.press('Escape');page.wait_for_function('!__bey.paused && !document.querySelector("dialog[open]")')
  page.click('#pause-button');before=page.evaluate('__bey.match.time');page.wait_for_timeout(200);assert page.evaluate('__bey.match.time')==before
  page.click('#resume-button');page.evaluate("window.dispatchEvent(new Event('blur'))");assert page.evaluate('__bey.paused');page.click('#resume-button')
  page.evaluate("document.getElementById('scene').dispatchEvent(new PointerEvent('pointercancel',{pointerId:1}))");assert page.evaluate('__bey.match.blades[0].steer') is None
@@ -66,7 +97,10 @@ with sync_playwright() as p:
  page.locator('#result-screen .back-home').click();page.click('#play-practice');page.locator('#match-settings summary').click() if not page.locator('#match-settings').evaluate('(el)=>el.open') else None;page.click('[data-difficulty="rookie"]');page.click('#start-match');launch(page);page.click('#dash-button')
  for attempt in range(20):
   if page.evaluate('__bey.match.blades[0].stats.guards')>0:break
-  page.wait_for_function("document.getElementById('guard-button').classList.contains('incoming') && __bey.match.blades[0].guardCD<=0",timeout=20000)
+  # The hit can land after click() returns. Stop on a real block even if it
+  # arrives while waiting for the next cue, rather than waiting another rush.
+  page.wait_for_function("__bey.match.blades[0].stats.guards>0 || (document.getElementById('guard-button').classList.contains('incoming') && __bey.match.blades[0].guardCD<=0)",timeout=20000)
+  if page.evaluate('__bey.match.blades[0].stats.guards')>0:break
   page.click('#guard-button');page.wait_for_timeout(1100)
  assert page.evaluate('__bey.match.blades[0].stats.guards')>0,'Practice guard instruction must be usable'
  page.wait_for_function('!document.getElementById("special-button").disabled');page.click('#special-button');screen(page,'result')
@@ -75,6 +109,18 @@ with sync_playwright() as p:
  # Phone touch and responsive layouts.
  phone=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=2,is_mobile=True,has_touch=True)
  mobile=phone.new_page();observe(mobile);load(mobile);mobile.screenshot(path=str(OUT/'mobile-home.png'))
+ for w,h in [(390,844),(320,568),(844,390)]:
+  mobile.set_viewport_size({'width':w,'height':h});mobile.tap('#help-button')
+  for i in range(3):
+   mobile.tap(f'[data-lesson="{i}"]')
+   assert mobile.locator('#help-dialog').evaluate('(el)=>el.scrollWidth<=el.clientWidth'),f'Help overflow at {w}'
+   assert mobile.locator(f'[data-lesson="{i}"]').bounding_box()['height']>=44
+  mobile.locator('#help-dialog').evaluate('(el)=>el.scrollTop=0')
+  box=mobile.locator('#help-practice').bounding_box();assert box['y']+box['height']<=h+1,('Tutorial practice action',w,h,box)
+  mobile.screenshot(path=str(OUT/f'tutorial-{w}x{h}.png'))
+  mobile.locator('#help-practice').scroll_into_view_if_needed();assert mobile.locator('#help-practice').is_visible()
+  mobile.locator('#help-dialog .dialog-close').tap()
+ mobile.set_viewport_size({'width':390,'height':844})
  mobile.tap('#play-duel');mobile.screenshot(path=str(OUT/'mobile-setup.png'));mobile.tap('#start-match');mobile.tap('#auto-launch');mobile.tap('#dash-button')
  assert mobile.evaluate('__bey.match.blades[0].stats.dashes')==1
  for w,h in [(390,844),(320,568),(844,390),(768,1024)]:
@@ -116,5 +162,5 @@ with sync_playwright() as p:
   load(mobile,path);assert mobile.evaluate('document.documentElement.scrollWidth<=innerWidth');mobile.screenshot(path=str(OUT/(path+'.png')))
  assert not errors,errors
  assert not bad,bad
- report={'renderer':render,'climber':climber,'javascriptErrors':errors,'failedResources':bad,'checks':['roster/search','keyboard actions','pause/blur','round/duel/rematch','championship/trophy','practice real guard','touch controls','four viewport sizes','WebGL fallback','nine-tier progression/persistence','restored rarity filter','Climber responsive navigation']}
+ report={'renderer':render,'climber':climber,'javascriptErrors':errors,'failedResources':bad,'checks':['visual tutorial/navigation/replay','static reduced-motion/performance demos','optional blade details','mobile tutorial','roster/search','keyboard actions','pause/blur','round/duel/rematch','championship/trophy','practice real guard','touch controls','four viewport sizes','WebGL fallback','nine-tier progression/persistence','restored rarity filter','Climber responsive navigation']}
  (OUT/'report.json').write_text(json.dumps(report,indent=2));print(json.dumps(report));browser.close()
