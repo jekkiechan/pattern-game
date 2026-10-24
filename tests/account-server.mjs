@@ -2,6 +2,7 @@ import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {extname,resolve,sep} from 'node:path';
 import {accountFixture} from './account-fixture.mjs';
+import {requestURL} from '../server/request.js';
 const port=Number(process.env.PORT||8000),base=`http://127.0.0.1:${port}`,root=resolve('.');
 const fixture=await accountFixture(base);
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.webp':'image/webp','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'};
@@ -10,7 +11,9 @@ const server=createServer(async(req,res)=>{
   if(req.url.startsWith('/api/')){
    const chunks=[];for await(const chunk of req)chunks.push(chunk);
    const body=Buffer.concat(chunks);
-   const response=await fixture.handle(new Request(base+req.url,{method:req.method,headers:req.headers,...(body.length?{body}: {})}));
+   const original=new URL(base+req.url);
+   const rewritten='/api/trainer?__trainer_route='+encodeURIComponent(original.pathname.slice('/api/'.length))+(original.search?'&'+original.search.slice(1):'');
+   const response=await fixture.handle(new Request(requestURL({url:rewritten},base),{method:req.method,headers:req.headers,...(body.length?{body}: {})}));
    res.statusCode=response.status;for(const [key,value] of response.headers)if(key!=='set-cookie')res.setHeader(key,value);
    const cookies=response.headers.getSetCookie();if(cookies.length)res.setHeader('Set-Cookie',cookies);
    res.end(Buffer.from(await response.arrayBuffer()));return;

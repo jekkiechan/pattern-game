@@ -2,6 +2,7 @@
  "buildCommand":"npm run build:site",
  "outputDirectory":"public",
  "framework":null,
+ "rewrites":[{"source":"/api/:path*","destination":"/api/trainer?__trainer_route=:path*"}],
  "functions":{"api/**/*.js":{"maxDuration":30}},
  "headers":[{"source":"/api/(.*)","headers":[{"key":"Cache-Control","value":"no-store"}]}]
 }
