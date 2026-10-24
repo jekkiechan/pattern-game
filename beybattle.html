@@ -1,133 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beybattle · Pattern Arcade</title>
-<meta name="description" content="Choose your blade. Master your special. Rule the arena. Play Beybattle and its three-round tournament.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/beybattle.css?v=3">
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a101c"><meta name="description" content="Choose your blade. Read your rival. Master the stadium. A balanced 3D spinning-top game with 33 blades, practice and championship play."><title>Beybattle · Pattern Spin League</title><link rel="stylesheet" href="css/league.css?v=5"></head>
 <body>
-<header class="topbar"><a href="index.html" class="wordmark"><span class="brand-mark">P</span> PATTERN <span>ARCADE</span></a><div class="settings"><button id="btn-sound">Sound on</button><button id="btn-motion">Motion full</button><a href="how-to-play.html">Guide →</a></div></header>
-
-<canvas id="game"></canvas>
-<div id="hud"></div>
-<div id="launch-hint" style="display:none">CLICK YOUR BLADE · DRAG BACK · RELEASE TO LAUNCH</div>
-
-<div id="overlay">
-  <div class="screen active" id="screen-start">
-    <div class="hero-copy">
-      <div class="eyebrow"><span></span> THE ARENA IS YOURS</div>
-      <h1>LET IT<br><em>RIP.</em></h1>
-      <p class="hero-name">BEYBATTLE</p>
-      <p class="hero-desc">Pick your blade. Time your special.<br>Be the last one spinning.</p>
-      <button class="btn primary" id="btn-instant">PLAY NOW <span>→</span></button>
-      <p class="quick-note">Jump in with Impact Drake and matched rivals.</p>
-      <div class="mode-row"><button class="btn" id="btn-start">CUSTOM BATTLE</button><button class="btn btn-tournament" id="btn-tournament">TOURNAMENT →</button></div>
-      <div id="trophy-display"></div>
-      <p class="tournament-note">Three rounds. One champion. Make your stamina count.</p>
-    </div>
-    <div class="hero-visual"><div class="hero-orbit"></div><canvas id="hero-art" width="700" height="520" aria-label="Impact Drake, Cobalt Dragoon and The Pattern blades"></canvas><div class="hero-stamp">01 / IMPACT DRAKE <span>CHAMPION · ATTACK</span></div><div class="collection-pill"><b id="roster-count">33</b> BLADES. FIND YOURS.</div></div>
-    <div class="playbook"><div><b>01</b><span><strong>Launch</strong>Drag back & release, or tap Launch.</span></div><div><b>02</b><span><strong>Dash</strong>Tap where you want to go.</span></div><div><b>03</b><span><strong>Go special</strong>Hold for 2 seconds. Release to unleash.</span></div></div>
-  </div>
-
-  <div class="screen" id="screen-select">
-    <div class="eyebrow">01 / BUILD YOUR BATTLE</div><h2>CHOOSE YOUR BLADE</h2><p class="screen-note">Attack hits hard. Defense holds strong. Stamina lasts longer.</p>
-    <div id="char-filters" class="filter-bar"></div>
-    <div id="char-grid"></div>
-    <div id="char-detail"><canvas id="detail-preview" width="256" height="256"></canvas>
-      <div>
-        <div id="detail-name"></div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
-          <div id="detail-type"></div>
-          <div id="detail-tier" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px"></div>
-        </div>
-        <div id="detail-desc"></div>
-        <div id="detail-special"></div>
-      </div>
-      <div id="detail-stats"></div>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" id="btn-select-back">← BACK</button>
-      <button class="btn" id="btn-fight">CHOOSE ARENA →</button>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-opponents">
-    <div class="eyebrow">03 / THE CHALLENGERS</div><h2>PICK YOUR OPPONENTS</h2><p class="screen-note">Matched rivals are ready. Swap any three to make your own challenge.</p>
-    <div class="subtitle" id="opp-count-label">SELECT 3 OPPONENTS</div>
-    <button class="btn-randomize-top" id="btn-randomize">↻ MATCH MY TIER</button>
-    <div id="opp-filters" class="filter-bar"></div>
-    <div id="opp-grid"></div>
-    <div class="nav-row">
-      <button class="btn-back" id="btn-opp-back">← BACK</button>
-      <button class="btn" id="btn-opponents">LET IT RIP →</button>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-arena">
-    <div class="eyebrow">02 / HOME GROUND</div><h2>CHOOSE YOUR ARENA</h2>
-    <div id="arena-grid"></div>
-    <div id="arena-detail">
-      <div>
-        <div id="arena-detail-name"></div>
-        <div id="arena-detail-desc"></div>
-        <div id="arena-affinity-row" class="affinity-row"></div>
-      </div>
-    </div>
-    <div class="nav-row">
-      <button class="btn-back" id="btn-arena-back">← BACK</button>
-      <button class="btn" id="btn-arena-next">PICK OPPONENTS →</button>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-end">
-    <div class="result-title" id="result-title"></div>
-    <div class="subtitle" id="result-sub" style="color:#445"></div>
-    <button class="btn" id="btn-restart">BATTLE AGAIN</button>
-  </div>
-
-  <div class="screen" id="screen-bracket">
-    <h2 class="bracket-title">TOURNAMENT</h2>
-    <div id="bracket-rounds"></div>
-    <div id="bracket-status" class="subtitle"></div>
-    <button class="btn" id="btn-next-round">BEGIN ROUND 1 →</button>
-  </div>
-
-  <div class="screen" id="screen-champion">
-    <div class="champion-crown">♔</div>
-    <div class="result-title win">CHAMPION!</div>
-    <div class="subtitle" id="champion-sub"></div>
-    <div id="champion-stats">
-      <div class="champ-stat">
-        <div class="champ-stat-val" id="champion-trophies">0</div>
-        <div class="champ-stat-lbl">TROPHIES</div>
-      </div>
-      <div class="champ-stat">
-        <div class="champ-stat-val" id="champion-streak">—</div>
-        <div class="champ-stat-lbl">RECORD</div>
-      </div>
-    </div>
-    <button class="btn" id="btn-champion-home">BACK TO TITLE</button>
-  </div>
-</div>
-
-<div id="battle-controls" hidden><p id="battle-tip"></p><div class="battle-actions"><button id="btn-pause">Pause</button><button id="btn-launch" class="action-primary">Launch [Space]</button><button id="btn-dash">Dash [D]</button><button id="btn-special" class="action-primary">Hold special [Space]</button></div></div>
-<div id="pause-panel" hidden role="dialog" aria-modal="true" aria-label="Game paused"><div><div class="eyebrow">TAKE A BREATHER</div><h2>PAUSED</h2><p>Your battle will be right here.</p><button class="btn primary" id="btn-resume">KEEP PLAYING</button><button class="btn-back" id="btn-exit">Back to title</button></div></div>
-<script src="js/beybattle/audio.js?v=3"></script>
-<script src="js/beybattle/config.js?v=3"></script>
-<script src="js/beybattle/entities.js?v=3"></script>
-<script src="js/beybattle/state.js?v=3"></script>
-<script src="js/beybattle/spawn.js?v=3"></script>
-<script src="js/beybattle/physics.js?v=3"></script>
-<script src="js/beybattle/specials.js?v=3"></script>
-<script src="js/beybattle/ai.js?v=3"></script>
-<script src="js/beybattle/update.js?v=3"></script>
-<script src="js/beybattle/render.js?v=3"></script>
-<script src="js/beybattle/tournament.js?v=3"></script>
-<script src="js/beybattle/experience.js?v=3"></script>
-<script src="js/beybattle/game.js?v=3"></script>
-</body>
-</html>
+<header class="app-header"><a href="index.html" class="arcade-link" aria-label="Pattern Arcade home"><span class="pattern-symbol">P</span><span>PATTERN <small>SPIN LEAGUE</small></span></a><button class="game-brand" id="home-link">BEY<span>BATTLE</span></button><nav aria-label="Game options"><button class="icon-button" id="help-button" aria-label="How to play">?</button><button class="icon-button" id="settings-button" aria-label="Settings">⚙</button></nav></header>
+<main>
+<section id="home-screen" class="screen home-screen">
+ <div class="home-copy"><p class="eyebrow"><span class="live-dot"></span> STEP INTO THE STADIUM</p><h1>BEY<span>BATTLE</span><i>SPIN. CLASH. RISE.</i></h1><p class="home-intro">A great blade needs a great blader.<br>Find your style. Make your move.</p><button class="button primary large" id="play-duel">PLAY A DUEL <span>→</span></button><p class="button-caption">One rival. First to two round wins.</p><div class="other-modes"><button id="play-practice"><span class="mode-icon">◎</span><span><b>Practice</b><small>Learn your moves</small></span><span>→</span></button><button id="play-championship"><span class="mode-icon">♜</span><span><b>Championship</b><small>Three rivals. One trophy.</small></span><span>→</span></button></div><div class="record-line" id="record-line">Every blade is unlocked. Your timing makes the difference.</div></div>
+ <div class="home-display"><div class="display-grid"></div><span class="display-index">BLADE LAB / 001</span><div id="home-view" class="studio-view"><canvas id="scene" aria-label="Interactive 3D blade preview"></canvas></div><div class="featured-info"><div><p class="eyebrow">FEATURED BLADE</p><h2 id="featured-name">IMPACT DRAKE</h2><span id="featured-role" class="role-tag">ATTACK</span></div><div class="featured-switches" id="featured-switches"></div></div><p class="rotate-hint">Drag to inspect · Real in-game model</p></div>
+ <div class="home-footer"><span><b>33</b> DISTINCT BLADES</span><span><b>6</b> STADIUMS</span><span><b>1</b> FAIR PLAYING FIELD</span><a href="how-to-play.html">Explore the field guide →</a></div>
+</section>
+<section id="setup-screen" class="screen setup-screen" hidden>
+ <div class="screen-heading"><div><button class="text-button back-home">← Back</button><p class="eyebrow" id="setup-mode">DUEL / LOADOUT</p><h2>Find your fighting style.</h2></div><span class="fair-badge">◇ Balanced stats. No overpowered tiers.</span></div>
+ <div class="loadout-layout"><aside class="blade-inspector"><div id="setup-view" class="studio-view"></div><div class="blade-spec"><div class="spec-top"><span class="role-tag" id="blade-role"></span><span class="blade-number" id="blade-number"></span></div><h3 id="blade-name"></h3><p id="blade-desc"></p><div id="blade-stats" class="blade-stats"></div><div class="ability"><span class="ability-label">SIGNATURE MOVE</span><h4 id="special-name"></h4><p id="special-desc"></p></div><p id="role-tip" class="role-tip"></p></div></aside>
+ <div class="loadout-options"><div class="collection-heading"><h3>Your collection <span>33 / 33</span></h3><label class="search-field"><span class="sr-only">Search blades</span><input type="search" id="blade-search" placeholder="Find a blade…" autocomplete="off"></label></div><div class="filters" id="blade-filters" aria-label="Filter blades"></div><div id="blade-grid" class="blade-grid" aria-label="Choose your blade"></div><div id="empty-search" hidden>No blades found. Try a name or change the filter.</div>
+ <details class="match-settings" id="match-settings"><summary>Match settings <span id="settings-summary">Bey Stadium · Rookie</span><b>+</b></summary><div class="match-settings-body"><fieldset><legend>Your challenge</legend><div class="segmented" id="difficulty-options"><button data-difficulty="rookie">Rookie</button><button data-difficulty="challenger">Challenger</button><button data-difficulty="expert">Expert</button></div><p id="difficulty-desc"></p></fieldset><fieldset><legend>Your stadium</legend><div id="arena-options" class="arena-options"></div><p id="arena-desc"></p></fieldset></div></details>
+ </div></div><div class="setup-footer"><div class="rival-preview"><img id="rival-portrait" alt="" width="40" height="40"><div><span id="rival-caption">YOUR RIVAL</span><b id="rival-name"></b></div><button class="text-button" id="change-rival">Change ↻</button></div><button class="button primary" id="start-match">ENTER STADIUM <span>→</span></button></div>
+</section>
+<section id="battle-screen" class="screen battle-screen" hidden>
+ <div class="match-topline"><span id="match-label">DUEL · ROUND 1</span><span id="arena-label">BEY STADIUM</span><button id="pause-button" class="text-button">Pause</button></div>
+ <div class="scoreboard"><div class="fighter-card player"><div class="fighter-heading"><span>YOU</span><h2 id="player-name"></h2><div class="score-dots" id="player-score"></div></div><div class="spin-track"><div id="player-spin"></div></div><div class="meter-meta"><span>SPIN <b id="player-spin-number">100</b></span><span id="player-status">READY</span></div></div><div class="versus"><span>VS</span><time id="round-time">0:00</time></div><div class="fighter-card rival"><div class="fighter-heading"><span>RIVAL</span><h2 id="opponent-name"></h2><div class="score-dots" id="opponent-score"></div></div><div class="spin-track"><div id="opponent-spin"></div></div><div class="meter-meta"><span>SPIN <b id="opponent-spin-number">100</b></span><span id="opponent-status">READY</span></div></div></div>
+ <div class="arena-view" id="battle-view"><div class="blade-label you-label" id="you-label">YOU ▾</div><div class="warning-label" id="rival-warning" hidden>RUSH INCOMING · GUARD!</div><div id="battle-announcement" class="battle-announcement" aria-live="polite"></div></div>
+ <div class="launch-panel" id="launch-panel"><p class="eyebrow">READY WHEN YOU ARE</p><h3>Time your launch.</h3><p>Press Launch when the marker reaches the blue zone.</p><div class="launch-meter"><span class="sweet-spot"></span><i id="launch-marker"></i></div><button class="button primary" id="launch-button">3, 2, 1… LET IT RIP! <kbd>Space</kbd></button><button class="text-button" id="auto-launch">Skip timing · standard launch</button></div>
+ <div id="coach" class="coach" hidden><div><span class="eyebrow">PRACTICE / <span id="coach-progress">01 OF 03</span></span><strong id="coach-title">Dash into your rival.</strong><p id="coach-copy">Press Dash. Your blade aims at your rival automatically.</p></div><button class="text-button" id="leave-practice">Exit practice</button></div>
+ <div class="battle-bottom"><p id="battle-hint">Your blade moves on its own. You choose when to strike.</p><div class="action-bar"><button id="dash-button" class="action dash"><span class="action-symbol">➤</span><span><b>DASH</b><small id="dash-status">Close the gap</small></span><kbd>Q</kbd><i></i></button><button id="guard-button" class="action guard"><span class="action-symbol">◇</span><span><b>GUARD</b><small id="guard-status">Block a rush</small></span><kbd>E</kbd><i></i></button><button id="special-button" class="action special"><span class="action-symbol">✦</span><span><b>SPECIAL</b><small id="special-status">Building energy</small></span><kbd>Space</kbd><i></i></button></div><p class="steer-hint">Optional: hold the arena or use arrow keys / WASD to steer.</p></div>
+</section>
+<section id="result-screen" class="screen result-screen" hidden><div class="result-card"><p class="eyebrow" id="result-eyebrow">ROUND COMPLETE</p><div class="result-emblem" id="result-emblem"></div><h2 id="result-title">Round won.</h2><p id="result-description"></p><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><div class="result-tip" id="result-tip"></div><button class="button primary" id="result-next">NEXT ROUND →</button><div class="result-links"><button class="text-button" id="result-loadout">Change blade</button><button class="text-button back-home">Back to league</button></div></div></section>
+<section id="bracket-screen" class="screen bracket-screen" hidden><p class="eyebrow">THE SPIN LEAGUE CHAMPIONSHIP</p><h2>Three rivals.<br>One shot at the trophy.</h2><p>Win each duel. Your spin fully recovers between rounds.</p><div id="bracket-list"></div><button class="button primary" id="bracket-next">MEET YOUR RIVAL →</button><button class="text-button back-home">Back to league</button></section>
+</main>
+<dialog id="settings-dialog"><form method="dialog"><button class="dialog-close" aria-label="Close settings">×</button></form><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2>Game settings</h2><label class="setting-row"><span><b>Sound effects</b><small>Clashes, launches and special moves</small></span><input id="sound-setting" type="checkbox" checked></label><label class="setting-row"><span><b>Reduced motion</b><small>Calmer previews and battle effects</small></span><input id="motion-setting" type="checkbox"></label><label class="setting-row"><span><b>Performance mode</b><small>Lower resolution for older devices</small></span><input id="quality-setting" type="checkbox"></label><p class="dialog-note">Settings save on this device. No account needed.</p></dialog>
+<dialog id="help-dialog"><form method="dialog"><button class="dialog-close" aria-label="Close how to play">×</button></form><p class="eyebrow">THE BASICS</p><h2>Timing beats button-mashing.</h2><p>Your blade moves on its own. Reduce your rival’s spin to zero. Win two rounds to take the duel.</p><div class="help-moves"><div><b>➤ Dash <kbd>Q</kbd></b><p>Rush toward your rival. Best when their guard is down.</p></div><div><b>◇ Guard <kbd>E</kbd></b><p>Blocks 75% damage for a moment. Watch for the orange rush warning.</p></div><div><b>✦ Special <kbd>Space</kbd></b><p>Energy builds over time and in clashes. Tap once when the meter is full.</p></div></div><p>Try Practice for a guided warm-up. All 33 blades use balanced stats; legendary names don’t get a free advantage.</p><button class="button primary" id="help-practice">TRY PRACTICE →</button></dialog>
+<dialog id="pause-dialog"><p class="eyebrow">TAKE YOUR TIME</p><h2>Battle paused.</h2><p>Your rival can wait.</p><button class="button primary" id="resume-button">BACK TO THE BATTLE →</button><button class="button secondary" id="pause-help">How to play</button><button class="text-button" id="quit-match">Leave this match</button></dialog>
+<div id="toast" role="status" hidden></div><div id="loading-note">Preparing the blade lab…</div>
+<noscript>This game needs JavaScript enabled. <a href="index.html">Return to Pattern Arcade</a>.</noscript>
+<script type="module" src="assets/beybattle.js?v=5"></script>
+</body></html>

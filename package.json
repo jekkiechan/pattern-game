@@ -1,0 +1,16 @@
+{
+  "name": "pattern-arcade",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/beybattle/app.js --bundle --minify --format=esm --target=es2020 --outfile=assets/beybattle.js",
+    "test": "node tests/engine.mjs && node tests/balance.mjs --gate",
+    "test:balance": "node tests/balance.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.11"
+  }
+}

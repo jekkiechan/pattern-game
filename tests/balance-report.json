@@ -1,0 +1,1742 @@
+{
+  "method": "All 528 unique pairs, independent seeds per pair, paired seeds with both orientations, identical bots, actual 120 Hz fixed step, draws count as half a win. 32 seeds per pairing per arena; standard-arena holdout uses a fresh base seed. Automated baseline, not human playtesting.",
+  "totalMatches": 118272,
+  "arenas": [
+    {
+      "simulationHz": 120,
+      "arena": "stadium",
+      "seedBase": 145,
+      "seeds": 32,
+      "matches": 16896,
+      "draws": 1682,
+      "averageSeconds": 17.3,
+      "roles": {
+        "attack": 47.9,
+        "balance": 48.7,
+        "defense": 54.9,
+        "stamina": 51.1
+      },
+      "roster": [
+        {
+          "id": 0,
+          "name": "IMPACT DRAKE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 47.2
+        },
+        {
+          "id": 1,
+          "name": "DRAN SWORD",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.4
+        },
+        {
+          "id": 2,
+          "name": "COBALT DRAGOON",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 50.5
+        },
+        {
+          "id": 3,
+          "name": "CRIMSON GARUDA",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.2
+        },
+        {
+          "id": 4,
+          "name": "SAMURAI SABER",
+          "role": "attack",
+          "special": "counter",
+          "winRate": 57.7
+        },
+        {
+          "id": 5,
+          "name": "HELLS CHAIN",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 57.9
+        },
+        {
+          "id": 6,
+          "name": "KNIGHT SHIELD",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56
+        },
+        {
+          "id": 7,
+          "name": "SHARK EDGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.1
+        },
+        {
+          "id": 8,
+          "name": "LEON CLAW",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.8
+        },
+        {
+          "id": 9,
+          "name": "WYVERN GALE",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 51.8
+        },
+        {
+          "id": 10,
+          "name": "UNICORN STING",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 49
+        },
+        {
+          "id": 11,
+          "name": "WIZARD ARROW",
+          "role": "stamina",
+          "special": "counter",
+          "winRate": 48.9
+        },
+        {
+          "id": 12,
+          "name": "TYRANNO BEAT",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.2
+        },
+        {
+          "id": 13,
+          "name": "VIPER TAIL",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 51.2
+        },
+        {
+          "id": 14,
+          "name": "ROCK BISON",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 50.9
+        },
+        {
+          "id": 15,
+          "name": "DRACIEL SHELL",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 55.5
+        },
+        {
+          "id": 16,
+          "name": "STORM PEGASUS",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 47.2
+        },
+        {
+          "id": 17,
+          "name": "PHOENIX BLAZE",
+          "role": "balance",
+          "special": "mend",
+          "winRate": 46.9
+        },
+        {
+          "id": 18,
+          "name": "WOLBORG ICE",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56.4
+        },
+        {
+          "id": 19,
+          "name": "HELL KERBECS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.7
+        },
+        {
+          "id": 20,
+          "name": "DIABLO NEMESIS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.5
+        },
+        {
+          "id": 21,
+          "name": "PHANTOM ORION",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 48.7
+        },
+        {
+          "id": 22,
+          "name": "BIG BANG PEGASIS F:D",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.4
+        },
+        {
+          "id": 23,
+          "name": "METEOR FORGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.2
+        },
+        {
+          "id": 24,
+          "name": "SERPENT COIL",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 54.7
+        },
+        {
+          "id": 25,
+          "name": "ORACLE EYE",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.1
+        },
+        {
+          "id": 26,
+          "name": "OBSIDIAN FANG",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 52.7
+        },
+        {
+          "id": 27,
+          "name": "VOID REAPER",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 55.2
+        },
+        {
+          "id": 28,
+          "name": "INFERNO TITAN",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 45.5
+        },
+        {
+          "id": 29,
+          "name": "ABYSS LEVIATHAN",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 53.5
+        },
+        {
+          "id": 30,
+          "name": "L-DRAGO DESTROY",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 54.6
+        },
+        {
+          "id": 31,
+          "name": "THE PATTERN",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 50.2
+        },
+        {
+          "id": 32,
+          "name": "THE UNKNOWN",
+          "role": "balance",
+          "special": "chaos",
+          "winRate": 49.3
+        }
+      ]
+    },
+    {
+      "simulationHz": 120,
+      "arena": "rail",
+      "seedBase": 145,
+      "seeds": 32,
+      "matches": 16896,
+      "draws": 1630,
+      "averageSeconds": 17.3,
+      "roles": {
+        "attack": 48.1,
+        "balance": 48.8,
+        "defense": 54.7,
+        "stamina": 51
+      },
+      "roster": [
+        {
+          "id": 0,
+          "name": "IMPACT DRAKE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.9
+        },
+        {
+          "id": 1,
+          "name": "DRAN SWORD",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46
+        },
+        {
+          "id": 2,
+          "name": "COBALT DRAGOON",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 51.4
+        },
+        {
+          "id": 3,
+          "name": "CRIMSON GARUDA",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 43.6
+        },
+        {
+          "id": 4,
+          "name": "SAMURAI SABER",
+          "role": "attack",
+          "special": "counter",
+          "winRate": 57.2
+        },
+        {
+          "id": 5,
+          "name": "HELLS CHAIN",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56.7
+        },
+        {
+          "id": 6,
+          "name": "KNIGHT SHIELD",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 55.9
+        },
+        {
+          "id": 7,
+          "name": "SHARK EDGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 44.9
+        },
+        {
+          "id": 8,
+          "name": "LEON CLAW",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 47.6
+        },
+        {
+          "id": 9,
+          "name": "WYVERN GALE",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 52.8
+        },
+        {
+          "id": 10,
+          "name": "UNICORN STING",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 49.5
+        },
+        {
+          "id": 11,
+          "name": "WIZARD ARROW",
+          "role": "stamina",
+          "special": "counter",
+          "winRate": 48.5
+        },
+        {
+          "id": 12,
+          "name": "TYRANNO BEAT",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.9
+        },
+        {
+          "id": 13,
+          "name": "VIPER TAIL",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 51
+        },
+        {
+          "id": 14,
+          "name": "ROCK BISON",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 51.2
+        },
+        {
+          "id": 15,
+          "name": "DRACIEL SHELL",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 55.9
+        },
+        {
+          "id": 16,
+          "name": "STORM PEGASUS",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 47.3
+        },
+        {
+          "id": 17,
+          "name": "PHOENIX BLAZE",
+          "role": "balance",
+          "special": "mend",
+          "winRate": 47
+        },
+        {
+          "id": 18,
+          "name": "WOLBORG ICE",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 57.1
+        },
+        {
+          "id": 19,
+          "name": "HELL KERBECS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 45.4
+        },
+        {
+          "id": 20,
+          "name": "DIABLO NEMESIS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.6
+        },
+        {
+          "id": 21,
+          "name": "PHANTOM ORION",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 48.2
+        },
+        {
+          "id": 22,
+          "name": "BIG BANG PEGASIS F:D",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.3
+        },
+        {
+          "id": 23,
+          "name": "METEOR FORGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 47.3
+        },
+        {
+          "id": 24,
+          "name": "SERPENT COIL",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 53.3
+        },
+        {
+          "id": 25,
+          "name": "ORACLE EYE",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 50.1
+        },
+        {
+          "id": 26,
+          "name": "OBSIDIAN FANG",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 51.1
+        },
+        {
+          "id": 27,
+          "name": "VOID REAPER",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 55.5
+        },
+        {
+          "id": 28,
+          "name": "INFERNO TITAN",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 45.5
+        },
+        {
+          "id": 29,
+          "name": "ABYSS LEVIATHAN",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 53.5
+        },
+        {
+          "id": 30,
+          "name": "L-DRAGO DESTROY",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 53.7
+        },
+        {
+          "id": 31,
+          "name": "THE PATTERN",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.7
+        },
+        {
+          "id": 32,
+          "name": "THE UNKNOWN",
+          "role": "balance",
+          "special": "chaos",
+          "winRate": 49.5
+        }
+      ]
+    },
+    {
+      "simulationHz": 120,
+      "arena": "glacier",
+      "seedBase": 145,
+      "seeds": 32,
+      "matches": 16896,
+      "draws": 1717,
+      "averageSeconds": 17.9,
+      "roles": {
+        "attack": 48.4,
+        "balance": 49.5,
+        "defense": 52.5,
+        "stamina": 51.6
+      },
+      "roster": [
+        {
+          "id": 0,
+          "name": "IMPACT DRAKE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 47.2
+        },
+        {
+          "id": 1,
+          "name": "DRAN SWORD",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 48.3
+        },
+        {
+          "id": 2,
+          "name": "COBALT DRAGOON",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 51.3
+        },
+        {
+          "id": 3,
+          "name": "CRIMSON GARUDA",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 46.5
+        },
+        {
+          "id": 4,
+          "name": "SAMURAI SABER",
+          "role": "attack",
+          "special": "counter",
+          "winRate": 55.1
+        },
+        {
+          "id": 5,
+          "name": "HELLS CHAIN",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 54
+        },
+        {
+          "id": 6,
+          "name": "KNIGHT SHIELD",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 53
+        },
+        {
+          "id": 7,
+          "name": "SHARK EDGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 43.2
+        },
+        {
+          "id": 8,
+          "name": "LEON CLAW",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 48.4
+        },
+        {
+          "id": 9,
+          "name": "WYVERN GALE",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 49.8
+        },
+        {
+          "id": 10,
+          "name": "UNICORN STING",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 51
+        },
+        {
+          "id": 11,
+          "name": "WIZARD ARROW",
+          "role": "stamina",
+          "special": "counter",
+          "winRate": 47.2
+        },
+        {
+          "id": 12,
+          "name": "TYRANNO BEAT",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 47.9
+        },
+        {
+          "id": 13,
+          "name": "VIPER TAIL",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 50.7
+        },
+        {
+          "id": 14,
+          "name": "ROCK BISON",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 48.7
+        },
+        {
+          "id": 15,
+          "name": "DRACIEL SHELL",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 54.4
+        },
+        {
+          "id": 16,
+          "name": "STORM PEGASUS",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.8
+        },
+        {
+          "id": 17,
+          "name": "PHOENIX BLAZE",
+          "role": "balance",
+          "special": "mend",
+          "winRate": 48.4
+        },
+        {
+          "id": 18,
+          "name": "WOLBORG ICE",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 54.9
+        },
+        {
+          "id": 19,
+          "name": "HELL KERBECS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 47.7
+        },
+        {
+          "id": 20,
+          "name": "DIABLO NEMESIS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.4
+        },
+        {
+          "id": 21,
+          "name": "PHANTOM ORION",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 48.9
+        },
+        {
+          "id": 22,
+          "name": "BIG BANG PEGASIS F:D",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.5
+        },
+        {
+          "id": 23,
+          "name": "METEOR FORGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 48.5
+        },
+        {
+          "id": 24,
+          "name": "SERPENT COIL",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 57.8
+        },
+        {
+          "id": 25,
+          "name": "ORACLE EYE",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.2
+        },
+        {
+          "id": 26,
+          "name": "OBSIDIAN FANG",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 50
+        },
+        {
+          "id": 27,
+          "name": "VOID REAPER",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 55.9
+        },
+        {
+          "id": 28,
+          "name": "INFERNO TITAN",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 47.6
+        },
+        {
+          "id": 29,
+          "name": "ABYSS LEVIATHAN",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 54.7
+        },
+        {
+          "id": 30,
+          "name": "L-DRAGO DESTROY",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 54.9
+        },
+        {
+          "id": 31,
+          "name": "THE PATTERN",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.4
+        },
+        {
+          "id": 32,
+          "name": "THE UNKNOWN",
+          "role": "balance",
+          "special": "chaos",
+          "winRate": 48.9
+        }
+      ]
+    },
+    {
+      "simulationHz": 120,
+      "arena": "volcano",
+      "seedBase": 145,
+      "seeds": 32,
+      "matches": 16896,
+      "draws": 1549,
+      "averageSeconds": 17.2,
+      "roles": {
+        "attack": 47.8,
+        "balance": 48.8,
+        "defense": 55,
+        "stamina": 51.1
+      },
+      "roster": [
+        {
+          "id": 0,
+          "name": "IMPACT DRAKE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.9
+        },
+        {
+          "id": 1,
+          "name": "DRAN SWORD",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.4
+        },
+        {
+          "id": 2,
+          "name": "COBALT DRAGOON",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 50.5
+        },
+        {
+          "id": 3,
+          "name": "CRIMSON GARUDA",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.4
+        },
+        {
+          "id": 4,
+          "name": "SAMURAI SABER",
+          "role": "attack",
+          "special": "counter",
+          "winRate": 57.4
+        },
+        {
+          "id": 5,
+          "name": "HELLS CHAIN",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 57.4
+        },
+        {
+          "id": 6,
+          "name": "KNIGHT SHIELD",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56.1
+        },
+        {
+          "id": 7,
+          "name": "SHARK EDGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.6
+        },
+        {
+          "id": 8,
+          "name": "LEON CLAW",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.1
+        },
+        {
+          "id": 9,
+          "name": "WYVERN GALE",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 52.4
+        },
+        {
+          "id": 10,
+          "name": "UNICORN STING",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 49
+        },
+        {
+          "id": 11,
+          "name": "WIZARD ARROW",
+          "role": "stamina",
+          "special": "counter",
+          "winRate": 49.1
+        },
+        {
+          "id": 12,
+          "name": "TYRANNO BEAT",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.3
+        },
+        {
+          "id": 13,
+          "name": "VIPER TAIL",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 50.8
+        },
+        {
+          "id": 14,
+          "name": "ROCK BISON",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 51.2
+        },
+        {
+          "id": 15,
+          "name": "DRACIEL SHELL",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 55.8
+        },
+        {
+          "id": 16,
+          "name": "STORM PEGASUS",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 47.5
+        },
+        {
+          "id": 17,
+          "name": "PHOENIX BLAZE",
+          "role": "balance",
+          "special": "mend",
+          "winRate": 48.3
+        },
+        {
+          "id": 18,
+          "name": "WOLBORG ICE",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 57
+        },
+        {
+          "id": 19,
+          "name": "HELL KERBECS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 45.1
+        },
+        {
+          "id": 20,
+          "name": "DIABLO NEMESIS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 43.9
+        },
+        {
+          "id": 21,
+          "name": "PHANTOM ORION",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 49
+        },
+        {
+          "id": 22,
+          "name": "BIG BANG PEGASIS F:D",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 44.5
+        },
+        {
+          "id": 23,
+          "name": "METEOR FORGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.2
+        },
+        {
+          "id": 24,
+          "name": "SERPENT COIL",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 54.1
+        },
+        {
+          "id": 25,
+          "name": "ORACLE EYE",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.5
+        },
+        {
+          "id": 26,
+          "name": "OBSIDIAN FANG",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 52.3
+        },
+        {
+          "id": 27,
+          "name": "VOID REAPER",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 55.3
+        },
+        {
+          "id": 28,
+          "name": "INFERNO TITAN",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 45.7
+        },
+        {
+          "id": 29,
+          "name": "ABYSS LEVIATHAN",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 53.1
+        },
+        {
+          "id": 30,
+          "name": "L-DRAGO DESTROY",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 53.7
+        },
+        {
+          "id": 31,
+          "name": "THE PATTERN",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.5
+        },
+        {
+          "id": 32,
+          "name": "THE UNKNOWN",
+          "role": "balance",
+          "special": "chaos",
+          "winRate": 49.7
+        }
+      ]
+    },
+    {
+      "simulationHz": 120,
+      "arena": "cyber",
+      "seedBase": 145,
+      "seeds": 32,
+      "matches": 16896,
+      "draws": 1625,
+      "averageSeconds": 17.3,
+      "roles": {
+        "attack": 47.1,
+        "balance": 49.1,
+        "defense": 54.6,
+        "stamina": 52.6
+      },
+      "roster": [
+        {
+          "id": 0,
+          "name": "IMPACT DRAKE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.5
+        },
+        {
+          "id": 1,
+          "name": "DRAN SWORD",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.1
+        },
+        {
+          "id": 2,
+          "name": "COBALT DRAGOON",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 51.3
+        },
+        {
+          "id": 3,
+          "name": "CRIMSON GARUDA",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.7
+        },
+        {
+          "id": 4,
+          "name": "SAMURAI SABER",
+          "role": "attack",
+          "special": "counter",
+          "winRate": 56.1
+        },
+        {
+          "id": 5,
+          "name": "HELLS CHAIN",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 55.8
+        },
+        {
+          "id": 6,
+          "name": "KNIGHT SHIELD",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56.8
+        },
+        {
+          "id": 7,
+          "name": "SHARK EDGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.5
+        },
+        {
+          "id": 8,
+          "name": "LEON CLAW",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.2
+        },
+        {
+          "id": 9,
+          "name": "WYVERN GALE",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 52.9
+        },
+        {
+          "id": 10,
+          "name": "UNICORN STING",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 51.2
+        },
+        {
+          "id": 11,
+          "name": "WIZARD ARROW",
+          "role": "stamina",
+          "special": "counter",
+          "winRate": 51.9
+        },
+        {
+          "id": 12,
+          "name": "TYRANNO BEAT",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 45.8
+        },
+        {
+          "id": 13,
+          "name": "VIPER TAIL",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 50.4
+        },
+        {
+          "id": 14,
+          "name": "ROCK BISON",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 52.1
+        },
+        {
+          "id": 15,
+          "name": "DRACIEL SHELL",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56.4
+        },
+        {
+          "id": 16,
+          "name": "STORM PEGASUS",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.5
+        },
+        {
+          "id": 17,
+          "name": "PHOENIX BLAZE",
+          "role": "balance",
+          "special": "mend",
+          "winRate": 49.4
+        },
+        {
+          "id": 18,
+          "name": "WOLBORG ICE",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 54
+        },
+        {
+          "id": 19,
+          "name": "HELL KERBECS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44
+        },
+        {
+          "id": 20,
+          "name": "DIABLO NEMESIS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 43.5
+        },
+        {
+          "id": 21,
+          "name": "PHANTOM ORION",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 50.4
+        },
+        {
+          "id": 22,
+          "name": "BIG BANG PEGASIS F:D",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 43.1
+        },
+        {
+          "id": 23,
+          "name": "METEOR FORGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 44.9
+        },
+        {
+          "id": 24,
+          "name": "SERPENT COIL",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 55
+        },
+        {
+          "id": 25,
+          "name": "ORACLE EYE",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 48.6
+        },
+        {
+          "id": 26,
+          "name": "OBSIDIAN FANG",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 52.5
+        },
+        {
+          "id": 27,
+          "name": "VOID REAPER",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 55
+        },
+        {
+          "id": 28,
+          "name": "INFERNO TITAN",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 44.7
+        },
+        {
+          "id": 29,
+          "name": "ABYSS LEVIATHAN",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 54.3
+        },
+        {
+          "id": 30,
+          "name": "L-DRAGO DESTROY",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 54.4
+        },
+        {
+          "id": 31,
+          "name": "THE PATTERN",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 51.7
+        },
+        {
+          "id": 32,
+          "name": "THE UNKNOWN",
+          "role": "balance",
+          "special": "chaos",
+          "winRate": 50.3
+        }
+      ]
+    },
+    {
+      "simulationHz": 120,
+      "arena": "void",
+      "seedBase": 145,
+      "seeds": 32,
+      "matches": 16896,
+      "draws": 1661,
+      "averageSeconds": 17.2,
+      "roles": {
+        "attack": 48.1,
+        "balance": 48.4,
+        "defense": 55.2,
+        "stamina": 50.9
+      },
+      "roster": [
+        {
+          "id": 0,
+          "name": "IMPACT DRAKE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 45.8
+        },
+        {
+          "id": 1,
+          "name": "DRAN SWORD",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.3
+        },
+        {
+          "id": 2,
+          "name": "COBALT DRAGOON",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 50.6
+        },
+        {
+          "id": 3,
+          "name": "CRIMSON GARUDA",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44.6
+        },
+        {
+          "id": 4,
+          "name": "SAMURAI SABER",
+          "role": "attack",
+          "special": "counter",
+          "winRate": 57.3
+        },
+        {
+          "id": 5,
+          "name": "HELLS CHAIN",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 56.8
+        },
+        {
+          "id": 6,
+          "name": "KNIGHT SHIELD",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 55.3
+        },
+        {
+          "id": 7,
+          "name": "SHARK EDGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46
+        },
+        {
+          "id": 8,
+          "name": "LEON CLAW",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 47.2
+        },
+        {
+          "id": 9,
+          "name": "WYVERN GALE",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 51.9
+        },
+        {
+          "id": 10,
+          "name": "UNICORN STING",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 50.3
+        },
+        {
+          "id": 11,
+          "name": "WIZARD ARROW",
+          "role": "stamina",
+          "special": "counter",
+          "winRate": 48.7
+        },
+        {
+          "id": 12,
+          "name": "TYRANNO BEAT",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46.2
+        },
+        {
+          "id": 13,
+          "name": "VIPER TAIL",
+          "role": "attack",
+          "special": "drain",
+          "winRate": 52.1
+        },
+        {
+          "id": 14,
+          "name": "ROCK BISON",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 52.3
+        },
+        {
+          "id": 15,
+          "name": "DRACIEL SHELL",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 57.4
+        },
+        {
+          "id": 16,
+          "name": "STORM PEGASUS",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 48.9
+        },
+        {
+          "id": 17,
+          "name": "PHOENIX BLAZE",
+          "role": "balance",
+          "special": "mend",
+          "winRate": 47.6
+        },
+        {
+          "id": 18,
+          "name": "WOLBORG ICE",
+          "role": "defense",
+          "special": "guard",
+          "winRate": 57.3
+        },
+        {
+          "id": 19,
+          "name": "HELL KERBECS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 44
+        },
+        {
+          "id": 20,
+          "name": "DIABLO NEMESIS",
+          "role": "balance",
+          "special": "wave",
+          "winRate": 43.6
+        },
+        {
+          "id": 21,
+          "name": "PHANTOM ORION",
+          "role": "stamina",
+          "special": "mend",
+          "winRate": 47.5
+        },
+        {
+          "id": 22,
+          "name": "BIG BANG PEGASIS F:D",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 44.3
+        },
+        {
+          "id": 23,
+          "name": "METEOR FORGE",
+          "role": "attack",
+          "special": "rush",
+          "winRate": 46.3
+        },
+        {
+          "id": 24,
+          "name": "SERPENT COIL",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 53.4
+        },
+        {
+          "id": 25,
+          "name": "ORACLE EYE",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 49.5
+        },
+        {
+          "id": 26,
+          "name": "OBSIDIAN FANG",
+          "role": "defense",
+          "special": "counter",
+          "winRate": 52.2
+        },
+        {
+          "id": 27,
+          "name": "VOID REAPER",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 54
+        },
+        {
+          "id": 28,
+          "name": "INFERNO TITAN",
+          "role": "attack",
+          "special": "wave",
+          "winRate": 46
+        },
+        {
+          "id": 29,
+          "name": "ABYSS LEVIATHAN",
+          "role": "stamina",
+          "special": "drain",
+          "winRate": 53.8
+        },
+        {
+          "id": 30,
+          "name": "L-DRAGO DESTROY",
+          "role": "balance",
+          "special": "drain",
+          "winRate": 54
+        },
+        {
+          "id": 31,
+          "name": "THE PATTERN",
+          "role": "balance",
+          "special": "counter",
+          "winRate": 50.1
+        },
+        {
+          "id": 32,
+          "name": "THE UNKNOWN",
+          "role": "balance",
+          "special": "chaos",
+          "winRate": 48.6
+        }
+      ]
+    }
+  ],
+  "holdout": {
+    "simulationHz": 120,
+    "arena": "stadium",
+    "seedBase": 98765,
+    "seeds": 32,
+    "matches": 16896,
+    "draws": 1609,
+    "averageSeconds": 17.3,
+    "roles": {
+      "attack": 48.2,
+      "balance": 48.6,
+      "defense": 54.3,
+      "stamina": 51.4
+    },
+    "roster": [
+      {
+        "id": 0,
+        "name": "IMPACT DRAKE",
+        "role": "attack",
+        "special": "rush",
+        "winRate": 46.2
+      },
+      {
+        "id": 1,
+        "name": "DRAN SWORD",
+        "role": "attack",
+        "special": "rush",
+        "winRate": 47.5
+      },
+      {
+        "id": 2,
+        "name": "COBALT DRAGOON",
+        "role": "attack",
+        "special": "drain",
+        "winRate": 48.9
+      },
+      {
+        "id": 3,
+        "name": "CRIMSON GARUDA",
+        "role": "balance",
+        "special": "wave",
+        "winRate": 45.3
+      },
+      {
+        "id": 4,
+        "name": "SAMURAI SABER",
+        "role": "attack",
+        "special": "counter",
+        "winRate": 57.3
+      },
+      {
+        "id": 5,
+        "name": "HELLS CHAIN",
+        "role": "defense",
+        "special": "guard",
+        "winRate": 55.6
+      },
+      {
+        "id": 6,
+        "name": "KNIGHT SHIELD",
+        "role": "defense",
+        "special": "guard",
+        "winRate": 56.4
+      },
+      {
+        "id": 7,
+        "name": "SHARK EDGE",
+        "role": "attack",
+        "special": "rush",
+        "winRate": 46.7
+      },
+      {
+        "id": 8,
+        "name": "LEON CLAW",
+        "role": "attack",
+        "special": "wave",
+        "winRate": 47.6
+      },
+      {
+        "id": 9,
+        "name": "WYVERN GALE",
+        "role": "stamina",
+        "special": "mend",
+        "winRate": 51.6
+      },
+      {
+        "id": 10,
+        "name": "UNICORN STING",
+        "role": "stamina",
+        "special": "mend",
+        "winRate": 49.6
+      },
+      {
+        "id": 11,
+        "name": "WIZARD ARROW",
+        "role": "stamina",
+        "special": "counter",
+        "winRate": 49.5
+      },
+      {
+        "id": 12,
+        "name": "TYRANNO BEAT",
+        "role": "attack",
+        "special": "wave",
+        "winRate": 46.6
+      },
+      {
+        "id": 13,
+        "name": "VIPER TAIL",
+        "role": "attack",
+        "special": "drain",
+        "winRate": 51.6
+      },
+      {
+        "id": 14,
+        "name": "ROCK BISON",
+        "role": "defense",
+        "special": "counter",
+        "winRate": 50.5
+      },
+      {
+        "id": 15,
+        "name": "DRACIEL SHELL",
+        "role": "defense",
+        "special": "guard",
+        "winRate": 56.4
+      },
+      {
+        "id": 16,
+        "name": "STORM PEGASUS",
+        "role": "attack",
+        "special": "rush",
+        "winRate": 46.9
+      },
+      {
+        "id": 17,
+        "name": "PHOENIX BLAZE",
+        "role": "balance",
+        "special": "mend",
+        "winRate": 46.9
+      },
+      {
+        "id": 18,
+        "name": "WOLBORG ICE",
+        "role": "defense",
+        "special": "guard",
+        "winRate": 55.7
+      },
+      {
+        "id": 19,
+        "name": "HELL KERBECS",
+        "role": "balance",
+        "special": "wave",
+        "winRate": 45.9
+      },
+      {
+        "id": 20,
+        "name": "DIABLO NEMESIS",
+        "role": "balance",
+        "special": "wave",
+        "winRate": 43.5
+      },
+      {
+        "id": 21,
+        "name": "PHANTOM ORION",
+        "role": "stamina",
+        "special": "mend",
+        "winRate": 51.1
+      },
+      {
+        "id": 22,
+        "name": "BIG BANG PEGASIS F:D",
+        "role": "attack",
+        "special": "rush",
+        "winRate": 46.1
+      },
+      {
+        "id": 23,
+        "name": "METEOR FORGE",
+        "role": "attack",
+        "special": "rush",
+        "winRate": 45.8
+      },
+      {
+        "id": 24,
+        "name": "SERPENT COIL",
+        "role": "stamina",
+        "special": "drain",
+        "winRate": 53.8
+      },
+      {
+        "id": 25,
+        "name": "ORACLE EYE",
+        "role": "balance",
+        "special": "counter",
+        "winRate": 48.8
+      },
+      {
+        "id": 26,
+        "name": "OBSIDIAN FANG",
+        "role": "defense",
+        "special": "counter",
+        "winRate": 51.4
+      },
+      {
+        "id": 27,
+        "name": "VOID REAPER",
+        "role": "balance",
+        "special": "drain",
+        "winRate": 54.6
+      },
+      {
+        "id": 28,
+        "name": "INFERNO TITAN",
+        "role": "attack",
+        "special": "wave",
+        "winRate": 47
+      },
+      {
+        "id": 29,
+        "name": "ABYSS LEVIATHAN",
+        "role": "stamina",
+        "special": "drain",
+        "winRate": 52.8
+      },
+      {
+        "id": 30,
+        "name": "L-DRAGO DESTROY",
+        "role": "balance",
+        "special": "drain",
+        "winRate": 54.3
+      },
+      {
+        "id": 31,
+        "name": "THE PATTERN",
+        "role": "balance",
+        "special": "counter",
+        "winRate": 50.8
+      },
+      {
+        "id": 32,
+        "name": "THE UNKNOWN",
+        "role": "balance",
+        "special": "chaos",
+        "winRate": 47.1
+      }
+    ]
+  }
+}
