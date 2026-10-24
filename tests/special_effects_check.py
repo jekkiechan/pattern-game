@@ -19,10 +19,12 @@ def check_special_effects(browser, base, out):
   page.add_init_script("localStorage.setItem('beybattleLeague',JSON.stringify({sound:false,motion:true,low:false}))")
   if fallback:
    page.add_init_script("const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(t,...a){return t.startsWith('webgl')?null:get.call(this,t,...a)}")
+  # Install and pause before the app queues requestAnimationFrame. Switching
+  # a live animation clock in Playwright 1.55 can leave stale resize frames.
+  page.clock.install(time=1000000);page.clock.pause_at(1001000)
   page.goto(base+'/beybattle.html');page.wait_for_function('window.__bey')
   if fallback:assert page.evaluate('__bey.display.stats().backend')=='canvas2d'
   else:assert page.evaluate('__bey.display.stats().models')>0
-  page.clock.install(time=1000000);page.clock.pause_at(1001000)
 
   def advance(ms):
    # Keep software WebGL work bounded per browser-clock turn.
@@ -66,8 +68,13 @@ def check_special_effects(browser, base, out):
   page.evaluate('__bey.match.blades[1].energy=100;__bey.match.special(1)');advance(100)
   assert page.locator('.special-callout:not([hidden])').count()==2
   for width,height in [(390,844),(320,568),(844,390)]:
-   page.set_viewport_size({'width':width,'height':height});advance(160)
-   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+   page.set_viewport_size({'width':width,'height':height})
+   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f'transient overflow at {width}x{height}'
+   advance(160)
+   overflow=page.evaluate("""() => ({width:innerWidth,scroll:document.documentElement.scrollWidth,
+    elements:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth).map(el=>({id:el.id,cls:el.className,right:el.getBoundingClientRect().right}))})""")
+   if overflow['scroll']>overflow['width']:page.screenshot(path=str(out/f'overflow-{width}.png'))
+   assert overflow['scroll']<=overflow['width'],overflow
    for selector in ['.special-callout.player','.special-callout.rival','#dash-button','#guard-button','#special-button']:
     box=page.locator(selector).bounding_box()
     assert box and box['x']>=0 and box['x']+box['width']<=width+1
@@ -77,9 +84,9 @@ def check_special_effects(browser, base, out):
 
   # Switching settings mid-special removes motion immediately on resume.
   page.click('#settings-button',force=True);page.check('#motion-setting',force=True);page.check('#quality-setting',force=True)
-  page.locator('#settings-dialog .dialog-close').click(force=True);advance(32)
+  page.locator('#settings-dialog .dialog-close').click(force=True);advance(160)
   assert page.evaluate('__bey.display.motion') is False
-  assert page.locator('.special-callout.player').evaluate('(el)=>el.style.transform')=='none'
+  assert page.locator('.special-callout.player').evaluate('(el)=>el.style.transform')=='none','reduced motion must render after the settings dialog closes'
   canvas=page.locator('#special-effects')
   assert canvas.evaluate('(el)=>el.width')==round(page.evaluate('__bey.display.width'))
   # With positions fixed, reduced motion has no time-varying arena decoration.

@@ -2,7 +2,6 @@
 import json, os, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-from special_effects_check import check_special_effects
 BASE=os.environ.get('GAME_URL','http://127.0.0.1:8000')
 OUT=Path(os.environ.get('QA_OUTPUT','/tmp/pattern-league-qa'));OUT.mkdir(parents=True,exist_ok=True)
 errors=[];bad=[]
@@ -115,7 +114,6 @@ with sync_playwright() as p:
  climber={'suite':'tests/climber_check.py','stages':10}
  for path in ['index.html','how-to-play.html','beyblade-climber.html']:
   load(mobile,path);assert mobile.evaluate('document.documentElement.scrollWidth<=innerWidth');mobile.screenshot(path=str(OUT/(path+'.png')))
- check_special_effects(browser,BASE,OUT)
  assert not errors,errors
  assert not bad,bad
  report={'renderer':render,'climber':climber,'javascriptErrors':errors,'failedResources':bad,'checks':['roster/search','keyboard actions','pause/blur','round/duel/rematch','championship/trophy','practice real guard','touch controls','four viewport sizes','WebGL fallback','nine-tier progression/persistence','restored rarity filter','Climber responsive navigation']}

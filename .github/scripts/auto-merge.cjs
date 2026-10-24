@@ -18,7 +18,7 @@ module.exports = async function autoMerge({ github, context, core }) {
   });
   // Require the actual jobs as well as the aggregate gate. Skips are not passes.
   const required = ['Build and gameplay tests', 'Browser / browser_check',
-    'Browser / climber_check', 'Browser / journey_check', 'CI passed'];
+    'Browser / climber_check', 'Browser / journey_check', 'Browser / special_effects_check', 'CI passed'];
   if (!required.every(name => jobs.some(job => job.name === name && job.conclusion === 'success'))) {
     core.info('The current CI run has not passed every required job.');
     return;

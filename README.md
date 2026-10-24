@@ -37,7 +37,7 @@ Simulation runs at 120 Hz with interpolated rendering. Rendering caps device pix
 
 Signature moves use a shared projected effects layer (`special-effects.js`) in both WebGL and Canvas: comet rush trails, expanding shockwaves, shield domes, recovery spirals, spin-steal tethers and orbiting counter blades. Each activation shows its name and move type, with separate player/rival banners. Special impacts follow actual damage events, including blocked hits and reflected counters; visuals do not change combat timing or balance. Pause freezes effects, new rounds clear them, and reduced motion uses stationary rings/symbols instead of moving effects or camera shake. Performance mode reduces effect detail and pixel density; trails and impact bursts are capped.
 
-`python tests/special_effects_check.py` checks every move type in WebGL and Canvas, pause, expiry, simultaneous specials, mobile layouts, reduced motion, performance mode and finishing hits. It also runs as part of `tests/browser_check.py` in CI.
+`python tests/special_effects_check.py` checks every move type in WebGL and Canvas, pause, expiry, simultaneous specials, mobile layouts, reduced motion, performance mode and finishing hits. It runs as a separate browser job in CI, required by the merge gate.
 
 Climber uses classic scripts under `js/climber/`, with fixed 60 Hz timing, interpolated rendering, cached blade art, offscreen culling and capped pixel density. Stage routes are authored, moving-platform travel is bounded, and crumbled platforms return after three seconds. Wind is telegraphed before it affects later stages. Saved progress is stored as earned medal bits, so replays cannot remove achievements. If browser storage is blocked, play continues for the current visit.
 

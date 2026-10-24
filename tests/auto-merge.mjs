@@ -5,7 +5,7 @@ const success = () => ({
  run: {id:9,event:'pull_request',conclusion:'success',path:'.github/workflows/ci.yml',
   head_repository:{full_name:'owner/game'},head_sha:'tested-head',head_branch:'feature'},
  jobs: ['Build and gameplay tests','Browser / browser_check','Browser / climber_check',
-  'Browser / journey_check','CI passed'].map(name=>({name,conclusion:'success'})),
+  'Browser / journey_check','Browser / special_effects_check','CI passed'].map(name=>({name,conclusion:'success'})),
  pr: {number:16,state:'open',draft:false,base:{ref:'main'},author_association:'OWNER',
   head:{sha:'tested-head',ref:'feature',repo:{full_name:'owner/game'}},mergeable:true,mergeable_state:'clean'},
 });
@@ -37,6 +37,7 @@ for(const [name,change] of [
  ['another workflow',d=>d.run.path='.github/workflows/other.yml'],
  ['foreign run',d=>d.run.head_repository.full_name='fork/game'],
  ['missing browser job',d=>d.jobs.splice(2,1)],
+ ['missing special effects job',d=>d.jobs=d.jobs.filter(j=>j.name!=='Browser / special_effects_check')],
  ['skipped test',d=>d.jobs[0].conclusion='skipped'],
  ['failed browser',d=>d.jobs[1].conclusion='failure'],
  ['stale commit',d=>d.pr.head.sha='new-head'],
