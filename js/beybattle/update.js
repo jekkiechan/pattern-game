@@ -60,8 +60,10 @@ function update(dt) {
     if (!b.alive || !b.launched) return;
     tickAI(b, dt);
 
-    b.x += b.vx; b.y += b.vy;
-    b.vx *= arena.friction; b.vy *= arena.friction;
+    b.x += b.vx * dt * 60; b.y += b.vy * dt * 60;
+    const drag = Math.pow(arena.friction, dt * 60);
+    b.vx *= drag; b.vy *= drag;
+    b.railCooldown = Math.max(0, (b.railCooldown || 0) - dt);
 
     b.spinRate = Math.max(0, b.spinRate - dt * (0.25 + b.wobble * 3.5));
     b.angle   += b.spinRate * dt;
@@ -208,7 +210,9 @@ function update(dt) {
   G.parts = G.parts.filter(p => p.life > 0);
   G.parts.forEach(p => p.update(dt));
 
-  refreshHUD();
+  if (G.parts.length > 240) G.parts.splice(0, G.parts.length - 240);
+  G.hudTick = (G.hudTick || 0) + dt;
+  if (G.hudTick >= .1) { refreshHUD(); refreshControls(); G.hudTick = 0; }
   checkWin();
 }
 
@@ -239,10 +243,10 @@ function checkWin() {
     rT.textContent = 'VICTORY!'; rT.className = 'result-title win';
     rS.textContent = `${w.name} IS THE CHAMPION`;
   } else {
-    rT.textContent = 'DEFEATED'; rT.className = 'result-title lose';
+    rT.textContent = 'NICE BATTLE!'; rT.className = 'result-title lose';
     rS.textContent = `${w.name} WINS THE ROUND`;
   }
 
-  setTimeout(() => document.getElementById('screen-end').classList.add('active'), 1400);
+  setTimeout(() => showScreen('screen-end'), 1400);
 }
 

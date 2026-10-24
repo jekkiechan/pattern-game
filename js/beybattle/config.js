@@ -106,14 +106,14 @@ const CONFIGS = [
     atkR:9, defR:2, staR:3, spdR:10, bstR:2, tier:'ELITE',
     special:{ name:'Venom Mark', desc:'Nearest foe takes 2× burst damage (4s)', effect:'venomMark' } },
 
-  { name:'ROCK BISON',    type:'DEFENSE', color:'#bb7733', glow:'#884411', blades:4, shape:'hells',
+  { name:'ROCK BISON',    type:'DEFENSE', color:'#bb7733', glow:'#884411', blades:4, shape:'bison',
     maxStamina:158, mass:1.92, defense:0.40, attackMult:0.62, burstResist:0.95, personality:'passive',
     desc:'Heaviest blade ever forged. Unmovable wall of earth.',
     atkR:2, defR:9, staR:10, spdR:1, bstR:9, tier:'LEGENDARY',
     special:{ name:'Tectonic Stance', desc:'Freeze 3s; next hit reflects back', effect:'tectonicStance' } },
 
   // ── NEW CHARACTERS ──
-  { name:'DRACIEL SHELL', type:'DEFENSE', color:'#00aa88', glow:'#00ddbb', blades:4, shape:'knight',
+  { name:'DRACIEL SHELL', type:'DEFENSE', color:'#00aa88', glow:'#00ddbb', blades:4, shape:'shell',
     maxStamina:120, mass:1.70, defense:0.35, attackMult:0.50, burstResist:0.88, personality:'passive',
     desc:'Clamshell energy layer with aqua-teal finish. Round turtle blades absorb impacts from all angles.',
     atkR:1, defR:10, staR:7, spdR:2, bstR:8, tier:'NOVICE',
@@ -125,25 +125,25 @@ const CONFIGS = [
     atkR:7, defR:4, staR:5, spdR:8, bstR:4, tier:'APPRENTICE',
     special:{ name:'Storm Ride', desc:'Chase last attacker at full speed', effect:'stormRide' } },
 
-  { name:'PHOENIX BLAZE', type:'BALANCE', color:'#ff8800', glow:'#ffcc00', blades:4, shape:'garuda',
+  { name:'PHOENIX BLAZE', type:'BALANCE', color:'#ff8800', glow:'#ffcc00', blades:4, shape:'phoenix',
     maxStamina:120, mass:1.25, defense:0.60, attackMult:1.20, burstResist:0.62, personality:'aggressive',
     desc:'Flame-feather blades in molten red and gold. A phoenix reborn with every hit — attack and endurance combined.',
     atkR:7, defR:6, staR:7, spdR:6, bstR:6, tier:'ADVANCED',
     special:{ name:'Phoenix Ember', desc:'If stamina <50%: +25 stamina & +30% atk', effect:'phoenixEmber' } },
 
-  { name:'WOLBORG ICE',   type:'DEFENSE', color:'#88ddff', glow:'#44aaee', blades:3, shape:'fang',
+  { name:'WOLBORG ICE',   type:'DEFENSE', color:'#88ddff', glow:'#44aaee', blades:3, shape:'wolf',
     maxStamina:140, mass:1.65, defense:0.46, attackMult:0.90, burstResist:0.90, personality:'defensive',
     desc:'Icy-blue fang blades with silver metallic finish. The wolf endures everything the arena throws at it.',
     atkR:5, defR:8, staR:8, spdR:4, bstR:9, tier:'CHAMPION',
     special:{ name:'Frozen Field', desc:'Slow all nearby foes for 3s', effect:'frozenField' } },
 
-  { name:'HELL KERBECS',  type:'BALANCE', color:'#cc8800', glow:'#ff6600', blades:4, shape:'nemesis',
+  { name:'HELL KERBECS',  type:'BALANCE', color:'#cc8800', glow:'#ff6600', blades:4, shape:'kerbecs',
     maxStamina:175, mass:1.96, defense:0.38, attackMult:1.65, burstResist:0.93, personality:'aggressive',
     desc:'Tri-pronged shadow blades in deep violet and gold. Three heads of Cerberus forged into one unstoppable force. Cerberus does not fall.',
     atkR:10, defR:10, staR:10, spdR:8, bstR:9, tier:'MYTHICAL',
     special:{ name:'Dark Pull', desc:'Rush back to center at full speed', effect:'darkPull' } },
 
-  { name:'DIABLO NEMESIS', type:'BALANCE', color:'#555566', glow:'#9900cc', blades:4, shape:'kerbecs',
+  { name:'DIABLO NEMESIS', type:'BALANCE', color:'#555566', glow:'#9900cc', blades:4, shape:'nemesis',
     maxStamina:180, mass:2.00, defense:0.28, attackMult:2.00, burstResist:0.99, personality:'aggressive',
     desc:'The God of Destruction. Forged from the power of every Beyblade ever created — unmatched attack, impenetrable defense, infinite endurance. It cannot be burst.',
     atkR:10, defR:10, staR:10, spdR:10, bstR:10, tier:'MYTHICAL',
@@ -161,13 +161,13 @@ const CONFIGS = [
     atkR:15, defR:5, staR:10, spdR:14, bstR:8, tier:'TRANSCENDENT',
     special:{ name:'Final Drive', desc:'Slam all foes & double attack power (4s)', effect:'finalDrive' } },
 
-  { name:'METEOR FORGE',   type:'ATTACK',  color:'#ff7722', glow:'#ffcc66', blades:4, shape:'claw',
+  { name:'METEOR FORGE',   type:'ATTACK',  color:'#ff7722', glow:'#ffcc66', blades:4, shape:'meteor',
     maxStamina:150, mass:1.70, defense:0.40, attackMult:1.75, burstResist:0.75, personality:'aggressive',
     desc:'Celestial iron forged in a dying star. Rises before its strike — gravity follows its descent.',
     atkR:10, defR:7, staR:7, spdR:7, bstR:8, tier:'LEGENDARY',
     special:{ name:'Meteor Fall', desc:'Rise invuln 1s, then crash down for massive dmg', effect:'meteorFall' } },
 
-  { name:'SERPENT COIL',   type:'STAMINA', color:'#44cc88', glow:'#88ff99', blades:3, shape:'fang',
+  { name:'SERPENT COIL',   type:'STAMINA', color:'#44cc88', glow:'#88ff99', blades:3, shape:'serpent',
     maxStamina:155, mass:1.22, defense:0.58, attackMult:1.15, burstResist:0.72, personality:'aggressive',
     desc:'Ophidian stamina-type that feeds on every strike it lands. The more it hits, the longer it lives.',
     atkR:6, defR:6, staR:9, spdR:7, bstR:7, tier:'ELITE',
@@ -280,3 +280,11 @@ const ARENAS = [
     }},
 ];
 
+
+// Rail rewards a deliberate dash near the edge; every type can use it.
+ARENAS.push({ name:'NEON RAIL', sub:'Ride the edge. Own the clash.',
+  rim:'#63f5c5', glow:'#26c6a0', bg:['#183c4a','#102937','#081723'],
+  grid:'rgba(120,255,220,0.10)', atm:'rgba(60,240,180,0.08)',
+  friction:0.996, edgeDrain:0.12, wallDamp:0.86, rail:true,
+  desc:'Dash near the glowing rim for a Rail Rush! Gain speed and 8 stamina. The rail recharges in 4 seconds.',
+  favors:null, penalizes:null, typeModifiers:null });

@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BEYBATTLE</title>
+<title>Beybattle · Pattern Arcade</title>
+<meta name="description" content="Choose your blade. Master your special. Rule the arena. Play Beybattle and its three-round tournament.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/beybattle.css?v=2">
+<link rel="stylesheet" href="css/beybattle.css?v=3">
 </head>
 <body>
+<header class="topbar"><a href="index.html" class="wordmark"><span class="brand-mark">P</span> PATTERN <span>ARCADE</span></a><div class="settings"><button id="btn-sound">Sound on</button><button id="btn-motion">Motion full</button><a href="how-to-play.html">Guide →</a></div></header>
 
 <canvas id="game"></canvas>
 <div id="hud"></div>
@@ -16,23 +18,26 @@
 
 <div id="overlay">
   <div class="screen active" id="screen-start">
-    <h1>BeyBattle</h1>
-    <div class="subtitle">Spinning Top Arena Combat</div>
-    <div class="mode-row">
-      <button class="btn" id="btn-start">QUICK BATTLE</button>
-      <button class="btn btn-tournament" id="btn-tournament">TOURNAMENT</button>
+    <div class="hero-copy">
+      <div class="eyebrow"><span></span> THE ARENA IS YOURS</div>
+      <h1>LET IT<br><em>RIP.</em></h1>
+      <p class="hero-name">BEYBATTLE</p>
+      <p class="hero-desc">Pick your blade. Time your special.<br>Be the last one spinning.</p>
+      <button class="btn primary" id="btn-instant">PLAY NOW <span>→</span></button>
+      <p class="quick-note">Jump in with Impact Drake and matched rivals.</p>
+      <div class="mode-row"><button class="btn" id="btn-start">CUSTOM BATTLE</button><button class="btn btn-tournament" id="btn-tournament">TOURNAMENT →</button></div>
+      <div id="trophy-display"></div>
+      <p class="tournament-note">Three rounds. One champion. Make your stamina count.</p>
     </div>
-    <div id="trophy-display"></div>
-    <div class="subtitle" style="font-size:10px;color:#333;margin-top:-8px">
-      3 rounds · stamina carries over · be crowned champion
-    </div>
+    <div class="hero-visual"><div class="hero-orbit"></div><canvas id="hero-art" width="700" height="520" aria-label="Impact Drake, Cobalt Dragoon and The Pattern blades"></canvas><div class="hero-stamp">01 / IMPACT DRAKE <span>CHAMPION · ATTACK</span></div><div class="collection-pill"><b id="roster-count">33</b> BLADES. FIND YOURS.</div></div>
+    <div class="playbook"><div><b>01</b><span><strong>Launch</strong>Drag back & release, or tap Launch.</span></div><div><b>02</b><span><strong>Dash</strong>Tap where you want to go.</span></div><div><b>03</b><span><strong>Go special</strong>Hold for 2 seconds. Release to unleash.</span></div></div>
   </div>
 
   <div class="screen" id="screen-select">
-    <h2>SELECT YOUR BLADE</h2>
+    <div class="eyebrow">01 / BUILD YOUR BATTLE</div><h2>CHOOSE YOUR BLADE</h2><p class="screen-note">Attack hits hard. Defense holds strong. Stamina lasts longer.</p>
     <div id="char-filters" class="filter-bar"></div>
     <div id="char-grid"></div>
-    <div id="char-detail">
+    <div id="char-detail"><canvas id="detail-preview" width="256" height="256"></canvas>
       <div>
         <div id="detail-name"></div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
@@ -51,9 +56,9 @@
   </div>
 
   <div class="screen" id="screen-opponents">
-    <h2>PICK YOUR OPPONENTS</h2>
+    <div class="eyebrow">03 / THE CHALLENGERS</div><h2>PICK YOUR OPPONENTS</h2><p class="screen-note">Matched rivals are ready. Swap any three to make your own challenge.</p>
     <div class="subtitle" id="opp-count-label">SELECT 3 OPPONENTS</div>
-    <button class="btn-randomize-top" id="btn-randomize">⚡ RANDOMIZE</button>
+    <button class="btn-randomize-top" id="btn-randomize">↻ MATCH MY TIER</button>
     <div id="opp-filters" class="filter-bar"></div>
     <div id="opp-grid"></div>
     <div class="nav-row">
@@ -63,7 +68,7 @@
   </div>
 
   <div class="screen" id="screen-arena">
-    <h2>CHOOSE YOUR ARENA</h2>
+    <div class="eyebrow">02 / HOME GROUND</div><h2>CHOOSE YOUR ARENA</h2>
     <div id="arena-grid"></div>
     <div id="arena-detail">
       <div>
@@ -109,17 +114,20 @@
   </div>
 </div>
 
-<script src="js/beybattle/audio.js?v=2"></script>
-<script src="js/beybattle/config.js?v=2"></script>
-<script src="js/beybattle/entities.js?v=2"></script>
-<script src="js/beybattle/state.js?v=2"></script>
-<script src="js/beybattle/spawn.js?v=2"></script>
-<script src="js/beybattle/physics.js?v=2"></script>
-<script src="js/beybattle/specials.js?v=2"></script>
-<script src="js/beybattle/ai.js?v=2"></script>
-<script src="js/beybattle/update.js?v=2"></script>
-<script src="js/beybattle/render.js?v=2"></script>
-<script src="js/beybattle/tournament.js?v=2"></script>
-<script src="js/beybattle/game.js?v=2"></script>
+<div id="battle-controls" hidden><p id="battle-tip"></p><div class="battle-actions"><button id="btn-pause">Pause</button><button id="btn-launch" class="action-primary">Launch [Space]</button><button id="btn-dash">Dash [D]</button><button id="btn-special" class="action-primary">Hold special [Space]</button></div></div>
+<div id="pause-panel" hidden role="dialog" aria-modal="true" aria-label="Game paused"><div><div class="eyebrow">TAKE A BREATHER</div><h2>PAUSED</h2><p>Your battle will be right here.</p><button class="btn primary" id="btn-resume">KEEP PLAYING</button><button class="btn-back" id="btn-exit">Back to title</button></div></div>
+<script src="js/beybattle/audio.js?v=3"></script>
+<script src="js/beybattle/config.js?v=3"></script>
+<script src="js/beybattle/entities.js?v=3"></script>
+<script src="js/beybattle/state.js?v=3"></script>
+<script src="js/beybattle/spawn.js?v=3"></script>
+<script src="js/beybattle/physics.js?v=3"></script>
+<script src="js/beybattle/specials.js?v=3"></script>
+<script src="js/beybattle/ai.js?v=3"></script>
+<script src="js/beybattle/update.js?v=3"></script>
+<script src="js/beybattle/render.js?v=3"></script>
+<script src="js/beybattle/tournament.js?v=3"></script>
+<script src="js/beybattle/experience.js?v=3"></script>
+<script src="js/beybattle/game.js?v=3"></script>
 </body>
 </html>

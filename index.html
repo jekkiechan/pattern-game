@@ -2,97 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BEYBLADE GAMES</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #000;
-    color: #fff;
-    font-family: 'Orbitron', monospace;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    gap: 48px;
-  }
-  h1 {
-    font-size: clamp(1.5rem, 5vw, 3rem);
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #00e5ff;
-    text-shadow: 0 0 20px #00e5ff88;
-  }
-  .games {
-    display: flex;
-    gap: 32px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  a.card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 36px 48px;
-    border: 2px solid #00e5ff44;
-    border-radius: 12px;
-    text-decoration: none;
-    color: #fff;
-    background: #0a0a1a;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  }
-  a.card:hover {
-    border-color: #00e5ff;
-    box-shadow: 0 0 32px #00e5ff44;
-    transform: translateY(-4px);
-  }
-  .card-title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: #00e5ff;
-  }
-  .card-desc {
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    color: #aaa;
-    text-transform: uppercase;
-  }
-  .icon { font-size: 3rem; }
-  .how-to-play {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #334;
-    text-decoration: none;
-    padding: 8px 18px;
-    border: 1px solid #111;
-    border-radius: 4px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .how-to-play:hover { color: #00e5ff; border-color: #00e5ff44; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Welcome to Pattern Arcade. Battle with 33 spinning blades or climb through 10 star-filled stages. Free to play, right in your browser.">
+<title>Pattern Arcade · Find your next challenge</title>
+<link rel="stylesheet" href="css/arcade.css?v=3">
 </head>
 <body>
-  <h1>Beyblade Games</h1>
-  <a class="how-to-play" href="how-to-play.html">? HOW TO PLAY</a>
-  <div class="games">
-    <a class="card" href="beyblade-climber.html">
-      <div class="icon">🌀</div>
-      <div class="card-title">Beyblade Climber</div>
-      <div class="card-desc">Climb to the top</div>
-    </a>
-    <a class="card" href="beybattle.html">
-      <div class="icon">⚔️</div>
-      <div class="card-title">Beybattle</div>
-      <div class="card-desc">Battle it out</div>
-    </a>
-  </div>
+<header><a class="brand" href="index.html"><b>P</b> PATTERN <span>ARCADE</span></a><a class="guide" href="how-to-play.html">HOW TO PLAY →</a></header>
+<main>
+<div class="intro"><p class="eyebrow">SMALL BLADES. BIG ADVENTURES.</p><h1>Find your<br><em>next challenge.</em></h1><p>Your blade. Your style. Your moment.</p></div>
+<div class="games">
+<a class="game battle" href="beybattle.html"><div class="game-top"><span class="tag">THE MAIN EVENT</span><span>01 / ARENA</span></div><img src="assets/battle-art.png" width="700" height="520" alt="Three colorful metal spinning blades above a stadium" fetchpriority="high"><div class="game-copy"><div class="meta">33 BLADES <i>·</i> 6 ARENAS <i>·</i> TOURNAMENTS</div><h2>Beybattle</h2><p>Launch into the arena. Master your special.<br>Be the last one spinning.</p><span class="play">ENTER THE ARENA <b>→</b></span></div></a>
+<a class="game climb" href="beyblade-climber.html"><div class="game-top"><span class="tag">REACH NEW HEIGHTS</span><span>02 / ADVENTURE</span></div><div class="climb-art" aria-hidden="true"><div class="orbit"></div><div class="platform p1"></div><div class="platform p2"></div><div class="platform p3"></div><div class="platform p4"></div><span class="star s1">✦</span><span class="star s2">✦</span><span class="star s3">✦</span><img src="assets/pattern-blade.png" width="256" height="256" alt=""></div><div class="game-copy"><div class="meta">10 STAGES <i>·</i> COLLECT STARS <i>·</i> KEEP CLIMBING</div><h2>Beyblade Climber</h2><p>Bounce higher. Find every star.<br>Take your spin to the sky.</p><span class="play">START CLIMBING <b>→</b></span></div></a>
+</div>
+<div class="bottom"><p>Made for the joy of playing.</p><span>TOUCH + KEYBOARD <i>·</i> NO DOWNLOAD NEEDED</span></div>
+</main>
 </body>
 </html>

@@ -5,6 +5,10 @@ function startRound() {
   const r = G.arenaR;
   const ax = G.arenaX, ay = G.arenaY;
 
+  G.pressIsCharging = false;
+  G.paused = false;
+  G.pointerId = null;
+  G.sceneDirty = true;
   G.parts         = [];
   G.blades        = [];
   G.popups        = [];
@@ -70,6 +74,10 @@ function startRound() {
   hint.textContent = 'DRAG YOUR BLADE BACK · RELEASE TO LAUNCH ALL';
   hint.style.display = 'block';
   G.state = 'ready';
+  document.body.classList.add('in-battle');
+  document.getElementById('battle-controls').hidden = false;
+  refreshControls();
+  G.blades.forEach(b => bladeSprite(b));
 }
 
 function launchAll() {
@@ -115,25 +123,27 @@ function buildHUD() {
   G.blades.forEach(b => {
     const id = b.name.replace(/\s/g, '-');
     const dc = displayColor(b);
+    b.hudColor = dc;
     hud.insertAdjacentHTML('beforeend', `
       <div class="stamina-bar">
-        <div class="stamina-label" style="color:${dc}">${b.name}</div>
+        <div class="stamina-label" style="color:${dc}">${b.isPlayer ? 'YOU · ' : ''}${b.name}</div>
         <div class="stamina-track">
           <div class="stamina-fill" id="sf-${id}"
-               style="width:100%;background:${dc};box-shadow:0 0 6px ${dc}88"></div>
+               style="width:100%;background:${dc};transform-origin:left"></div>
         </div>
       </div>`);
+    b.hudFill = document.getElementById(`sf-${id}`);
   });
 }
 
 function refreshHUD() {
   G.blades.forEach(b => {
-    const fill = document.getElementById(`sf-${b.name.replace(/\s/g,'-')}`);
+    const fill = b.hudFill;
     if (!fill) return;
     const pct = Math.max(0, (b.stamina / b.maxStamina) * 100);
-    fill.style.width   = `${pct}%`;
+    fill.style.transform = `scaleX(${Math.min(1, pct / 100)})`;
     fill.style.opacity = b.alive ? '1' : '0.2';
-    if (pct < 30) fill.style.background = '#ff3333';
+    fill.style.background = pct < 30 ? '#ff6f80' : b.hudColor;
   });
 }
 

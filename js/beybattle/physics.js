@@ -14,8 +14,11 @@ function wallCheck(b, arena) {
     b.x = G.arenaX + nx * max;
     b.y = G.arenaY + ny * max;
     const dot = b.vx * nx + b.vy * ny;
-    b.vx = (b.vx - 2 * dot * nx) * wDamp;
-    b.vy = (b.vy - 2 * dot * ny) * wDamp;
+    // Only reflect an outward-moving blade, never an incoming launch.
+    if (dot > 0) {
+      b.vx = (b.vx - 2 * dot * nx) * wDamp;
+      b.vy = (b.vy - 2 * dot * ny) * wDamp;
+    }
     const impact = Math.abs(dot);
     if (impact > 1.8) {
       spawnHitParticles(b.x + nx * b.radius, b.y + ny * b.radius,
@@ -48,6 +51,7 @@ function bladeCollide(a, b) {
 
   // Mass-weighted impulse
   const rvn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+  if (rvn >= 0) return;
   if (rvn < 0) {
     const J = -(1 + RESTITUTION) * rvn / totalMass;
     a.vx -= J * b.mass * nx; a.vy -= J * b.mass * ny;

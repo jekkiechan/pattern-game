@@ -5,20 +5,36 @@ const FIXED_DT  = 1 / 60;
 const MAX_STEPS = 4;
 let   physAcc   = 0;
 function loop(ts) {
-  const frame = Math.min((ts - G.lastTime) / 1000, 0.25);
+  const frame = Math.min((ts - G.lastTime) / 1000, .1);
   G.lastTime = ts;
-  if (G.state === 'ready' || G.state === 'active') {
-    physAcc += frame;
-    let steps = 0;
-    while (physAcc >= FIXED_DT && steps < MAX_STEPS) {
-      update(FIXED_DT);
-      physAcc -= FIXED_DT;
-      steps++;
+  if (!document.hidden && !G.paused) {
+    if (G.state === 'ready' || G.state === 'active') {
+      physAcc += frame;
+      let steps = 0;
+      while (physAcc >= FIXED_DT && steps < MAX_STEPS) {
+        G.blades.forEach(b => { b.prevX = b.x; b.prevY = b.y; b.prevAngle = b.angle; });
+        update(FIXED_DT); physAcc -= FIXED_DT; steps++;
+      }
+      if (steps === MAX_STEPS) physAcc = 0;
+    } else physAcc = 0;
+    G.popups.forEach(p => p.timer -= frame);
+    G.popups = G.popups.filter(p => p.timer > 0);
+    if (G.state === 'ready' || G.state === 'active' || G.sceneDirty || G.popups.length) {
+      renderInterpolated(physAcc / FIXED_DT);
+      G.sceneDirty = false;
     }
-    if (steps === MAX_STEPS) physAcc = 0;
   }
-  render();
   requestAnimationFrame(loop);
+}
+function renderInterpolated(alpha) {
+  G.blades.forEach(b => {
+    b.simX = b.x; b.simY = b.y; b.simAngle = b.angle;
+    b.x = (b.prevX ?? b.x) + (b.x - (b.prevX ?? b.x)) * alpha;
+    b.y = (b.prevY ?? b.y) + (b.y - (b.prevY ?? b.y)) * alpha;
+    b.angle = (b.prevAngle ?? b.angle) + (b.angle - (b.prevAngle ?? b.angle)) * alpha;
+  });
+  render();
+  G.blades.forEach(b => { b.x = b.simX; b.y = b.simY; b.angle = b.simAngle; });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -38,6 +54,13 @@ function doBoost(player, p) {
   const sp = Math.hypot(player.vx, player.vy);
   if (sp > MAX_SPEED) { player.vx *= MAX_SPEED / sp; player.vy *= MAX_SPEED / sp; }
   G.boostCooldown = BOOST_COOLDOWN;
+  if (ARENAS[G.selectedArena].rail && !player.railCooldown &&
+      Math.hypot(player.x - G.arenaX, player.y - G.arenaY) > G.arenaRCurrent * .72) {
+    player.vx *= 1.3; player.vy *= 1.3;
+    player.stamina = Math.min(player.maxStamina, player.stamina + 8);
+    player.railCooldown = 4;
+    G.popups.push({text:'RAIL RUSH!',x:player.x,y:player.y-28,color:'#63f5c5',timer:1.2,maxTimer:1.2});
+  }
   for (let i = 0; i < 12; i++) {
     const a = Math.random() * Math.PI * 2;
     const s = 70 + Math.random() * 110;
@@ -47,6 +70,7 @@ function doBoost(player, p) {
 }
 
 function onDown(e) {
+  if (G.paused) return;
   if (G.state === 'ready') {
     const player = G.blades[0];
     if (!player) return;
@@ -72,6 +96,7 @@ function onMove(e) {
   G.aimX = p.x; G.aimY = p.y;
 }
 function onUp(e) {
+  if (G.paused) return;
   if (G.state === 'active') {
     const player = G.blades.find(b => b.isPlayer && b.alive);
     G.pressIsCharging = false;
@@ -105,105 +130,49 @@ function onUp(e) {
   document.getElementById('launch-hint').style.display = 'none';
 }
 
-canvas.addEventListener('mousedown',  onDown);
-canvas.addEventListener('mousemove',  onMove);
-canvas.addEventListener('mouseup',    onUp);
-canvas.addEventListener('touchstart', e => { e.preventDefault(); onDown(e); }, { passive: false });
-canvas.addEventListener('touchmove',  e => { e.preventDefault(); onMove(e); }, { passive: false });
-canvas.addEventListener('touchend',   e => { e.preventDefault(); onUp(e);   }, { passive: false });
+canvas.addEventListener('pointerdown', e => {
+  if (e.button !== 0 || G.pointerId != null || G.paused) return;
+  G.pointerId = e.pointerId;
+  canvas.setPointerCapture(e.pointerId); audio(); onDown(e);
+});
+canvas.addEventListener('pointermove', e => {
+  G.target = pos(e);
+  if (G.pointerId === e.pointerId) onMove(e);
+});
+canvas.addEventListener('pointerup', e => {
+  if (G.pointerId !== e.pointerId) return;
+  onUp(e); G.pointerId = null;
+});
+canvas.addEventListener('pointercancel', cancelInput);
+canvas.addEventListener('lostpointercapture', cancelInput);
 
 // ═══════════════════════════════════════════════════════════
 // SCREEN BUTTONS
 // ═══════════════════════════════════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  if (id) document.getElementById(id).classList.add('active');
+  if (id) {
+    document.getElementById(id).classList.add('active');
+    G.state = 'idle'; G.paused = false; cancelInput();
+    document.body.classList.remove('in-battle');
+    document.getElementById('battle-controls').hidden = true;
+    document.getElementById('pause-panel').hidden = true;
+    document.getElementById('hud').style.display = 'none';
+    document.getElementById('launch-hint').style.display = 'none';
+    document.getElementById('overlay').scrollTop = 0;
+  }
+  G.sceneDirty = true;
 }
 
 // ── BLADE PREVIEW RENDERER ──
 function drawBladeToCanvas(cfg, previewCanvas) {
-  const gameCtx = ctx;
-  ctx = previewCanvas.getContext('2d');
+  const pc = previewCanvas.getContext('2d');
   const W = previewCanvas.width, H = previewCanvas.height;
-  const R = W * 0.30;
-
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#07090f';
-  ctx.fillRect(0, 0, W, H);
-
-  // Subtle glow bg
-  const bg = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W/2);
-  bg.addColorStop(0, hexAlpha(cfg.glow, 0.18));
-  bg.addColorStop(1, 'transparent');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  ctx.save();
-  ctx.translate(W / 2, H / 2);
-  ctx.rotate(Math.PI / 8);
-
-  for (let i = 0; i < cfg.blades; i++) {
-    ctx.save();
-    ctx.rotate((i / cfg.blades) * Math.PI * 2);
-    ctx.shadowBlur  = 10;
-    ctx.shadowColor = cfg.glow;
-    if      (cfg.shape === 'drake')   drawDrakeBlade(R);
-    else if (cfg.shape === 'dran')    drawDranBlade(R);
-    else if (cfg.shape === 'dragoon') drawDragoonBlade(R);
-    else if (cfg.shape === 'garuda')  drawGarudaBlade(R);
-    else if (cfg.shape === 'saber')   drawSaberBlade(R);
-    else if (cfg.shape === 'hells')   drawHellsBlade(R);
-    else if (cfg.shape === 'knight')  drawKnightBlade(R);
-    else if (cfg.shape === 'kerbecs') drawKerbecsBlade(R);
-    else if (cfg.shape === 'nemesis') drawNemesisBlade(R);
-    else if (cfg.shape === 'orion')   drawOrionBlade(R);
-    else if (cfg.shape === 'pegasis') drawPegasisBlade(R);
-    else if (cfg.shape === 'unknown') drawUnknownBlade(R);
-    else if (cfg.shape === 'titan')   drawTitanBlade(R);
-    else if (cfg.shape === 'abyss')   drawAbyssBlade(R);
-    else if (cfg.shape === 'oracle')  drawOracleBlade(R);
-    else if (cfg.shape === 'obsidian')drawObsidianBlade(R);
-    else if (cfg.shape === 'ldrago')  drawLdragoBlade(R);
-    else if (cfg.shape === 'pattern') drawPatternBlade(R);
-    else drawBladeShape(cfg.shape, R, cfg.color);
-    ctx.restore();
-  }
-
-  if      (cfg.shape === 'drake')   drawDrakeHub(R);
-  else if (cfg.shape === 'dran')    drawDranHub(R);
-  else if (cfg.shape === 'dragoon') drawDragoonHub(R);
-  else if (cfg.shape === 'garuda')  drawGarudaHub(R);
-  else if (cfg.shape === 'saber')   drawSaberHub(R);
-  else if (cfg.shape === 'hells')   drawHellsHub(R);
-  else if (cfg.shape === 'knight')  drawKnightHub(R);
-  else if (cfg.shape === 'kerbecs') drawKerbecsHub(R);
-  else if (cfg.shape === 'nemesis') drawNemesisHub(R);
-  else if (cfg.shape === 'orion')   drawOrionHub(R);
-  else if (cfg.shape === 'pegasis') drawPegasisHub(R);
-  else if (cfg.shape === 'unknown') drawUnknownHub(R);
-  else if (cfg.shape === 'titan')   drawTitanHub(R);
-  else if (cfg.shape === 'abyss')   drawAbyssHub(R);
-  else if (cfg.shape === 'oracle')  drawOracleHub(R);
-  else if (cfg.shape === 'obsidian')drawObsidianHub(R);
-  else if (cfg.shape === 'ldrago')  drawLdragoHub(R);
-  else if (cfg.shape === 'pattern') drawPatternHub(R);
-  else {
-    const hub = ctx.createRadialGradient(-R*0.18, -R*0.18, 0, 0, 0, R*0.58);
-    hub.addColorStop(0,    '#ffffff');
-    hub.addColorStop(0.28, cfg.color);
-    hub.addColorStop(1,    '#000000');
-    ctx.shadowBlur  = 8;
-    ctx.shadowColor = cfg.glow;
-    ctx.beginPath(); ctx.arc(0, 0, R * 0.58, 0, Math.PI * 2);
-    ctx.fillStyle = hub; ctx.fill();
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = '#ffffff';
-    ctx.beginPath(); ctx.arc(0, 0, R * 0.15, 0, Math.PI * 2); ctx.fill();
-  }
-
-  ctx.restore();
-  ctx = gameCtx;
+  pc.clearRect(0, 0, W, H);
+  const glow = pc.createRadialGradient(W/2,H/2,0,W/2,H/2,W/2);
+  glow.addColorStop(0, hexAlpha(cfg.glow, .22));glow.addColorStop(1,'transparent');
+  pc.fillStyle = glow;pc.fillRect(0,0,W,H);
+  pc.drawImage(bladeSprite(cfg),0,0,W,H);
 }
 
 // ── CHARACTER SELECT SCREEN ──
@@ -239,6 +208,7 @@ const TIER_COLORS = {
 };
 const STAT_KEYS   = ['atkR','defR','staR','spdR','bstR'];
 const STAT_LABELS = ['ATK','DEF','STA','SPD','BST'];
+const STAT_NAMES = ['Attack','Defense','Stamina','Speed','Burst resistance'];
 
 const TIER_ORDER  = ['UNKNOWN','GOD','TRANSCENDENT','MYTHICAL','LEGENDARY','CHAMPION','ELITE','ADVANCED','APPRENTICE','NOVICE'];
 const ALL_TYPES   = ['ATTACK','DEFENSE','STAMINA','BALANCE','???'];
@@ -254,6 +224,7 @@ function buildFilterChips(containerId, onChange) {
     chip.className = 'filter-chip' + (charFilter.types.has(t) ? ' active' : '');
     chip.style.setProperty('--c', tc);
     chip.textContent = t;
+    chip.setAttribute('aria-pressed', charFilter.types.has(t));
     chip.addEventListener('click', () => {
       if (charFilter.types.has(t)) charFilter.types.delete(t);
       else charFilter.types.add(t);
@@ -346,16 +317,18 @@ function buildSelectScreen() {
   const previewCanvases = appendTierSections(grid, groupByTier(filtered), (cfg, i) => {
     const tc   = TYPE_COLORS[cfg.type] || '#fff';
     const dc   = displayColor(cfg);
-    const card = document.createElement('div');
+    const card = document.createElement('button');
+    card.type = 'button';
     card.className = 'char-card' + (i === G.selectedChar ? ' selected' : '');
     card.style.setProperty('--c', dc);
+    card.setAttribute('aria-pressed', i === G.selectedChar);
     if (i === G.selectedChar) {
       card.style.borderColor = dc;
       card.style.boxShadow   = `0 0 14px ${dc}55`;
     }
     const { tierColor, tierClass, statBars } = makeCharCardHTML(cfg, dc, tc);
     card.innerHTML = `
-      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
+      <canvas class="blade-preview" width="192" height="192" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
       <div class="char-card-name" style="color:${dc};text-shadow:0 0 6px ${cfg.glow}66">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
@@ -375,12 +348,19 @@ function buildSelectScreen() {
 
 function selectChar(i, rebuild = true) {
   G.selectedChar = i;
-  if (rebuild) buildSelectScreen();
+  if (rebuild) {
+    document.querySelectorAll('#char-grid .char-card').forEach(c => {
+      const selected = c.querySelector('.char-card-name').textContent === CONFIGS[i].name;
+      c.classList.toggle('selected', selected); c.setAttribute('aria-pressed', selected);
+      c.style.borderColor = selected ? displayColor(CONFIGS[i]) : ''; c.style.boxShadow = '';
+    });
+  }
 
   const cfg = CONFIGS[i];
   const tc  = TYPE_COLORS[cfg.type] || '#fff';
 
   const tierColor = TIER_COLORS[cfg.tier] || '#aaa';
+  drawBladeToCanvas(cfg, document.getElementById('detail-preview'));
   const dn = document.getElementById('detail-name');
   dn.textContent  = cfg.name;
   dn.style.color  = displayColor(cfg);
@@ -403,7 +383,7 @@ function selectChar(i, rebuild = true) {
       : val;
     const valStyle = val === '???' ? '' : `color:${detailDc};text-shadow:0 0 12px ${detailDc}`;
     return `
-    <div class="big-stat">
+    <div class="big-stat" title="${STAT_NAMES[si]}" aria-label="${STAT_NAMES[si]}: ${val}">
       <div class="big-stat-val" style="${valStyle}">${valHtml}</div>
       <div class="big-stat-lbl">${STAT_LABELS[si]}</div>
     </div>`;
@@ -432,20 +412,22 @@ function buildArenaScreen() {
   grid.innerHTML = '';
 
   ARENAS.forEach((ar, i) => {
-    const card = document.createElement('div');
+    const card = document.createElement('button');
+    card.type = 'button';
     card.className = 'arena-card' + (i === G.selectedArena ? ' selected' : '');
     if (i === G.selectedArena) {
       card.style.borderColor = ar.rim;
       card.style.boxShadow   = `0 0 14px ${ar.glow}55`;
     }
     const pc = document.createElement('canvas');
-    pc.width = 120; pc.height = 80;
+    pc.width = 360; pc.height = 240;
     card.appendChild(pc);
     card.insertAdjacentHTML('beforeend', `
       <div class="arena-card-body">
         <div class="arena-card-name" style="color:${ar.rim}">${ar.name}</div>
         <div class="arena-card-sub">${ar.sub}</div>
       </div>`);
+    card.setAttribute('aria-pressed', i === G.selectedArena);
     card.addEventListener('click', () => selectArena(i));
     grid.appendChild(card);
 
@@ -489,9 +471,11 @@ function buildOpponentsScreen() {
     const tc   = TYPE_COLORS[cfg.type] || '#fff';
     const dc   = displayColor(cfg);
     const sel  = G.selectedOpponents.includes(i);
-    const card = document.createElement('div');
+    const card = document.createElement('button');
+    card.type = 'button';
     card.className = 'char-card opp-card' + (sel ? ' selected-opp' : '');
-    card.style.setProperty('--c', sel ? dc : '#333');
+    card.style.setProperty('--c', dc);
+    card.setAttribute('aria-pressed', sel);
     if (sel) {
       card.style.borderColor = dc;
       card.style.boxShadow   = `0 0 14px ${dc}55`;
@@ -499,9 +483,9 @@ function buildOpponentsScreen() {
       card.style.borderColor = '#1a1f2e';
     }
     const { tierColor, tierClass, statBars } = makeCharCardHTML(cfg, dc, tc);
-    const nameC = sel ? dc : '#667';
+    const nameC = dc;
     card.innerHTML = `
-      <canvas class="blade-preview" width="72" height="72" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
+      <canvas class="blade-preview" width="192" height="192" style="display:block;margin:0 auto 4px;border-radius:50%;border:1px solid ${dc}33"></canvas>
       <div class="char-card-name" style="color:${nameC};${sel ? `text-shadow:0 0 6px ${cfg.glow}66` : ''}">${cfg.name}</div>
       <div style="display:flex;gap:4px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">
         <div class="char-type-badge" style="background:${tc}22;color:${tc};margin-bottom:0">${cfg.type}</div>
@@ -556,7 +540,11 @@ function buildOpponentsScreen() {
 
 // ── randomize opponents ──
 function randomizeOpponents() {
-  const pool = CONFIGS.map((_, i) => i).filter(i => i !== G.selectedChar);
+  const rank = TIER_ORDER.indexOf(CONFIGS[G.selectedChar].tier);
+  let pool = CONFIGS.map((_, i) => i).filter(i => i !== G.selectedChar &&
+    Math.abs(TIER_ORDER.indexOf(CONFIGS[i].tier) - rank) <= 1);
+  if (pool.length < 3) pool = CONFIGS.map((_, i) => i).filter(i => i !== G.selectedChar)
+    .sort((a,b) => Math.abs(TIER_ORDER.indexOf(CONFIGS[a].tier)-rank)-Math.abs(TIER_ORDER.indexOf(CONFIGS[b].tier)-rank)).slice(0,6);
   G.selectedOpponents = [];
   while (G.selectedOpponents.length < 3 && pool.length > 0) {
     const idx = Math.floor(Math.random() * pool.length);
@@ -585,6 +573,7 @@ document.getElementById('btn-arena-next').addEventListener('click', () => {
     tShowBracket();
   } else {
     buildOpponentsScreen();
+    if (!G.selectedOpponents.length) randomizeOpponents();
     showScreen('screen-opponents');
   }
 });
@@ -626,6 +615,7 @@ document.getElementById('btn-champion-home').addEventListener('click', () => {
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('resize', resize);
 resize();
+initExperience();
 tRefreshTrophyDisplay();
 G.lastTime = performance.now();
 requestAnimationFrame(loop);

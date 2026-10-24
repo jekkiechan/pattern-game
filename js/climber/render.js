@@ -35,10 +35,10 @@ function drawWorld() {
   ctx.globalAlpha = 1;
 
   // platforms
-  for (const p of platforms) drawPlatform(p.x,p.y,p.w,p.type,p.broken);
+  for (const p of platforms) if (p.y-camera > -30 && p.y-camera < H+30) drawPlatform(p.x,p.y,p.w,p.type,p.broken);
 
   // stars
-  for (const s of collectStars) drawStar(s.x,s.y,10,s.collected);
+  for (const s of collectStars) if (s.y-camera > -20 && s.y-camera < H+20) drawStar(s.x,s.y,10,s.collected);
 
   // particles
   for (const p of particles) {
@@ -134,7 +134,7 @@ function drawTitleScreen() {
   }
 
   if (Math.floor(frameCount/30)%2===0) {
-    const msg = 'PRESS SPACE TO START';
+    const msg = 'TAP OR SPACE TO START';
     pixText(msg, W/2-textW(msg,2)/2, 370, 2, '#ffffff', '#333333');
   }
   const c1 = 'LEFT RIGHT TO MOVE';
@@ -173,7 +173,7 @@ function drawStageIntro() {
     ctx.restore();
   }
 
-  if (introTimer < 80 && Math.floor(frameCount/20)%2===0) {
+  if (frameCount < 80 && Math.floor(frameCount/20)%2===0) {
     const go = 'READY!';
     pixText(go, W/2-textW(go,3)/2, 380, 3, '#66ff66', '#003300');
   }
@@ -233,7 +233,7 @@ function drawDeadScreen() {
   pixText(sc,W/2-textW(sc,3)/2,py2+60,3,'#ffffff','#333333');
 
   if (Math.floor(frameCount/30)%2===0) {
-    const rt='PRESS SPACE TO RETRY';
+    const rt='TAP OR SPACE TO RETRY';
     pixText(rt,W/2-textW(rt,2)/2,py2+100,2,'#ffaaaa','#330000');
   }
 }
@@ -268,9 +268,29 @@ function drawVictory() {
 }
 
 // ══════════ MAIN LOOP ══════════
-function loop() {
-  update();
+let lastTick = 0, accumulator = 0, previousCamera = 0;
+function loop(ts) {
+  const elapsed = lastTick ? Math.min((ts-lastTick)/1000,.1) : 0;
+  lastTick = ts;
+  if (paused || document.hidden) { accumulator=0;requestAnimationFrame(loop);return; }
+  accumulator += elapsed;
+  let steps = 0;
+  while(accumulator >= 1/60 && steps < 5) {
+    if(player){player.prevX=player.x;player.prevY=player.y;player.prevAngle=player.angle;}
+    previousCamera=camera;update();accumulator -= 1/60;steps++;
+  }
+  if(steps===5) accumulator=0;
 
+  const simCamera=camera;
+  const simPlayer=player ? {x:player.x,y:player.y,angle:player.angle} : null;
+  if(player && state==='playing') {
+    const a=accumulator*60;
+    // Never interpolate across screen wrapping or a fresh stage.
+    if(Math.abs(player.x-(player.prevX??player.x))<W/2) player.x=(player.prevX??player.x)+(player.x-(player.prevX??player.x))*a;
+    player.y=(player.prevY??player.y)+(player.y-(player.prevY??player.y))*a;
+    player.angle=(player.prevAngle??player.angle)+(player.angle-(player.prevAngle??player.angle))*a;
+    camera=previousCamera+(camera-previousCamera)*a;
+  }
   if (state === 'title') drawTitleScreen();
   else if (state === 'dead') drawDeadScreen();
   else if (state === 'victory') drawVictory();
@@ -293,6 +313,8 @@ function loop() {
     }
   }
 
+  if(simPlayer){player.x=simPlayer.x;player.y=simPlayer.y;player.angle=simPlayer.angle;}
+  camera=simCamera;
   requestAnimationFrame(loop);
 }
 

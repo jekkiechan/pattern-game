@@ -39,11 +39,22 @@ const stars = Array.from({ length: 90 }, () => ({
 }));
 
 function resize() {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-  G.arenaX = canvas.width  / 2;
-  G.arenaY = canvas.height / 2;
-  G.arenaR = Math.min(canvas.width, canvas.height) * 0.38;
-  if (!G.arenaRCurrent) G.arenaRCurrent = G.arenaR;
+  const oldX = G.arenaX, oldY = G.arenaY, oldR = G.arenaR;
+  const ratio = oldR ? G.arenaRCurrent / oldR : 1;
+  G.viewW = window.innerWidth; G.viewH = window.innerHeight;
+  G.dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(G.viewW * G.dpr);
+  canvas.height = Math.round(G.viewH * G.dpr);
+  canvas.style.width = G.viewW + 'px'; canvas.style.height = G.viewH + 'px';
+  ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
+  G.arenaX = G.viewW / 2;
+  G.arenaY = G.viewH / 2 + (G.viewH < 500 ? 20 : 8);
+  G.arenaR = Math.max(55, Math.min(G.viewW * .40, (G.viewH - 210) * .43));
+  G.arenaRCurrent = G.arenaR * ratio;
+  if (oldR) G.blades.forEach(b => {
+    b.x = G.arenaX + (b.x - oldX) * G.arenaR / oldR;
+    b.y = G.arenaY + (b.y - oldY) * G.arenaR / oldR;
+    b.prevX = b.x; b.prevY = b.y; b.trail.length = 0;
+  });
+  G.sceneDirty = true;
 }
-

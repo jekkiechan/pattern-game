@@ -34,12 +34,14 @@ function buildStage(stageIdx) {
 
   // place stars on random non-fragile platforms (not ground)
   const eligible = platforms.filter((p, i) => i > 0 && p.type !== 'fragile');
-  const shuffled = eligible.sort(() => Math.random() - 0.5);
+  const shuffled = eligible.slice();
+  for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
   const chosen = shuffled.slice(0, cfg.stars);
+  starsTotal = chosen.length;
   for (const p of chosen) {
     collectStars.push({
       x: p.x + p.w/2, y: p.y - 18,
-      collected: false, sparkle: 0
+      collected: false, sparkle: 0, platform: p
     });
   }
 
@@ -51,7 +53,7 @@ function buildStage(stageIdx) {
 }
 
 // ══════════ BEYBLADE DRAWING ══════════
-function drawBeyblade(sx, sy, radius, angle, alive) {
+function drawBeybladeArt(sx, sy, radius, angle, alive) {
   const r = radius;
   ctx.save();
   ctx.translate(sx, sy);
@@ -146,13 +148,25 @@ function drawBeyblade(sx, sy, radius, angle, alive) {
   ctx.restore();
 }
 
+// One texture per state replaces gradients and paths on every frame.
+const climberSprites = new Map();
+function drawBeyblade(x,y,radius,angle,alive) {
+  if (!climberSprites.has(alive)) {
+    const img=document.createElement('canvas');img.width=img.height=192;
+    const previous=ctx;ctx=img.getContext('2d');
+    drawBeybladeArt(96,96,48,0,alive);ctx=previous;climberSprites.set(alive,img);
+  }
+  ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+  ctx.drawImage(climberSprites.get(alive),-radius*2,-radius*2,radius*4,radius*4);ctx.restore();
+}
+
 // ══════════ PLATFORM DRAWING ══════════
 function drawPlatform(px, py, pw, type, broken) {
   if (broken) return;
   const colors = {
-    normal: {base:'#667799',edge:'#8899bb',glow:'rgba(100,150,200,0.3)'},
+    normal: {base:'#405b82',edge:'#9fbce7',glow:'rgba(100,150,200,0.3)'},
     boost:  {base:'#aa8822',edge:'#ffcc44',glow:'rgba(255,200,50,0.5)'},
-    fragile:{base:'#774444',edge:'#995555',glow:'rgba(200,80,80,0.3)'},
+    fragile:{base:'#8f4f62',edge:'#f897aa',glow:'rgba(200,80,80,0.3)'},
     moving: {base:'#336688',edge:'#44aadd',glow:'rgba(50,150,255,0.4)'},
     finish: {base:'#44aa44',edge:'#66ff66',glow:'rgba(50,255,100,0.5)'},
   };
@@ -250,9 +264,12 @@ function spawnStarCollect(sx2,sy2) {
 }
 
 // ══════════ GAME LOGIC ══════════
+let pendingStage = null;
 function startStage(idx) {
+  pendingStage = null;
   currentStage = idx;
   buildStage(idx);
+  previousCamera=camera;
   state = 'playing';
   clearFlash = 0;
 }
@@ -279,9 +296,9 @@ function update() {
   if (keys['ArrowLeft'] || keys['KeyA']) player.vx -= moveForce;
   if (keys['ArrowRight'] || keys['KeyD']) player.vx += moveForce;
   if (keys['ArrowDown'] || keys['KeyS']) dropping = true;
-  else if (!touchX) dropping = false;
+  else if (touchX === null) dropping = false;
   if (touchX !== null && !dropping) {
-    const mid = canvas.getBoundingClientRect().left + canvas.width/2;
+    const mid = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width/2;
     player.vx += touchX < mid ? -moveForce : moveForce;
   }
 
@@ -315,10 +332,10 @@ function update() {
             if (currentStage + 1 > bestStage) bestStage = currentStage + 1;
             if (currentStage >= 9) { state = 'victory'; }
             else {
-              clearFlash = 100; // show banner for ~1.7s while player falls
+              clearFlash = 60; // show banner for ~1.7s while player falls
               const next = currentStage + 1;
               // delay stage rebuild until player falls back (handled in clearFlash countdown)
-              setTimeout(() => { if (state === 'playing') startStage(next); }, 1000);
+              pendingStage = next;
             }
           } else {
             spawnBounce(player.x, p.y, '#44ff44');
@@ -340,6 +357,7 @@ function update() {
 
   // star collection
   for (const s of collectStars) {
+    if (s.platform) s.x = s.platform.x + s.platform.w / 2;
     if (s.collected) continue;
     const dx = player.x - s.x, dy = player.y - s.y;
     if (dx*dx + dy*dy < (player.radius+10)*(player.radius+10)) {
@@ -356,7 +374,9 @@ function update() {
   else camera += (targetCam - camera) * (dropping ? 0.12 : 0.05);
 
   // clear flash countdown
-  if (clearFlash > 0) clearFlash--;
+  if (clearFlash > 0 && --clearFlash === 0 && pendingStage !== null) {
+    const next=pendingStage;pendingStage=null;startStage(next);return;
+  }
 
   // death (only if not in clear flash)
   if (clearFlash === 0 && player.y - camera > H + 50) { state = 'dead'; }

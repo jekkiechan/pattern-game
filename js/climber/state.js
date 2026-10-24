@@ -21,6 +21,9 @@ let actionPress = false;
 
 document.addEventListener('keydown', e => {
   if (e.repeat) return;
+  if (e.code === 'KeyP' || e.code === 'Escape') { e.preventDefault(); pauseClimber(!paused); return; }
+  if (paused) return;
+  if (e.code.startsWith('Arrow')) e.preventDefault();
   keys[e.code] = true;
   if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); actionPress = true; }
 });
@@ -41,3 +44,17 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', () => { touchX = null; dropping = false; touchStartY = null; }, {passive:false});
 canvas.addEventListener('click', () => { actionPress = true; });
 
+
+let paused = false;
+function pauseClimber(value) {
+  paused = value;
+  Object.keys(keys).forEach(k => keys[k] = false);
+  touchX = null; dropping = false; actionPress = false;
+  document.getElementById('climber-pause').textContent = paused ? 'Resume' : 'Pause';
+  document.getElementById('climber-paused').hidden = !paused;
+}
+document.getElementById('climber-pause').onclick = () => pauseClimber(!paused);
+document.getElementById('climber-paused').onclick = () => pauseClimber(false);
+window.addEventListener('blur', () => pauseClimber(true));
+document.addEventListener('visibilitychange', () => { if (document.hidden) pauseClimber(true); });
+canvas.addEventListener('touchcancel', () => { touchX=null; dropping=false; touchStartY=null; });

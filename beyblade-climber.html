@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BEYBLADE CLIMBER</title>
-<link rel="stylesheet" href="css/climber.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beyblade Climber · Pattern Arcade</title>
+<link rel="stylesheet" href="css/climber.css?v=3">
 </head>
 <body>
-<canvas id="game"></canvas>
-<script src="js/climber/config.js"></script>
-<script src="js/climber/state.js"></script>
-<script src="js/climber/engine.js"></script>
-<script src="js/climber/render.js"></script>
+<header><a href="index.html"><b>P</b> PATTERN ARCADE</a><button id="climber-pause">Pause</button></header>
+<main><div class="climber-label"><span>THE SKY IS THE LIMIT</span><strong>BEYBLADE CLIMBER</strong></div><canvas id="game" aria-label="Beyblade Climber game"></canvas><button id="climber-paused" hidden>PAUSED · Tap to resume</button></main>
+<footer>← → or A / D to steer <span>↓ to drop</span><small>On touch: hold left or right. Swipe down to drop.</small></footer>
+<script src="js/climber/config.js?v=3"></script>
+<script src="js/climber/state.js?v=3"></script>
+<script src="js/climber/engine.js?v=3"></script>
+<script src="js/climber/render.js?v=3"></script>
 </body>
 </html>

@@ -1,13 +1,14 @@
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+let ctx = canvas.getContext('2d');
 
 const W = 400, H = 600;
 let scale = 1;
 function resize() {
-  scale = Math.min(window.innerWidth / W, window.innerHeight / H, 2);
-  canvas.width = Math.floor(W * scale);
-  canvas.height = Math.floor(H * scale);
-  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  scale = Math.min((window.innerWidth - 24) / W, (window.innerHeight - 125) / H, 1.5);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W * scale * dpr); canvas.height = Math.round(H * scale * dpr);
+  canvas.style.width = W * scale + 'px'; canvas.style.height = H * scale + 'px';
+  ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
 }
 resize();
 window.addEventListener('resize', resize);

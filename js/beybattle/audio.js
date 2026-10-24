@@ -2,8 +2,16 @@
 // AUDIO
 // ═══════════════════════════════════════════════════════════
 let _audioCtx = null;
+let masterGain = null;
+let soundEnabled = true;
 function audio() {
-  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!_audioCtx) {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = _audioCtx.createGain();
+    masterGain.gain.value = soundEnabled ? .45 : 0;
+    masterGain.connect(_audioCtx.destination);
+  }
+  if (_audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
   return _audioCtx;
 }
 
@@ -25,7 +33,7 @@ function playHit(intensity = 0.5) {
 
   dist.curve = makeDistCurve(150);
   osc.connect(dist); osc2.connect(dist);
-  dist.connect(gain); gain.connect(ac.destination);
+  dist.connect(gain); gain.connect(masterGain);
 
   const f = 280 + intensity * 550;
   osc.type  = 'sawtooth';
@@ -50,7 +58,7 @@ function playLaunch() {
 
   filt.type = 'highpass';
   filt.frequency.value = 600;
-  osc.connect(filt); filt.connect(gain); gain.connect(ac.destination);
+  osc.connect(filt); filt.connect(gain); gain.connect(masterGain);
 
   osc.type = 'sawtooth';
   osc.frequency.setValueAtTime(180, now);
@@ -66,7 +74,7 @@ function playSpinOut() {
   const ac = audio(), now = ac.currentTime;
   const osc  = ac.createOscillator();
   const gain = ac.createGain();
-  osc.connect(gain); gain.connect(ac.destination);
+  osc.connect(gain); gain.connect(masterGain);
 
   osc.type = 'triangle';
   osc.frequency.setValueAtTime(380, now);
@@ -97,7 +105,7 @@ function playWhoosh() {
   gain.gain.setValueAtTime(0.28, now);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
 
-  src.connect(filt); filt.connect(gain); gain.connect(ac.destination);
+  src.connect(filt); filt.connect(gain); gain.connect(masterGain);
   src.start(now);
 }
 
