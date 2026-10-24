@@ -5,6 +5,9 @@ layer is loaded on the arcade, both games and the field guide. `entry.js` expose
 `patternAccountsReady` and the resolved `patternAccounts` storage instance.
 Games must await it before reading progress; Skybound's boot loader then loads
 its classic scripts in order so the existing global simulation stays intact.
+The arcade home may display a read-only local preview while the session check
+runs. Only `patternAccountsReady` may establish the active trainer for games and
+save writes; replace the preview with the server result, including sign-out.
 
 Keep signup to trainer name + password, optional guest play, downloadable recovery
 codes, and a visible active trainer in each game. Account switching reloads the

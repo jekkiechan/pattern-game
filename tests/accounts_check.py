@@ -35,12 +35,20 @@ def league_win(page):
   if round==0:page.click('#result-next')
  page.click('.result-links .back-home');page.wait_for_function('__bey.screen==="home"')
 def synced(page):page.wait_for_function('document.querySelector("#trainer-status").textContent.includes("Progress saved to your trainer")')
+def delay_bootstrap(route):time.sleep(.7);route.continue_()
+PREVIEW_OBSERVER='''Object.defineProperty(window,'patternArcadePreviewReady',{set(value){if(value){window.__previewAt=performance.now();window.__preview={heading:document.querySelector('#welcome-heading').textContent,signInDisabled:document.querySelector('#sign-in-trainer').disabled,trainerButtonDisabled:document.querySelector('#trainer-button').disabled};}}});'''
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-webgl'])
  context=browser.new_context(viewport={'width':1280,'height':900});page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+ page.add_init_script(PREVIEW_OBSERVER)
  account_requests=[];page.on('request',lambda request:account_requests.append((request.method,request.url)) if '/api/' in request.url else None)
+ page.route('**/api/trainer/bootstrap',delay_bootstrap)
  page.goto(BASE+'/');ready(page)
+ page.unroute('**/api/trainer/bootstrap',delay_bootstrap)
  assert account_requests==[('GET',BASE+'/api/trainer/bootstrap')],account_requests
+ preview=page.evaluate('''() => ({...window.__preview,previewAt:window.__previewAt,bootstrapEnd:performance.getEntriesByType('resource').find(e=>e.name.includes('/api/trainer/bootstrap')).responseEnd})''')
+ assert not preview['signInDisabled'] and not preview['trainerButtonDisabled'],preview
+ assert preview['previewAt']<preview['bootstrapEnd'],preview
  assert page.locator('#create-trainer').is_visible() and page.locator('#sign-in-trainer').is_visible()
  page.click('#play-guest');assert page.locator('#games-heading').evaluate('(el)=>el===document.activeElement')
  page.evaluate('localStorage.setItem("beybattleSave",JSON.stringify({wins:2}));localStorage.setItem("climberSkybound",JSON.stringify({version:1,medals:[3],blade:"volt"}))');page.reload();ready(page)
@@ -49,6 +57,11 @@ with sync_playwright() as p:
  with page.expect_download() as downloaded:page.click('#export-guest')
  progress_file=OUT/'guest-progress.json';downloaded.value.save_as(progress_file);close_account(page)
  code=create(page,NEPHEW,'Nephew');synced(page)
+ page.route('**/api/trainer/bootstrap',delay_bootstrap)
+ page.reload();ready(page)
+ page.unroute('**/api/trainer/bootstrap',delay_bootstrap)
+ preview=page.evaluate('''() => ({...window.__preview,previewAt:window.__previewAt,bootstrapEnd:performance.getEntriesByType('resource').find(e=>e.name.includes('/api/trainer/bootstrap')).responseEnd})''')
+ assert preview['heading'].endswith(NEPHEW+'.') and preview['previewAt']<preview['bootstrapEnd'],preview
  assert page.locator('#welcome-heading').inner_text().endswith(NEPHEW+'.')
  assert not page.locator('#welcome-actions').is_visible()
  assert page.locator('#guest-progress-invite').is_visible()

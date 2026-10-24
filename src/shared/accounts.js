@@ -3,6 +3,28 @@ const slotName=slot=>({beybattleLeague:'Beybattle',patternTrainerJourney:'Traine
 const ACTIVE='patternActiveTrainer';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone=value=>structuredClone(value);
+const summary=(slot,data)=>{if(!data)return 'Ready for your first adventure';if(slot==='beybattleLeague')return `${data.wins||0} wins · ${data.trophies||0} trophies · ${(data.league?.medals||[]).reduce((a,b)=>a+b,0)} stars`;if(slot==='climberSkybound'){const medals=data.medals||[];return `${medals.filter(n=>n&1).length} / 10 stages · ${medals.reduce((sum,n)=>sum+[1,2,4].filter(bit=>n&bit).length,0)} / 30 medals`;}return data.starter===null?'Journey not started':`${data.name||'Trainer'} · ${data.completed||0} of 6 seals`;};
+
+// The arcade can show a read-only snapshot while the session is checked. Games
+// still wait for patternAccountsReady before reading or writing trainer progress.
+export function createTrainerPreview(){
+ const enabled=document.querySelector('meta[name="trainer-service"]')?.content==='enabled';
+ let user=null;
+ if(enabled){
+  try{
+   const cached=JSON.parse(localStorage.getItem(ACTIVE));
+   if(typeof cached?.id==='string'&&typeof cached.name==='string'&&typeof cached.username==='string')user=cached;
+  }catch{}
+ }
+ function read(slot,fallback){
+  if(!user||!SLOTS.includes(slot))return fallback;
+  try{
+   const data=JSON.parse(localStorage.getItem(`patternTrainer:${user.id}:${slot}`))?.data;
+   return data?validateProgress(slot,data):fallback;
+  }catch{return fallback;}
+ }
+ return {user,read,summary,enabled};
+}
 
 // Storage is scoped once per page. A changed cookie can never redirect queued saves
 // to another trainer: the API verifies x-trainer-id against the current session.
@@ -104,7 +126,6 @@ export async function createTrainerAccounts(){
   const conflict=[...conflicts.entries()][0];
   shell(`<h2>${escape(user.name)}</h2><p>@${escape(user.username)}</p><p data-sync-status>${escape(status)}</p><div class="trainer-game-summaries">${SLOTS.map(slot=>`<div><b>${slotName(slot)}</b><span>${escape(summary(slot,read(slot,null)))}</span></div>`).join('')}</div>${conflict?`<section class="save-conflict"><h3>Two versions of your ${slotName(conflict[0])} progress</h3><p>Another device saved a different version. Choose one to keep. This replaces the other version.</p><div class="save-choices"><div><strong>This device</strong><p>${escape(summary(conflict[0],envelope(conflict[0]).data))}</p><button class="button secondary" data-conflict="device">Keep this device</button></div><div><strong>Cloud save</strong><p>${escape(summary(conflict[0],conflict[1].data))}</p><button class="button secondary" data-conflict="cloud">Keep cloud save</button></div></div></section>`:''}<div class="trainer-actions"><button class="button secondary" id="account-sync">Sync now</button><button class="text-button" id="import-guest">Import guest progress…</button><label>Import a progress file<input id="import-file" type="file" accept="application/json,.json"></label><button class="text-button" id="account-recovery">Get a new recovery code…</button><button class="button secondary" id="account-signout">Switch trainer / sign out</button></div><p class="dialog-note">Switching trainers also switches other game tabs. Your pending progress stays with this trainer on this device.</p>`);
  }
- function summary(slot,data){if(!data)return 'Ready for your first adventure';if(slot==='beybattleLeague')return `${data.wins||0} wins · ${data.trophies||0} trophies · ${(data.league?.medals||[]).reduce((a,b)=>a+b,0)} stars`;if(slot==='climberSkybound'){const medals=data.medals||[];return `${medals.filter(n=>n&1).length} / 10 stages · ${medals.reduce((sum,n)=>sum+[1,2,4].filter(bit=>n&bit).length,0)} / 30 medals`;}return data.starter===null?'Journey not started':`${data.name||'Trainer'} · ${data.completed||0} of 6 seals`;}
  function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type})),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  function hasProgress(slot,data){if(!data)return false;if(slot==='beybattleLeague')return !!(data.wins||data.trophies||data.league?.medals?.some(Boolean));if(slot==='climberSkybound')return data.medals?.some(Boolean);return data.starter!==null&&data.starter!==undefined;}
  function showImport(saves,title){
