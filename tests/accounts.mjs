@@ -11,7 +11,7 @@ function player(){let cookie='',id;return {get id(){return id;},async request(pa
  const url=requestURL({url:'/api/trainer?__trainer_route='+encodeURIComponent(path)},base);
  const response=await fixture.handle(new Request(url,{method,headers:{origin:base,'content-type':'application/json',cookie,...(id?{'x-trainer-id':id}:{}),...extra},...(body?{body:JSON.stringify(body)}:{})}));
  for(const value of response.headers.getSetCookie()){const part=value.split(';')[0];const name=part.split('=')[0];cookie=cookie.split('; ').filter(c=>!c.startsWith(name+'=')).concat(part).filter(Boolean).join('; ');}
- const data=await response.json();if(data.user)id=data.user.id;return {status:response.status,data};
+ const data=await response.json();if(data.user)id=data.user.id;return {status:response.status,data,cookies:response.headers.getSetCookie()};
  }};}
 try{
  const nephew=player(),uncle=player(),anonymous=player();
@@ -55,7 +55,9 @@ try{
  assert.equal((await anonymous.request('trainer/recover',{username:'nephew',code:'wrong',password:'new-password-123'})).status,400);
  const recovered=await anonymous.request('trainer/recover',{username:'nephew',code,password:'new-password-123'});assert.equal(recovered.status,200,JSON.stringify(recovered));assert.notEqual(recovered.data.recoveryCode,code);
  assert.equal((await nephew.request('trainer/progress')).status,401,'Recovery revokes old sessions');
- assert.deepEqual((await nephew.request('trainer/bootstrap')).data,{user:null,saves:{}},'Bootstrap cannot restore a revoked session');
+ const revokedBootstrap=await nephew.request('trainer/bootstrap');
+ assert.deepEqual(revokedBootstrap.data,{user:null,saves:{}},'Bootstrap cannot restore a revoked session');
+ assert.ok(revokedBootstrap.cookies.some(cookie=>cookie.includes('session_token=')&&cookie.includes('Max-Age=0')),'Bootstrap clears a revoked session cookie');
  assert.equal((await anonymous.request('trainer/recover',{username:'nephew',code,password:'another-password'})).status,400,'Recovery codes are single use');
  assert.notEqual((await nephew.request('auth/sign-in/username',{username:'nephew',password:'spinning-tops-123'})).status,200);
  assert.equal((await nephew.request('auth/sign-in/username',{username:'NEPHEW',password:'new-password-123'})).status,200);
