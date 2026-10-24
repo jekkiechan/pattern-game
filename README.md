@@ -16,6 +16,77 @@ Story progress and dialogue position autosave on this browser/device separately 
 
 Both games and the arcade share self-hosted Noto Sans/Noto Serif typography, an ink/ivory/brass palette, visible selection states, and responsive menus. Font licenses are in `assets/fonts/`.
 
+## Trainer accounts on Vercel
+
+The Vercel build supports multiple private trainer accounts with a username,
+trainer name and password (8–128 characters). No email address is requested.
+Each account keeps its own League stars, wins, trophies, settings and Wind Road
+story progress. Skybound remains a separate device-local game. Guest play remains
+available without signing in, including on GitHub Pages.
+
+Open **Trainer / Sign in** to create an account. Save the recovery code somewhere
+safe: it can reset the password without email. Recovery codes are stored only as
+hashes, work once, and are replaced after a reset. Password resets invalidate old
+sessions. A signed-in trainer can generate a replacement code using their current
+password. Switching trainers signs out and reloads the game; it also switches
+other open game tabs. Pending saves stay in that trainer's local storage.
+
+Account saves sync automatically and restore on another signed-in device. Offline
+play queues saves locally; keep the device's browser data until syncing finishes.
+The status below the home menu shows whether saves reached the cloud. Concurrent
+device edits require choosing **this device** or **cloud save** in Trainer before
+sync resumes. League and story saves resolve separately; keeping one version
+replaces the other. A session that expires must sign in again to upload pending
+progress. Storage-blocked browsers can still play, but should keep the tab open
+until cloud saving succeeds.
+
+Guest progress is never assigned automatically. After signing in, choose
+**Import guest progress**, review the summary and confirm the replacement. This
+affects only the current trainer. The guest save remains available. Browser saves
+belong to their original host: to import an existing GitHub Pages save into the
+Vercel version, open Trainer on GitHub Pages and choose **Download guest progress**. On
+Vercel, sign in, open Trainer and choose **Import a progress file**, review the
+summary, and confirm. Signing in alone cannot read another site's localStorage.
+
+### Production setup
+
+1. Import `jekkiechan/pattern-game` into Vercel. `vercel.json` builds playable
+   assets into `public/` and serves the account API as a Node Function. No framework
+   conversion is needed. The repository root remains playable on GitHub Pages.
+2. Connect a Neon Postgres database through Vercel Marketplace (or an existing
+   Postgres database) and supply `DATABASE_URL`. Use the provider's TLS-enabled
+   pooled connection string. Never put it in browser code.
+3. Set `BETTER_AUTH_SECRET` to a random secret of at least 32 characters and
+   `BETTER_AUTH_URL` to the exact site's origin, e.g. `https://your-game.vercel.app`.
+   Auth uses Better Auth's username plugin, password hashing, session cookies and
+   database-backed rate limits. The library requires an internal email identifier;
+   the server generates a random `@trainer.invalid` value and never sends email.
+4. Link the project and run `vercel env pull .env.local`. With the real variables
+   present, run `npm run db:migrate` once before enabling accounts. It creates the
+   Better Auth schema plus progress, hashed recovery-code and rate-limit tables.
+   Run migrations again when changing auth plugins/schema. Do not run migrations
+   during the public build.
+5. Deploy and verify sign-up → code saved → battle → sign-out → another account →
+   sign-in on a separate device. Preview deployments need their own database and
+   exact `BETTER_AUTH_URL`; do not point previews at production account data.
+
+Without the server variables/schema, guest play still works and account actions
+explain that the service is unavailable. Only `build:site` enables the account
+client in the published HTML; the committed Pages HTML does not probe an API that
+Pages cannot serve. API responses are never cached. Progress endpoints use the
+authenticated session, expected trainer ID, parameterized SQL and optimistic
+revisions; another user's ID in the payload cannot select their save.
+
+### Account validation
+
+`npm run test:accounts` uses a real Postgres engine in WASM (PGlite), the production
+`pg` driver and Better Auth to check account isolation, revision conflicts,
+cross-origin rejection, single-use recovery, session revocation and rate limits.
+`node tests/account-server.mjs` starts an isolated in-memory account test server
+on port 8000; then run `python tests/accounts_check.py` for real browser flows,
+cross-device restoration, offline conflicts and mobile dialogs. These test tools
+never connect to production. CI requires both suites alongside existing checks.
+
 ## Run and build
 
 Serve this directory with `python -m http.server 8000`. The committed bundle runs without installing packages or contacting a CDN. To change Beybattle source, run `npm ci` and `npm run build` (Node 20+). Commit the rebuilt `assets/beybattle.js` alongside source changes. GitHub Pages publishes the repository root of `main`.

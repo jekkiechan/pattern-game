@@ -75,10 +75,49 @@ jobs:
             ${{ runner.temp }}/game-server.log
           retention-days: 14
 
+  accounts:
+    name: Trainer accounts / API and browser
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npm run test:accounts
+      - run: python -m pip install -r tests/requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Verify real account flows with local Postgres
+        env:
+          QA_OUTPUT: ${{ runner.temp }}/qa-accounts
+        run: |
+          node tests/account-server.mjs > "$RUNNER_TEMP/account-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8000/beybattle.html > /dev/null; then break; fi
+            sleep 1
+          done
+          python tests/accounts_check.py
+      - name: Upload account screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: qa-accounts
+          path: |
+            ${{ runner.temp }}/qa-accounts
+            ${{ runner.temp }}/account-server.log
+          retention-days: 14
+
   ci-passed:
     name: CI passed
     if: always()
-    needs: [build-and-test, browser]
+    needs: [build-and-test, browser, accounts]
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
@@ -86,6 +125,8 @@ jobs:
         env:
           BUILD_RESULT: ${{ needs.build-and-test.result }}
           BROWSER_RESULT: ${{ needs.browser.result }}
+          ACCOUNTS_RESULT: ${{ needs.accounts.result }}
         run: |
           test "$BUILD_RESULT" = success
           test "$BROWSER_RESULT" = success
+          test "$ACCOUNTS_RESULT" = success

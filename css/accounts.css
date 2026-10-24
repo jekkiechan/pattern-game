@@ -1,0 +1,18 @@
+#trainer-button{border:1px solid #b6a68566;border-radius:6px;padding:7px 10px;font:inherit;font-size:12px;color:inherit;background:transparent;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#trainer-status{display:block;font-size:12px;color:#b6a685;margin-top:8px;line-height:1.5}
+#trainer-dialog{width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto}
+#trainer-dialog h2{font-size:clamp(24px,5vw,34px);overflow-wrap:anywhere}
+#trainer-dialog p{line-height:1.6}
+#trainer-dialog label{display:grid;gap:6px;margin:16px 0;font-size:14px}
+#trainer-dialog label small{color:#b6a685;font-size:12px}
+#trainer-dialog input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #b6a68566;border-radius:6px;color:#f5efe2;background:#0a101c;font:inherit;font-size:16px}
+#trainer-dialog .button{white-space:normal;min-height:44px}
+.trainer-tabs{display:flex;flex-wrap:wrap;gap:16px;margin:20px 0}
+.trainer-tabs [aria-pressed=true]{color:#d3b97c;text-decoration:underline;text-underline-offset:5px}
+.trainer-actions{display:grid;gap:16px;margin:20px 0}
+.recovery-code{display:block;overflow-wrap:anywhere;user-select:all;background:#121c2c;padding:20px;margin:20px 0;font-size:18px;line-height:1.8;color:#e3c686}
+#account-message{color:#efc48e;overflow-wrap:anywhere}
+.save-conflict{border:1px solid #b6a68566;padding:16px;margin-top:16px}
+.save-choices{display:grid;gap:20px}.save-choices p{margin:6px 0 12px}
+.in-battle #trainer-button{display:none}
+@media(max-width:480px){#trainer-button{max-width:80px;min-width:0;min-height:44px;padding:6px;font-size:11px}.app-header{gap:4px;padding-inline:12px}.app-header nav{gap:4px;min-width:0}.app-header .game-brand{font-size:18px}.app-header .arcade-link>span:last-child{display:none}}
