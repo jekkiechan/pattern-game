@@ -59,6 +59,17 @@ export function createApp({database,auth,recovery,baseURL}){
     }catch(error){await database.query('INSERT INTO trainer_recovery (user_id,code_hash) VALUES ($1,$2) ON CONFLICT DO NOTHING',[user.id,candidate]);throw error;}
     return json({recoveryCode:code});
    }
+   if(path==='/api/trainer/bootstrap'&&request.method==='GET'){
+    const {response:session,headers}=await auth.api.getSession({headers:request.headers,returnHeaders:true});
+    let saves={};
+    if(session){
+     const result=await database.query('SELECT slot,data,revision FROM trainer_progress WHERE user_id=$1',[session.user.id]);
+     saves=Object.fromEntries(result.rows.map(row=>[row.slot,{data:row.data,revision:row.revision}]));
+    }
+    const response=json({user:session?publicUser(session.user):null,saves});
+    for(const cookie of headers.getSetCookie())response.headers.append('Set-Cookie',cookie);
+    return response;
+   }
    const session=await auth.api.getSession({headers:request.headers});
    if(!session)return json({error:'Sign in to save your trainer.'},401);
    // Reject a delayed request from a different trainer/tab, even if its cookie changed.

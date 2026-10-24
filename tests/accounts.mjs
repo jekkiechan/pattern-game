@@ -11,10 +11,11 @@ function player(){let cookie='',id;return {get id(){return id;},async request(pa
  const url=requestURL({url:'/api/trainer?__trainer_route='+encodeURIComponent(path)},base);
  const response=await fixture.handle(new Request(url,{method,headers:{origin:base,'content-type':'application/json',cookie,...(id?{'x-trainer-id':id}:{}),...extra},...(body?{body:JSON.stringify(body)}:{})}));
  for(const value of response.headers.getSetCookie()){const part=value.split(';')[0];const name=part.split('=')[0];cookie=cookie.split('; ').filter(c=>!c.startsWith(name+'=')).concat(part).filter(Boolean).join('; ');}
- const data=await response.json();if(data.user)id=data.user.id;return {status:response.status,data};
+ const data=await response.json();if(data.user)id=data.user.id;return {status:response.status,data,cookies:response.headers.getSetCookie()};
  }};}
 try{
  const nephew=player(),uncle=player(),anonymous=player();
+ assert.deepEqual((await anonymous.request('trainer/bootstrap')).data,{user:null,saves:{}});
  assert.equal((await anonymous.request('trainer/progress')).status,401);
  for(const [client,username,name] of [[nephew,'nephew','Nephew'],[uncle,'uncle','Uncle']]){
   const created=await client.request('auth/sign-up/email',{username,name,password:'spinning-tops-123'});assert.equal(created.status,200,JSON.stringify(created));
@@ -23,6 +24,10 @@ try{
  const duplicate=await anonymous.request('auth/sign-up/email',{username:'NEPHEW',name:'Copy',password:'spinning-tops-123'});assert.notEqual(duplicate.status,200);
  const save={slot:'beybattleLeague',revision:0,data:{wins:4,trophies:1,league:{medals:[3,2]}}};
  assert.equal((await nephew.request('trainer/progress',save,'PUT')).status,200);
+ const bootstrap=await nephew.request('trainer/bootstrap',null,'GET',{'x-trainer-id':uncle.id});
+ assert.equal(bootstrap.status,200);
+ assert.equal(bootstrap.data.user.id,nephew.id,'Bootstrap uses the session, not a supplied trainer ID');
+ assert.equal(bootstrap.data.saves.beybattleLeague.data.wins,4);
  assert.deepEqual((await uncle.request('trainer/progress')).data.saves,{});
  const wrongOwner=await uncle.request('trainer/progress',{...save,userId:nephew.id},'PUT',{'x-trainer-id':nephew.id});assert.equal(wrongOwner.status,409);
  const stale=await nephew.request('trainer/progress',{...save,data:{wins:0}},'PUT');assert.equal(stale.status,409);assert.equal(stale.data.current.data.wins,4);
@@ -50,6 +55,9 @@ try{
  assert.equal((await anonymous.request('trainer/recover',{username:'nephew',code:'wrong',password:'new-password-123'})).status,400);
  const recovered=await anonymous.request('trainer/recover',{username:'nephew',code,password:'new-password-123'});assert.equal(recovered.status,200,JSON.stringify(recovered));assert.notEqual(recovered.data.recoveryCode,code);
  assert.equal((await nephew.request('trainer/progress')).status,401,'Recovery revokes old sessions');
+ const revokedBootstrap=await nephew.request('trainer/bootstrap');
+ assert.deepEqual(revokedBootstrap.data,{user:null,saves:{}},'Bootstrap cannot restore a revoked session');
+ assert.ok(revokedBootstrap.cookies.some(cookie=>cookie.includes('session_token=')&&cookie.includes('Max-Age=0')),'Bootstrap clears a revoked session cookie');
  assert.equal((await anonymous.request('trainer/recover',{username:'nephew',code,password:'another-password'})).status,400,'Recovery codes are single use');
  assert.notEqual((await nephew.request('auth/sign-in/username',{username:'nephew',password:'spinning-tops-123'})).status,200);
  assert.equal((await nephew.request('auth/sign-in/username',{username:'NEPHEW',password:'new-password-123'})).status,200);
