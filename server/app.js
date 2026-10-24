@@ -1,5 +1,5 @@
 import {createHash,randomBytes,randomUUID,timingSafeEqual} from 'node:crypto';
-import {SLOTS,validateProgress} from '../src/beybattle/save-data.js';
+import {SLOTS,validateProgress} from '../src/shared/save-data.js';
 
 const json=(data,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 const hash=value=>createHash('sha256').update(value).digest('hex');

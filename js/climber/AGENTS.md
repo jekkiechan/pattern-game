@@ -8,6 +8,9 @@ Also read this guide for `beyblade-climber.html`, `css/climber.css` or stage ass
 - Keep classic JavaScript under `js/climber/`: configuration in `config.js`,
   state/input/progress in `state.js`, simulation in `engine.js`, drawing in
   `render.js`, and cached blade artwork in `art.js`.
+- `boot.js` awaits the shared arcade account before loading those classic scripts
+  in order. Read/write `climberSkybound` through `patternAccounts`; direct localStorage
+  access would bypass trainer isolation. Preserve the existing guest key and saves.
 - Preserve fixed 60 Hz simulation with interpolated rendering, cached art,
   offscreen culling and capped pixel density.
 - Preserve ten authored stages across five worlds, three flight styles (Comet,

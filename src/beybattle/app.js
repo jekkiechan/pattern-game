@@ -8,9 +8,8 @@ import {TrainerJourney} from './journey-ui.js';
 import {CHAPTERS} from './journey.js';
 import {SpecialEffects} from './special-effects.js';
 import {VisualTutorial,LESSONS,moveScene} from './tutorial.js';
-import {createTrainerAccounts} from './accounts.js';
 async function main(){
-const accounts=await createTrainerAccounts();
+const accounts=await window.patternAccountsReady;
 const $=id=>document.getElementById(id);
 const tutorial=new VisualTutorial($('help-dialog'));
 let shownPracticeStep=-1;

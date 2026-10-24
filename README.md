@@ -18,14 +18,17 @@ Both games and the arcade share self-hosted Noto Sans/Noto Serif typography, an 
 
 ## Trainer accounts on Vercel
 
-The Vercel build supports multiple private trainer accounts with a username,
-trainer name and password (8–128 characters). No email address is requested.
-Each account keeps its own League stars, wins, trophies, settings and Wind Road
-story progress. Skybound remains a separate device-local game. Guest play remains
-available without signing in, including on GitHub Pages.
+The arcade home page is the starting point for both games: choose **Create trainer**,
+**Sign in**, or **Play as a guest for now**. Signup asks only for a trainer name
+(used to sign in) and password (8–128 characters). No email is needed. Existing
+accounts keep their usernames and display names. Each trainer keeps separate
+Beybattle stars, wins, trophies and Wind Road progress, plus Skybound stages,
+medals, flight style and settings. The active trainer appears in each game header;
+the signed-in arcade shows progress in both games. Guest play remains available,
+including on GitHub Pages.
 
-Open **Trainer / Sign in** to create an account. Save the recovery code somewhere
-safe: it can reset the password without email. Recovery codes are stored only as
+After signup choose **Download my code** and ask a grown-up to keep the recovery
+code safe: it can reset the password without email. Recovery codes are stored only as
 hashes, work once, and are replaced after a reset. Password resets invalidate old
 sessions. A signed-in trainer can generate a replacement code using their current
 password. Switching trainers signs out and reloads the game; it also switches
@@ -35,18 +38,21 @@ Account saves sync automatically and restore on another signed-in device. Offlin
 play queues saves locally; keep the device's browser data until syncing finishes.
 The status below the home menu shows whether saves reached the cloud. Concurrent
 device edits require choosing **this device** or **cloud save** in Trainer before
-sync resumes. League and story saves resolve separately; keeping one version
+sync resumes. League, story and Skybound saves resolve separately; keeping one version
 replaces the other. A session that expires must sign in again to upload pending
 progress. Storage-blocked browsers can still play, but should keep the tab open
 until cloud saving succeeds.
 
 Guest progress is never assigned automatically. After signing in, choose
-**Import guest progress**, review the summary and confirm the replacement. This
+**Import guest progress**, review the summary, select individual saves and confirm. This
 affects only the current trainer. The guest save remains available. Browser saves
 belong to their original host: to import an existing GitHub Pages save into the
 Vercel version, open Trainer on GitHub Pages and choose **Download guest progress**. On
 Vercel, sign in, open Trainer and choose **Import a progress file**, review the
-summary, and confirm. Signing in alone cannot read another site's localStorage.
+summary, choose the saves to bring, and confirm. Existing account progress is
+not selected for replacement by default. The signed-in arcade offers to bring
+guest progress from this device. Older progress files with only League and story
+saves remain compatible. Signing in alone cannot read another site's localStorage.
 
 ### Production setup
 
@@ -62,8 +68,12 @@ summary, and confirm. Signing in alone cannot read another site's localStorage.
    Auth uses Better Auth's username plugin, password hashing, session cookies and
    database-backed rate limits. The library requires an internal email identifier;
    the server generates a random `@trainer.invalid` value and never sends email.
-4. Link the project and run `vercel env pull .env.local`. With the real variables
-   present, run `npm run db:migrate` once before enabling accounts. It creates the
+4. Run the included migration with server-side variables securely supplied. For
+   local development, link the project and pull Development variables into
+   `.env.local`, then run `npm run db:migrate`. Vercel does not return Production
+   Secret values from `env pull`; run a reviewed one-time migration in a trusted
+   server environment for production instead of printing or copying credentials.
+   The migration creates the
    Better Auth schema plus progress, hashed recovery-code and rate-limit tables.
    Run migrations again when changing auth plugins/schema. Do not run migrations
    during the public build.
@@ -73,7 +83,7 @@ summary, and confirm. Signing in alone cannot read another site's localStorage.
 
 Without the server variables/schema, guest play still works and account actions
 explain that the service is unavailable. Only `build:site` enables the account
-client in the published HTML; the committed Pages HTML does not probe an API that
+client on every published page; the committed Pages HTML does not probe an API that
 Pages cannot serve. API responses are never cached. Progress endpoints use the
 authenticated session, expected trainer ID, parameterized SQL and optimistic
 revisions; another user's ID in the payload cannot select their save.
@@ -85,12 +95,13 @@ revisions; another user's ID in the payload cannot select their save.
 cross-origin rejection, single-use recovery, session revocation and rate limits.
 `node tests/account-server.mjs` starts an isolated in-memory account test server
 on port 8000; then run `python tests/accounts_check.py` for real browser flows,
-cross-device restoration, offline conflicts and mobile dialogs. These test tools
+cross-device restoration in both games, offline conflicts, selective guest imports,
+two-field signup and mobile arcade/dialog layouts. These test tools
 never connect to production. CI requires both suites alongside existing checks.
 
 ## Run and build
 
-Serve this directory with `python -m http.server 8000`. The committed bundle runs without installing packages or contacting a CDN. To change Beybattle source, run `npm ci` and `npm run build` (Node 20+). Commit the rebuilt `assets/beybattle.js` alongside source changes. GitHub Pages publishes the repository root of `main`.
+Serve this directory with `python -m http.server 8000`. The committed bundles run without installing packages or contacting a CDN. To change game or shared account source, run `npm ci` and `npm run build` (Node 20+). Commit the rebuilt `assets/beybattle.js` and `assets/accounts.js` alongside source changes. GitHub Pages publishes the repository root of `main`.
 
 ## Visual learning
 

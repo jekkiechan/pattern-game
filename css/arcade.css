@@ -47,3 +47,23 @@ h2 { font: 500 38px/1.25 var(--font-display); letter-spacing: -.035em; margin: 1
   .bottom { display: block; line-height: 2; }.bottom span { font-size: 8px; letter-spacing: .06em; }
 }
 @media (prefers-reduced-motion: reduce) { .game, .play b { transition: none; }.game:hover .play b { transform: none; } }
+.arcade-nav{display:flex;align-items:center;gap:24px}
+.arcade-welcome{display:grid;grid-template-columns:1.3fr 1fr;gap:70px;align-items:center;padding-bottom:30px}
+.arcade-welcome h1{font-size:clamp(42px,5.5vw,70px);margin:22px 0}
+#welcome-copy{font-size:15px;color:var(--premium-muted);line-height:1.8;max-width:470px}
+.welcome-actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 0}
+.arcade-primary,.arcade-secondary{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:50px;padding:14px 20px;border:1px solid var(--premium-gold);border-radius:3px;font:600 13px var(--font-ui);text-decoration:none;cursor:pointer}
+.arcade-primary{background:#e6dab6;color:#142126}.arcade-secondary{background:transparent;color:var(--premium-text);border-color:var(--premium-line)}
+.arcade-text{border:0;background:transparent;color:var(--premium-muted);min-height:44px;padding:8px 0;font:inherit;font-size:12px;cursor:pointer}
+.arcade-text:hover{color:var(--premium-text)}#welcome-guest{margin:10px 0 0}#welcome-trainer{margin-top:24px}#welcome-trainer .arcade-text{display:block;margin-top:8px}
+.welcome-pass{position:relative;border:1px solid var(--premium-line);background:radial-gradient(ellipse at 70% 5%,#43534d60,#142327 70%);padding:34px;min-height:320px;overflow:hidden}
+.welcome-pass>p{font-size:9px;letter-spacing:.18em;color:var(--premium-gold)}.welcome-pass h2{font-size:30px;position:relative;margin:22px 0}.welcome-pass ul{padding:0;list-style:none;color:var(--premium-muted);font-size:13px;line-height:2.2;position:relative}.welcome-pass li::before{content:'✦';margin-right:10px;color:var(--premium-gold)}
+.pass-symbol{position:absolute;right:12px;top:0;font:240px/.9 var(--font-display);color:#cbb5890c}.pass-footer{display:block;border-top:1px solid var(--premium-line);padding-top:20px;margin-top:22px;font-size:9px;letter-spacing:.13em;color:var(--premium-gold)}.pass-footer i{padding:0 12px;font-style:normal}
+.games-heading{font-size:28px;margin:22px 0 0}.games{margin-top:22px}.game-copy .game-progress{min-height:42px;color:var(--premium-gold);font-size:11px;line-height:1.7;margin:14px 0 18px}
+button:disabled{opacity:.6;cursor:wait}
+@media(max-width:900px){.arcade-welcome{gap:30px}.welcome-actions{display:grid}.welcome-pass{padding:26px}.arcade-nav{gap:14px}}
+@media(max-width:760px){.arcade-welcome{grid-template-columns:1fr;gap:26px;padding-bottom:10px}.welcome-pass{min-height:0;padding:22px}.welcome-pass h2{font-size:24px;margin:14px 0}.welcome-pass ul{margin:10px 0}.pass-footer{margin-top:14px;padding-top:14px}.welcome-actions{display:flex}#welcome-copy{font-size:13px}.arcade-primary,.arcade-secondary{font-size:12px;padding-inline:16px}.games-heading{font-size:25px}.arcade-nav .guide{display:none}.game-copy .game-progress{min-height:0}}
+@media(max-width:370px){.welcome-actions{display:grid}.arcade-welcome h1{font-size:40px}.welcome-pass h2{font-size:23px}}
+
+.guest-progress-invite{border-left:2px solid var(--premium-gold);padding:8px 16px;margin-top:16px}.guest-progress-invite p{font-size:12px;color:var(--premium-muted);margin:0}
+.trainer-active .welcome-pass{display:none}.trainer-active .arcade-welcome{grid-template-columns:1fr;gap:0;padding-bottom:0}.trainer-active .arcade-welcome h1{font-size:clamp(36px,4vw,58px);overflow-wrap:anywhere}

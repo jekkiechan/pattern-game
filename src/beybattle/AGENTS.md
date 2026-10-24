@@ -10,7 +10,7 @@ Also read this guide for Beybattle HTML, CSS, assets or integration changes.
 | `engine.js` | Deterministic simulation; no DOM or Three.js dependency |
 | `roster.js` | Blade roles, visual motifs, normalized specials and arena rules |
 | `app.js` | Screens, input, persistence and battle integration |
-| `accounts.js` | Trainer UI, per-user local saves, cloud queue and explicit conflict resolution |
+| `../shared/accounts.js` | Arcade-wide trainer UI, isolated saves, cloud queue and conflict resolution |
 | `progression.js` | League unlocks, skill goals and saved best stars |
 | `models.js`, `renderer.js` | Detailed blade models; shared preview/battle rendering |
 | `fallback.js` | Playable Canvas 2D rendering |
@@ -40,6 +40,8 @@ The responsive interface lives in `css/league.css`; story styling also uses
   Guest keys must never become another trainer's defaults. Cloud writes carry
   the expected trainer ID and revision; preserve both checks. Account switching
   reloads the game. Server auth and database setup are documented in README.md.
+- Await the shared `patternAccountsReady` instance; do not create a second account
+  client inside the Beybattle bundle. The same trainer also owns Skybound progress.
 
 ## Trainer Journey — The Wind Road
 

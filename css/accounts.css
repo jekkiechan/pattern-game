@@ -1,6 +1,22 @@
+[hidden]{display:none!important}
 #trainer-button{border:1px solid #b6a68566;border-radius:6px;padding:7px 10px;font:inherit;font-size:12px;color:inherit;background:transparent;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #trainer-status{display:block;font-size:12px;color:#b6a685;margin-top:8px;line-height:1.5}
 #trainer-dialog{width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto}
+#trainer-dialog{box-sizing:border-box;padding:28px;background:radial-gradient(ellipse at 50% 0,#3b443b66,#142126 60%);color:#e9e7dd;border:1px solid #cbb58965;border-radius:4px;font-family:var(--font-ui);box-shadow:0 30px 100px #0008}
+#trainer-dialog::backdrop{background:#040a13dc;backdrop-filter:blur(5px)}
+#trainer-dialog h2{font-family:var(--font-display);font-weight:400;line-height:1.2;letter-spacing:-.03em;margin:12px 0 18px}
+#trainer-dialog p{font-size:13px;color:#b1c3c0;margin:12px 0}
+#trainer-dialog .eyebrow{font-size:10px;letter-spacing:2px;color:#cbb589;margin:0 36px 12px 0}
+#trainer-dialog .dialog-close{position:absolute;right:12px;top:12px;min-width:44px;min-height:44px;padding:0;border:0;background:transparent;color:#afc5cf;font-size:28px;cursor:pointer}
+#trainer-dialog .button{display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;padding:13px 18px;margin-top:16px;border:1px solid #cbb58980;border-radius:3px;background:#1b2c30;color:#e9e7dd;font:600 12px var(--font-ui);cursor:pointer}
+#trainer-dialog .button.primary{background:#e6dab6;color:#172327;border-color:#e6dab6}
+#trainer-dialog .text-button{border:0;background:transparent;color:#bfcec9;font:inherit;font-size:12px;padding:8px 4px;min-height:44px;cursor:pointer}
+#trainer-dialog :focus-visible,#trainer-button:focus-visible{outline:2px solid #e6dab6;outline-offset:3px}
+#trainer-dialog .password-visibility{display:flex;align-items:center;gap:8px;font-size:12px}
+#trainer-dialog .password-visibility input{width:18px;height:18px;margin:0;accent-color:#cbb589}
+#trainer-dialog .import-choice{display:flex;align-items:flex-start;gap:10px;padding:14px 0;border-bottom:1px solid #cbb58930}
+#trainer-dialog .import-choice input{width:20px;height:20px;flex-shrink:0;accent-color:#cbb589}
+#trainer-dialog .import-choice span{display:grid;gap:6px;font-size:13px}#trainer-dialog .import-choice small{font-size:11px;line-height:1.6}
 #trainer-dialog h2{font-size:clamp(24px,5vw,34px);overflow-wrap:anywhere}
 #trainer-dialog p{line-height:1.6}
 #trainer-dialog label{display:grid;gap:6px;margin:16px 0;font-size:14px}
@@ -10,9 +26,13 @@
 .trainer-tabs{display:flex;flex-wrap:wrap;gap:16px;margin:20px 0}
 .trainer-tabs [aria-pressed=true]{color:#d3b97c;text-decoration:underline;text-underline-offset:5px}
 .trainer-actions{display:grid;gap:16px;margin:20px 0}
+.trainer-game-summaries{display:grid;gap:12px;border-block:1px solid #cbb58940;padding:18px 0;margin:20px 0}
+.trainer-game-summaries div{display:grid;gap:5px}.trainer-game-summaries b{font-size:13px}.trainer-game-summaries span{font-size:12px;color:#b1c3c0}
+.trainer-status-strip{max-width:1260px;margin:auto;padding:0 24px}.trainer-status-strip #trainer-status{margin:8px 0 0}
+.in-game .trainer-status-strip,.in-game #trainer-button{display:none}
 .recovery-code{display:block;overflow-wrap:anywhere;user-select:all;background:#121c2c;padding:20px;margin:20px 0;font-size:18px;line-height:1.8;color:#e3c686}
 #account-message{color:#efc48e;overflow-wrap:anywhere}
 .save-conflict{border:1px solid #b6a68566;padding:16px;margin-top:16px}
 .save-choices{display:grid;gap:20px}.save-choices p{margin:6px 0 12px}
 .in-battle #trainer-button{display:none}
-@media(max-width:480px){#trainer-button{max-width:80px;min-width:0;min-height:44px;padding:6px;font-size:11px}.app-header{gap:4px;padding-inline:12px}.app-header nav{gap:4px;min-width:0}.app-header .game-brand{font-size:18px}.app-header .arcade-link>span:last-child{display:none}}
+@media(max-width:480px){#trainer-button{max-width:80px;min-width:0;min-height:44px;padding:6px;font-size:11px}.app-header{gap:4px;padding-inline:12px}.app-header nav{gap:4px;min-width:0}.app-header .game-brand{font-size:18px}.app-header .arcade-link>span:not(.pattern-symbol){display:none}.topbar .brand span,.topbar .sibling,.guide-play-link{display:none}.topbar{padding-inline:12px;gap:8px}.topbar nav{gap:5px}.topbar nav>button{padding-inline:7px;font-size:10px}.trainer-status-strip{padding-inline:22px}#trainer-dialog{padding:24px 20px}}

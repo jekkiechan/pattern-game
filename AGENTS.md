@@ -11,6 +11,7 @@ Scoped guides add local detail; they do not replace these shared principles.
 | Beybattle mechanics, UI, rendering or Trainer Journey | [src/beybattle/AGENTS.md](src/beybattle/AGENTS.md) |
 | Skybound stages, physics or controls | [js/climber/AGENTS.md](js/climber/AGENTS.md) |
 | Tests, balance, browser checks or CI | [tests/AGENTS.md](tests/AGENTS.md) |
+| Shared trainer accounts, arcade entry or game saves | [src/shared/AGENTS.md](src/shared/AGENTS.md) |
 
 Read these links explicitly when starting at the repository root; do not assume
 your tool automatically loads every nested guide. For shared HTML, CSS or assets,
@@ -64,6 +65,7 @@ current player experience, controls and detailed validation results.
 - In-game destructive resets require explicit confirmation and affect only the
   intended save. Keep mode saves and settings isolated as designed.
 - Edit Beybattle source, then rebuild and commit `assets/beybattle.js` with it.
+  Shared account source also rebuilds `assets/accounts.js`; commit both bundles.
   Never hand-edit that generated bundle. Update affected asset cache versions
   so returning players receive fixes. Shared typography is `css/premium.css`;
   self-hosted font licenses are in `assets/fonts/`.
