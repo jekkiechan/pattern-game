@@ -4,6 +4,8 @@ import {Match,STEP} from './engine.js';
 import {Display} from './renderer.js';
 import {Sound} from './audio.js';
 import {CanvasDisplay} from './fallback.js';
+import {TrainerJourney} from './journey-ui.js';
+import {CHAPTERS} from './journey.js';
 const $=id=>document.getElementById(id);
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
 const saved=read('beybattleLeague',{}),old=read('beybattleSave',{}),oldSettings=read('patternSettings',{});
@@ -22,6 +24,13 @@ try{display=new Display($('scene'),{low:options.low,motion:options.motion});}cat
 let screen='home',mode='duel',filter='starters',tierFilter='all',selected=options.player,arena=options.arena,rival=1,leagueTier=unlockedTier(options.league);
 let session=null,match=null,paused=false,acc=0,last=0,hudClock=0,launchClock=0,noticeTime=0,finishDelay=0,finishHandled=false,practiceStep=0;
 let pointerId=null,inspectX=0,keys=new Set(),practiceReturn='duel';
+const journey=new TrainerJourney($('journey-screen'),{battle:startJourneyBattle,home});
+function openJourney(){closeDialogs();paused=false;match=null;session=null;mode='journey';show('journey');}
+function startJourneyBattle(chapter,starter){
+ const c=CHAPTERS[chapter];mode='journey';selected=starter;arena=c.arena;rival=c.rival;sound.start();
+ session={mode,player:starter,rivals:[rival],stage:0,score:[0,0],round:1,won:false,duelComplete:false,stats:{},chapter,arena,difficulty:c.difficulty};
+ newRound();
+}
 function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,2700);}
 function portrait(id){return `assets/blades/${id}.webp`;}
 function chooseRival(){if(mode==='league'){rival=LEAGUE[leagueTier].rival;}else{const pool=ROSTER.filter(c=>c.id!==selected&&c.id!==rival);rival=pool[Math.floor(Math.random()*pool.length)].id;}updateRival();}
@@ -31,6 +40,7 @@ function show(next){
  document.body.classList.toggle('in-battle',next==='battle');keys.clear();cancelPointer();
  if(next==='home'){$('home-view').append($('scene'));display.select(selected);updateFeatured();updateRecord();}
  if(next==='league')renderLeague();
+ if(next==='journey')journey.open();
  if(next==='setup'){$('setup-view').append($('scene'));display.select(selected);renderCollection();updateInspector();updateRival();updateSettings();}
  if(next==='battle'){$('battle-view').prepend($('scene'));display.battle(match);updateHUD();}
  display.resize();acc=0;last=performance.now();window.scrollTo(0,0);
@@ -92,8 +102,9 @@ function newRound(){
  paused=false;closeDialogs();match=new Match(session.player,session.rivals[session.stage],{seed:Math.floor(Math.random()*1e8),arena:session.arena,difficulty:session.difficulty,practice:mode==='practice'});
  finishHandled=false;finishDelay=0;launchClock=0;practiceStep=0;$('launch-panel').hidden=false;$('coach').hidden=true;$('battle-announcement').textContent='';$('rival-warning').hidden=true;
  ['dash','guard','special'].forEach(name=>$(name+'-button').classList.remove('coach-focus'));
- $('match-label').textContent=mode==='practice'?'PRACTICE · NO LOSING':`${mode==='league'?LEAGUE[session.tier].name.toUpperCase()+' TIER':mode==='championship'?`CHAMPIONSHIP ${session.stage+1}/3`:'DUEL'} · ROUND ${session.round}`;
- $('battle-objective').hidden=mode!=='league';$('practice-tip').hidden=mode==='practice'||options.trained;
+ $('match-label').textContent=mode==='practice'?'PRACTICE · NO LOSING':`${mode==='journey'?CHAPTERS[session.chapter].place:mode==='league'?LEAGUE[session.tier].name.toUpperCase()+' TIER':mode==='championship'?`CHAMPIONSHIP ${session.stage+1}/3`:'DUEL'} · ROUND ${session.round}`;
+ $('battle-objective').hidden=!['league','journey'].includes(mode);$('practice-tip').hidden=mode==='practice'||mode==='journey'||options.trained;
+ if(mode==='journey')$('battle-objective').textContent=`${CHAPTERS[session.chapter].objective} Dash · Q / Guard · E / Special · Space`;
  $('arena-label').textContent=ARENAS.find(a=>a.id===arena).name.toUpperCase();show('battle');
 }
 function launch(auto=false){if(screen!=='battle'||match?.state!=='ready'||paused)return;sound.start();const phase=(Math.sin(launchClock*2.7)+1)/2;const quality=auto?.5:1-Math.abs(phase-.5)*2;match.launch(quality);$('launch-panel').hidden=true;
@@ -134,6 +145,8 @@ function updateHUD(){
 }
 function finishRound(){
  $('result-reward').hidden=true;
+ $('result-loadout').hidden=mode==='journey';
+ const resultBack=$('result-screen').querySelector('.back-home');resultBack.textContent=mode==='journey'?'Return to journey':'Back to home';resultBack.onclick=mode==='journey'?openJourney:home;
  if(mode==='practice'){
   options.trained=true;save();
   $('result-eyebrow').textContent='PRACTICE COMPLETE';$('result-title').textContent='You’re ready.';$('result-description').textContent='Dash, guard, special. You’ve got the basics. Now meet your first rival.';$('result-score').innerHTML='';$('result-tip').textContent='Watch your rival, not just your own blade. The orange warning is your cue to guard.';$('result-next').textContent=practiceReturn==='league'?'BACK TO YOUR LEAGUE TIER →':'PLAY A REAL DUEL →';$('result-next').onclick=()=>setup(practiceReturn);
@@ -161,6 +174,15 @@ function finishRound(){
     $('result-next').onclick=()=>{if(session.tier===8){match=null;show('league');}else{leagueTier=session.tier+1;setup('league');}};
    }else if(done){$('result-description').textContent='Your unlocked tiers and best stars are safe. Try this rival again with a fresh start.';$('result-next').textContent='TRY THIS TIER AGAIN →';}
   }
+  if(mode==='journey'&&done){
+   const chapter=session.chapter,c=CHAPTERS[chapter];
+   journey.complete(chapter,session.won);
+   $('result-eyebrow').textContent=c.place+' · '+(session.won?'Seal earned':'A chance to try again');
+   $('result-title').textContent=session.won?c.seal+' seal earned.':'The road is still yours.';
+   $('result-description').textContent=session.won?`${c.title} · Your partner and your story move forward.`:'Every trainer loses sometimes. Retry with full spin, or return to the map. Your earned seals are safe.';
+   $('result-next').textContent=session.won?'Continue the story →':'Try this duel again →';
+   $('result-next').onclick=session.won?openJourney:()=>startJourneyBattle(chapter,journey.state.starter);
+  }
  }
  $('result-emblem').innerHTML=`<img src="${portrait(selected)}" alt="${ROSTER[selected].name}">`;
  const s=session.duelComplete?session.stats:match.blades[0].stats;$('result-stats').innerHTML=[['DASH HITS',s.rushHits],['PERFECT GUARDS',s.perfects],['SPECIALS',s.specials]].map(([label,n])=>`<div><b>${n||0}</b><span>${label}</span></div>`).join('');
@@ -176,6 +198,7 @@ function home(){closeDialogs();paused=false;match=null;session=null;show('home')
 function warmup(){if(mode!=='practice')practiceReturn=mode==='league'?'league':'duel';setup('practice');startSession();}
 $('play-duel').onclick=()=>setup('duel');$('play-practice').onclick=()=>{practiceReturn='duel';setup('practice');};$('play-championship').onclick=()=>setup('championship');
 $('play-league').onclick=()=>show('league');$('league-map').onclick=e=>{const b=e.target.closest('[data-tier]');if(b&&!b.disabled){leagueTier=+b.dataset.tier;setup('league');}};
+$('play-journey').onclick=openJourney;
 $('tier-filter').innerHTML='<option value="all">All tiers</option>'+Object.entries(BLADE_TIERS).map(([key,tier])=>`<option value="${key}">${tier.label}</option>`).join('');
 $('tier-filter').onchange=e=>{tierFilter=e.target.value;filter='all';renderCollection();};
 $('practice-tip').onclick=warmup;
@@ -187,7 +210,7 @@ $('arena-options').onclick=e=>{const b=e.target.closest('[data-arena]');if(b){ar
 $('change-rival').onclick=chooseRival;$('start-match').onclick=startSession;$('bracket-next').onclick=newRound;
 $('launch-button').onclick=()=>launch();$('auto-launch').onclick=()=>launch(true);
 $('dash-button').onclick=()=>action('dash');$('guard-button').onclick=()=>action('guard');$('special-button').onclick=()=>action('special');
-$('pause-button').onclick=pause;$('resume-button').onclick=()=>{$('pause-dialog').close();paused=false;};$('quit-match').onclick=home;
+$('pause-button').onclick=pause;$('resume-button').onclick=()=>{$('pause-dialog').close();paused=false;};$('quit-match').onclick=()=>mode==='journey'?openJourney():home();
 $('settings-button').onclick=()=>openDialog('settings-dialog');$('help-button').onclick=()=>openDialog('help-dialog');
 $('pause-help').onclick=()=>{$('pause-dialog').close();openDialog('help-dialog');};$('help-practice').onclick=warmup;$('leave-practice').onclick=()=>setup(practiceReturn);$('result-loadout').onclick=()=>setup(mode);
 for(const dialog of document.querySelectorAll('dialog'))dialog.addEventListener('close',()=>{if(!document.querySelector('dialog[open]')){paused=false;acc=0;last=performance.now();}});
@@ -239,4 +262,4 @@ $('featured-switches').innerHTML=[0,2,31].map(id=>`<button data-id="${id}" aria-
 $('featured-switches').onclick=e=>{const b=e.target.closest('[data-id]');if(b){selected=+b.dataset.id;display.select(selected);updateFeatured();}};
 applyOptions();show('home');display.render(0);$('loading-note').hidden=true;requestAnimationFrame(frame);
 // Inspection surface for reproducible browser regression tests.
-window.__bey={get match(){return match;},get screen(){return screen;},get session(){return session;},get paused(){return paused;},get league(){return options.league;},display,roster:ROSTER,setup};
+window.__bey={get match(){return match;},get screen(){return screen;},get session(){return session;},get paused(){return paused;},get league(){return options.league;},get journey(){return structuredClone(journey.state);},display,roster:ROSTER,setup};

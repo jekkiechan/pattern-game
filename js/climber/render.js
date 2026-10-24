@@ -1,6 +1,6 @@
 // Canvas art is local, cached where useful, and independent of frame-rate physics.
 const bgStars=Array.from({length:45},(_,i)=>({x:(i*97.37)%W,y:(i*137.53)%900,r:i%3===0?1.5:.7}));
-function textAt(text,x,y,size,color,align='center'){ctx.font=`${size>15?'700':'600'} ${size}px Arial`;ctx.textAlign=align;ctx.fillStyle=color;ctx.fillText(text,x,y);}
+function textAt(text,x,y,size,color,align='center'){ctx.font=`${size>15?'700':'600'} ${size}px "Noto Sans", sans-serif`;ctx.textAlign=align;ctx.fillStyle=color;ctx.fillText(text,x,y);}
 function pill(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
 function drawBg(){
  const world=WORLDS[STAGES[currentStage].world],g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,world.sky[0]);g.addColorStop(1,world.sky[1]);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);

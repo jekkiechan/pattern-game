@@ -1,5 +1,5 @@
 """UI regression: Python Playwright + Chromium; serve repository on port 8000."""
-import json, os
+import json, os, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 BASE=os.environ.get('GAME_URL','http://127.0.0.1:8000')
@@ -18,7 +18,7 @@ def finish(page,winner):
 def launch(page):
  page.click('#auto-launch');page.wait_for_function('__bey.match.state==="playing"')
 with sync_playwright() as p:
- browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'])
+ browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'])
  page=browser.new_page(viewport={'width':1440,'height':1000});observe(page);load(page)
  page.screenshot(path=str(OUT/'desktop-home.png'))
  print('Roster and duel flow',flush=True)

@@ -1,18 +1,18 @@
 """Climber gameplay regression: serve repository on port 8000, then run with Python Playwright."""
-import json, os
+import json, os, shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 BASE=os.environ.get('GAME_URL','http://127.0.0.1:8000')
 OUT=Path(os.environ.get('QA_OUTPUT','/tmp/pattern-climber-qa'));OUT.mkdir(parents=True,exist_ok=True)
 with sync_playwright() as p:
- browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox'])
  page=browser.new_page(viewport={'width':1440,'height':1000});errors=[]
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(BASE+'/beyblade-climber.html');assert page.locator('[data-stage]').count()==10
  assert page.locator('[data-stage]:not([disabled])').count()==1
  page.click('[data-blade="nimbus"]');page.reload();assert page.locator('[data-blade="nimbus"]').get_attribute('aria-pressed')=='true'
  page.screenshot(path=str(OUT/'home-desktop.png'),full_page=True)
- page.click('#continue-button');page.keyboard.press('Space');assert page.evaluate('run.bursts')==1
+ page.click('#continue-button');page.keyboard.press('Space');page.wait_for_function('run.bursts===1')
  page.click('#climber-pause');before=page.evaluate('run.frames');page.wait_for_timeout(150);assert before==page.evaluate('run.frames')
  page.click('#climber-paused');page.evaluate("window.dispatchEvent(new Event('blur'))");assert page.evaluate('paused');page.click('#climber-paused')
  # A miss is a recoverable gameplay event: checkpoint, stars and burst survive it.

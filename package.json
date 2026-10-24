@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/beybattle/app.js --bundle --minify --format=esm --target=es2020 --outfile=assets/beybattle.js",
-    "test": "node tests/engine.mjs && node tests/balance.mjs --gate",
+    "test": "node tests/engine.mjs && node tests/journey.mjs && node tests/auto-merge.mjs && node tests/balance.mjs --gate",
     "test:balance": "node tests/balance.mjs"
   },
   "dependencies": {
