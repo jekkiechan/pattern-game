@@ -1,10 +1,15 @@
-import {readLeague} from './progression.js';
-import {readJourney} from './journey.js';
+import {readLeague} from '../beybattle/progression.js';
+import {readJourney} from '../beybattle/journey.js';
 
-export const SLOTS=['beybattleLeague','patternTrainerJourney'];
+export const SLOTS=['beybattleLeague','patternTrainerJourney','climberSkybound'];
 export function validateProgress(slot,value){
  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Invalid progress');
  if(slot==='patternTrainerJourney')return readJourney(value);
+ if(slot==='climberSkybound')return {
+  version:1,medals:Array.from({length:10},(_,i)=>Math.max(0,Math.min(7,Number(value.medals?.[i])|0))),
+  blade:['comet','nimbus','volt'].includes(value.blade)?value.blade:'comet',
+  sound:value.sound===true,reduced:value.reduced===true
+ };
  if(slot!=='beybattleLeague')throw new Error('Unknown save');
  const count=n=>Number.isSafeInteger(n)&&n>=0?Math.min(n,100000000):0;
  return {

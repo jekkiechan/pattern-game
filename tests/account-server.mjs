@@ -18,8 +18,9 @@ const server=createServer(async(req,res)=>{
    const cookies=response.headers.getSetCookie();if(cookies.length)res.setHeader('Set-Cookie',cookies);
    res.end(Buffer.from(await response.arrayBuffer()));return;
   }
-  const file=resolve(root,'.'+decodeURIComponent(new URL(req.url,base).pathname));if(!file.startsWith(root+sep)){res.statusCode=403;res.end();return;}
-  res.setHeader('Content-Type',types[extname(file)]||'application/octet-stream');let content=await readFile(file);if(file.endsWith('/beybattle.html'))content=content.toString().replace('name="trainer-service" content="disabled"','name="trainer-service" content="enabled"');res.end(content);
+  const path=decodeURIComponent(new URL(req.url,base).pathname);
+  const file=resolve(root,'.'+(path==='/'?'/index.html':path));if(!file.startsWith(root+sep)){res.statusCode=403;res.end();return;}
+  res.setHeader('Content-Type',types[extname(file)]||'application/octet-stream');let content=await readFile(file);if(file.endsWith('.html'))content=content.toString().replace('name="trainer-service" content="disabled"','name="trainer-service" content="enabled"');res.end(content);
  }catch{res.statusCode=404;res.end();}
 });
 server.listen(port,'127.0.0.1',()=>console.log(`Account test server ready: ${base}`));

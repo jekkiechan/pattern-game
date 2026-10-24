@@ -3,12 +3,13 @@ let camera=0,frameCount=0,starsCollected=0,starsTotal=0,paused=false,clearFlash=
 let checkpoint=null,run=null,toastFrames=0,coachFrames=0,actionPress=false,dropping=false;
 const keys={},held={left:false,right:false,drop:false};
 let touchX=null,arenaPointer=null,storageAvailable=true,audioContext=null;
-function readSave(){try{const v=JSON.parse(localStorage.getItem('climberSkybound')||'{}');return v&&typeof v==='object'?v:{};}catch{return {};}}
+const trainerStorage=window.patternAccounts;
+function readSave(){const value=trainerStorage.read('climberSkybound',{});return value&&typeof value==='object'?value:{};}
 const rawSave=readSave();
 const progress={version:1,medals:Array.from({length:10},(_,i)=>Math.max(0,Math.min(7,Number(rawSave.medals?.[i])|0))),blade:BLADES.some(b=>b.id===rawSave.blade)?rawSave.blade:'comet',sound:rawSave.sound===true,reduced:typeof rawSave.reduced==='boolean'?rawSave.reduced:matchMedia('(prefers-reduced-motion: reduce)').matches};
 function completed(){let n=0;while(n<10&&(progress.medals[n]&1))n++;return n;}
 let bestStage=completed();
-function saveProgress(){try{localStorage.setItem('climberSkybound',JSON.stringify(progress));}catch{storageAvailable=false;$('save-note').textContent='Saving is unavailable. Your progress lasts for this visit.';$('save-note').classList.add('storage-notice');}}
+function saveProgress(){storageAvailable=trainerStorage.write('climberSkybound',progress);if(!storageAvailable){$('save-note').textContent=trainerStorage.user?'Device saving is unavailable. Keep this tab open until your trainer syncs.':'Saving is unavailable. Your progress lasts for this visit.';$('save-note').classList.add('storage-notice');}}
 function sound(kind){if(!progress.sound)return;try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();audioContext.resume().catch(()=>{});const now=audioContext.currentTime;const tones=kind==='clear'?[523,659,784]:kind==='star'?[740,988]:kind==='burst'?[260,520]:kind==='checkpoint'?[440,660]:[380];tones.forEach((f,i)=>{const o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.setValueAtTime(f,now+i*.08);g.gain.setValueAtTime(.035,now+i*.08);g.gain.exponentialRampToValueAtTime(.001,now+i*.08+.16);o.connect(g);g.connect(audioContext.destination);o.start(now+i*.08);o.stop(now+i*.08+.17);});}catch{}}
 function announce(text){$('game-status').textContent=text;}
 function toast(text,frames=110){$('toast').textContent=text;$('toast').hidden=false;toastFrames=frames;announce(text);}
@@ -52,4 +53,5 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('keyup',e=>keys[e.code]=false);
 window.addEventListener('blur',()=>{clearInput();if(state==='playing')pauseClimber(true);});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')pauseClimber(true);});
+if(trainerStorage.user)$('save-note').textContent='Your stages and medals save with '+trainerStorage.user.name+'.';
 settingsUI();renderHome();

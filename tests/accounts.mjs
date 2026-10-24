@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import {accountFixture} from './account-fixture.mjs';
 import {requestURL} from '../server/request.js';
 
@@ -29,6 +30,19 @@ try{
  const story={version:1,name:'Nephew',starter:0,completed:2,choices:{},scene:null};
  assert.equal((await nephew.request('trainer/progress',{slot:'patternTrainerJourney',revision:0,data:story},'PUT')).status,200);
  assert.equal((await uncle.request('trainer/progress')).data.saves.patternTrainerJourney,undefined);
+ // Reproduce the deployed two-slot constraint before upgrading an existing database.
+ await fixture.database.query("ALTER TABLE trainer_progress DROP CONSTRAINT trainer_progress_slot_check; ALTER TABLE trainer_progress ADD CONSTRAINT trainer_progress_slot_check CHECK (slot IN ('beybattleLeague','patternTrainerJourney'))");
+ await fixture.database.query(await readFile(new URL('../server/schema.sql',import.meta.url),'utf8'));
+ const sky={version:1,medals:[7,1],blade:'nimbus',sound:true,reduced:false};
+ assert.equal((await nephew.request('trainer/progress',{slot:'climberSkybound',revision:0,data:sky},'PUT')).status,200);
+ const skySave=(await nephew.request('trainer/progress')).data.saves.climberSkybound;
+ assert.deepEqual(skySave.data.medals,[7,1,0,0,0,0,0,0,0,0]);
+ assert.equal((await uncle.request('trainer/progress')).data.saves.climberSkybound,undefined);
+ assert.equal((await nephew.request('trainer/progress',{slot:'climberSkybound',revision:0,data:{medals:[]}},'PUT')).status,409);
+ // Re-running the schema migration adds the slot without resetting old saves.
+ await fixture.database.query(await readFile(new URL('../server/schema.sql',import.meta.url),'utf8'));
+ assert.equal((await nephew.request('trainer/progress')).data.saves.beybattleLeague.data.wins,5);
+ assert.equal((await nephew.request('trainer/progress')).data.saves.climberSkybound.data.blade,'nimbus');
  assert.equal((await nephew.request('trainer/progress',{slot:'__proto__',revision:0,data:{}},'PUT')).status,400);
  assert.equal((await nephew.request('trainer/progress',save,'PUT',{origin:'https://evil.example'})).status,403);
  const codeResult=await nephew.request('trainer/recovery-code',{password:'spinning-tops-123'});assert.equal(codeResult.status,200,JSON.stringify(codeResult));const code=codeResult.data.recoveryCode;

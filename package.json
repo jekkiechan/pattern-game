@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild src/beybattle/app.js --bundle --minify --format=esm --target=es2020 --outfile=assets/beybattle.js",
+    "build": "esbuild src/beybattle/app.js --bundle --minify --format=esm --target=es2020 --outfile=assets/beybattle.js && esbuild src/shared/entry.js --bundle --minify --format=iife --target=es2020 --outfile=assets/accounts.js",
     "test": "node tests/engine.mjs && node tests/journey.mjs && node tests/auto-merge.mjs && node tests/balance.mjs --gate",
     "test:balance": "node tests/balance.mjs",
     "build:site": "npm run build && node scripts/build-site.mjs",
