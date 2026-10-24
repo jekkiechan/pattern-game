@@ -77,7 +77,7 @@ export class Display {
    let n=this.low?10:24;const tint=new T.Color('#ffd899');for(const p of this.particles){if(p.life>0)continue;const a=Math.random()*TAU;p.life=.25+Math.random()*.35;p.x=e.x;p.y=.45;p.z=e.z;const s=1+Math.random()*4;p.vx=Math.cos(a)*s;p.vz=Math.sin(a)*s;p.vy=2+Math.random()*2;p.color=tint;if(--n<=0)break;}
    this.ringFX(e.x,e.z,'#ffd7a0',.4,1.4);
   }
-  if(['special','block','rail'].includes(e.type)){const b=this.match.blades[e.i];this.ringFX(b.x,b.z,e.type==='block'?'#91d7ff':b.cfg.accent,.8,3);}
+  if(['special','block','rail','perfect','counter'].includes(e.type)){const b=this.match.blades[e.i];this.ringFX(b.x,b.z,['perfect','counter'].includes(e.type)?'#f5df87':e.type==='block'?'#91d7ff':b.cfg.accent,.8,3);}
  }
  ringFX(x,z,color,life,size){if(!this.motion)return;const fx=this.effects.find(e=>e.life<=0)||this.effects[0];fx.life=fx.max=life;fx.size=size;fx.mesh.position.set(x,.06,z);fx.mesh.material.color.set(color);}
  render(dt,alpha=1){
@@ -87,7 +87,7 @@ export class Display {
    this.impact=Math.max(0,this.impact-dt*.3);this.camera.position.x=this.motion?Math.sin(this.match.time*65)*this.impact:0;
    this.fighters.forEach((f,i)=>{const b=this.match.blades[i];f.root.position.set(T.MathUtils.lerp(b.px,b.x,alpha),0,T.MathUtils.lerp(b.pz,b.z,alpha));f.model.rotation.y=T.MathUtils.lerp(b.prevAngle,b.angle,alpha);
     const wobble=Math.max(0,(30-b.spin)/30);f.model.rotation.z=Math.sin(b.angle*.6)*wobble*.12;
-    f.ring.material.opacity=b.guard>0?.95:b.warning>0?.9:.45;f.ring.material.color.set(b.guard>0?'#e1f5ff':b.warning>0?'#ff7748':i?'#ff9b75':'#82caff');f.ring.scale.setScalar(b.guard>0?1.15:b.specialTime>0&&this.motion?1.2+Math.sin(b.specialTime*12)*.12:1);
+    f.ring.material.opacity=b.guard>0||b.counterReady>0?.95:b.warning>0?.9:.45;f.ring.material.color.set(b.counterReady>0?'#f5df87':b.guard>0?'#e1f5ff':b.warning>0?'#ff7748':i?'#ff9b75':'#82caff');f.ring.scale.setScalar(b.guard>0?1.15:b.specialTime>0&&this.motion?1.2+Math.sin(b.specialTime*12)*.12:1);
     f.model.position.y=.36+(b.specialTime>0&&this.motion?Math.sin(b.specialTime*5)*.04:0);
     if(this.match.state==='over'&&this.motion){if(this.match.winner===i){f.model.position.y+=Math.sin(Math.min(1,this.finishClock)*Math.PI)*.45;f.model.rotation.y+=this.finishClock*4;}else{f.model.rotation.z=Math.min(.38,this.finishClock*.5);}}
     f.trailPositions.copyWithin(3,0,69);f.trailPositions[0]=f.root.position.x;f.trailPositions[1]=.2;f.trailPositions[2]=f.root.position.z;

@@ -455,6 +455,17 @@ export const ARENAS = [
 ];
 export const STARTERS = [0,6,9,17];
 
+// Original collection tiers restored. League challenges bring their legends to life.
+export const BLADE_TIERS = {
+ NOVICE:{label:'Novice',color:'#9fbdc9'},APPRENTICE:{label:'Apprentice',color:'#86dcb5'},
+ ADVANCED:{label:'Advanced',color:'#72cafa'},ELITE:{label:'Elite',color:'#afabff'},
+ CHAMPION:{label:'Champion',color:'#ffbb74'},LEGENDARY:{label:'Legendary',color:'#f6d771'},
+ MYTHICAL:{label:'Mythical',color:'#ee9fdf'},TRANSCENDENT:{label:'Transcendent',color:'#a2e8ec'},
+ GOD:{label:'God',color:'#f8ebad'},UNKNOWN:{label:'Unknown',color:'#cdb6ff'}
+};
+const originalTiers=['CHAMPION','ELITE','ELITE','CHAMPION','ADVANCED','CHAMPION','ELITE','ADVANCED','ELITE','CHAMPION','ELITE','ADVANCED','ADVANCED','ELITE','LEGENDARY','NOVICE','APPRENTICE','ADVANCED','CHAMPION','MYTHICAL','MYTHICAL','TRANSCENDENT','TRANSCENDENT','LEGENDARY','ELITE','CHAMPION','MYTHICAL','LEGENDARY','LEGENDARY','LEGENDARY','TRANSCENDENT','GOD','UNKNOWN'];
+ROSTER.forEach((blade,i)=>blade.tier=originalTiers[i]);
+
 // Per-archetype ability budgets are calibrated by mirrored round-robin simulations.
 export const ABILITY_POWER = {
  attack:{drain:.92,rush:1.04,counter:.98}, defense:{guard:.90,counter:1.30}, stamina:{counter:1.20,drain:1.15}, balance:{mend:.85,chaos:.90}

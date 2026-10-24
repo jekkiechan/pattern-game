@@ -21,6 +21,7 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'])
  page=browser.new_page(viewport={'width':1440,'height':1000});observe(page);load(page)
  page.screenshot(path=str(OUT/'desktop-home.png'))
+ print('Roster and duel flow',flush=True)
  page.click('#play-duel');assert page.locator('.blade-card').count()==4
  page.click('[data-filter="all"]');assert page.locator('.blade-card').count()==33
  page.fill('#blade-search','not a blade');assert page.locator('#empty-search').is_visible()
@@ -41,9 +42,11 @@ with sync_playwright() as p:
  page.click('#result-next');launch(page);finish(page,0);assert page.evaluate('__bey.session.score')==[2,0]
  assert page.locator('#result-title').inner_text()=='Duel won!'
  page.click('#result-next');assert page.evaluate('__bey.session.score')==[0,0]
+ print('Model cache',flush=True)
  # All models build, thumbnails and GPU model cache remain bounded.
  page.evaluate("__bey.setup('duel')");page.evaluate('for(let i=0;i<33;i++)__bey.display.snapshot(i)')
  render=page.evaluate('__bey.display.stats()');assert render['models']<=8
+ print('Championship',flush=True)
  page.locator('#setup-screen .back-home').click();page.click('#play-championship');page.click('#start-match')
  assert page.locator('.bracket-rival').count()==3
  for stage in range(3):
@@ -58,15 +61,17 @@ with sync_playwright() as p:
   if stage<2:page.click('#result-next');screen(page,'bracket')
  assert page.locator('#result-title').inner_text()=='Champion!'
  assert page.evaluate("JSON.parse(localStorage.getItem('beybattleLeague')).trophies")==1
+ print('Practice',flush=True)
  # Practice actual actions; wait for warning and guard it, without injecting block stats.
  page.locator('#result-screen .back-home').click();page.click('#play-practice');page.locator('#match-settings summary').click() if not page.locator('#match-settings').evaluate('(el)=>el.open') else None;page.click('[data-difficulty="rookie"]');page.click('#start-match');launch(page);page.click('#dash-button')
  for attempt in range(20):
   if page.evaluate('__bey.match.blades[0].stats.guards')>0:break
-  page.wait_for_function('__bey.match.blades[1].warning>0 && __bey.match.blades[0].guardCD<=0',timeout=20000)
+  page.wait_for_function("document.getElementById('guard-button').classList.contains('incoming') && __bey.match.blades[0].guardCD<=0",timeout=20000)
   page.click('#guard-button');page.wait_for_timeout(1100)
  assert page.evaluate('__bey.match.blades[0].stats.guards')>0,'Practice guard instruction must be usable'
  page.wait_for_function('!document.getElementById("special-button").disabled');page.click('#special-button');screen(page,'result')
  assert page.locator('#result-eyebrow').inner_text()=='PRACTICE COMPLETE'
+ print('Phone and fallback',flush=True)
  # Phone touch and responsive layouts.
  phone=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=2,is_mobile=True,has_touch=True)
  mobile=phone.new_page();observe(mobile);load(mobile);mobile.screenshot(path=str(OUT/'mobile-home.png'))
@@ -84,16 +89,32 @@ with sync_playwright() as p:
  compat.add_init_script("const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return type.startsWith('webgl')?null:original.call(this,type,...args)}")
  load(compat);compat.click('#play-duel');compat.click('#start-match');launch(compat);compat.click('#dash-button');assert compat.evaluate('__bey.match.blades[0].stats.dashes')==1
  compat.screenshot(path=str(OUT/'compatibility.png'))
- # Climber remains responsive and fixed-step, and every stage has collectible targets.
- load(page,'beyblade-climber.html')
- climber=page.evaluate('''()=>{const raf=requestAnimationFrame;window.requestAnimationFrame=()=>0;const counts=[];
- for(const hz of [30,60,120]){state='title';actionPress=false;frameCount=0;lastTick=0;accumulator=0;paused=false;loop(1000);for(let i=1;i<=hz*2;i++)loop(1000+i*1000/hz);counts.push(frameCount)}
- window.requestAnimationFrame=raf;for(let i=0;i<10;i++){buildStage(i);if(collectStars.length!==starsTotal)throw Error('uncollectible targets')}startStage(0);return {counts,stages:STAGES.length}}''')
- assert max(climber['counts'])-min(climber['counts'])<=1
- page.click('#climber-pause');before=page.evaluate('frameCount');page.wait_for_timeout(150);assert before==page.evaluate('frameCount');page.click('#climber-paused')
+ # New tier run persists its first unlock; existing modes remain playable.
+ print('League progression',flush=True)
+ page.evaluate("()=>{const saved=JSON.parse(localStorage.getItem('beybattleLeague'));saved.trained=false;localStorage.setItem('beybattleLeague',JSON.stringify(saved));}")
+ load(page);page.click('#play-league');assert page.locator('[data-tier]:not([disabled])').count()==1
+ page.screenshot(path=str(OUT/'league-map.png'));page.click('[data-tier="0"]');page.click('#start-match')
+ assert page.locator('#battle-objective').is_visible()
+ page.click('#practice-tip');assert page.evaluate('__bey.session.mode')=='practice'
+ launch(page);page.click('#dash-button')
+ # Return flow is independent of skill scoring, covered by the real guard test above.
+ page.evaluate('()=>{const m=__bey.match;m.blades[0].stats.guards=1;m.blades[0].stats.specials=1;}')
+ screen(page,'result');page.click('#result-next');assert page.locator('#setup-mode').inner_text().startswith('NOVICE')
+ page.click('#start-match')
+ for rnd in range(2):
+  launch(page);finish(page,0)
+  if rnd==0:page.click('#result-next')
+ assert page.locator('#result-title').inner_text()=='Novice conquered!'
+ assert page.evaluate('__bey.league.medals[0]')>=1
+ page.reload();page.wait_for_function('window.__bey');page.click('#play-league');assert page.locator('[data-tier]:not([disabled])').count()==2
+ # Check restored blade rarity labels and filtering.
+ page.click('[data-tier="1"]');page.click('[data-filter="all"]');page.select_option('#tier-filter','GOD');assert page.locator('.blade-card').count()==1
+ assert 'GOD' in page.locator('.blade-card').inner_text()
+ # Climber has its own real-input route suite in climber_check.py.
+ climber={'suite':'tests/climber_check.py','stages':10}
  for path in ['index.html','how-to-play.html','beyblade-climber.html']:
   load(mobile,path);assert mobile.evaluate('document.documentElement.scrollWidth<=innerWidth');mobile.screenshot(path=str(OUT/(path+'.png')))
  assert not errors,errors
  assert not bad,bad
- report={'renderer':render,'climber':climber,'javascriptErrors':errors,'failedResources':bad,'checks':['roster/search','keyboard actions','pause/blur','round/duel/rematch','championship/trophy','practice real guard','touch controls','four viewport sizes','WebGL fallback','Climber timing/stages']}
+ report={'renderer':render,'climber':climber,'javascriptErrors':errors,'failedResources':bad,'checks':['roster/search','keyboard actions','pause/blur','round/duel/rematch','championship/trophy','practice real guard','touch controls','four viewport sizes','WebGL fallback','nine-tier progression/persistence','restored rarity filter','Climber responsive navigation']}
  (OUT/'report.json').write_text(json.dumps(report,indent=2));print(json.dumps(report));browser.close()
