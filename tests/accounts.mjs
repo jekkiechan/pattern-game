@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict';
 import {accountFixture} from './account-fixture.mjs';
+import {requestURL} from '../server/request.js';
 
 const base='http://localhost:8000',fixture=await accountFixture(base);
+assert.equal(requestURL({url:'/api/trainer?__trainer_route=auth%2Fget-session&disableCookieCache=true'},base).href,base+'/api/auth/get-session?disableCookieCache=true');
+assert.equal(requestURL({url:'/api/trainer',query:{__trainer_route:'auth/sign-up/email'}},base).pathname,'/api/auth/sign-up/email');
+assert.equal(requestURL({url:'/api/auth/get-session'},base).pathname,'/api/auth/get-session');
 function player(){let cookie='',id;return {get id(){return id;},async request(path,body,method=body?'POST':'GET',extra={}){
- const response=await fixture.handle(new Request(base+'/api/'+path,{method,headers:{origin:base,'content-type':'application/json',cookie,...(id?{'x-trainer-id':id}:{}),...extra},...(body?{body:JSON.stringify(body)}:{})}));
+ const url=requestURL({url:'/api/trainer?__trainer_route='+encodeURIComponent(path)},base);
+ const response=await fixture.handle(new Request(url,{method,headers:{origin:base,'content-type':'application/json',cookie,...(id?{'x-trainer-id':id}:{}),...extra},...(body?{body:JSON.stringify(body)}:{})}));
  for(const value of response.headers.getSetCookie()){const part=value.split(';')[0];const name=part.split('=')[0];cookie=cookie.split('; ').filter(c=>!c.startsWith(name+'=')).concat(part).filter(Boolean).join('; ');}
  const data=await response.json();if(data.user)id=data.user.id;return {status:response.status,data};
  }};}

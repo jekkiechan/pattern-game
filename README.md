@@ -51,7 +51,8 @@ summary, and confirm. Signing in alone cannot read another site's localStorage.
 ### Production setup
 
 1. Import `jekkiechan/pattern-game` into Vercel. `vercel.json` builds playable
-   assets into `public/` and serves the account API as a Node Function. No framework
+   assets into `public/` and explicitly rewrites `/api/:path*` to the account Node
+   Function (`api/trainer.js`). No framework
    conversion is needed. The repository root remains playable on GitHub Pages.
 2. Connect a Neon Postgres database through Vercel Marketplace (or an existing
    Postgres database) and supply `DATABASE_URL`. Use the provider's TLS-enabled
