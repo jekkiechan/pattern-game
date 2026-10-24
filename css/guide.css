@@ -1,0 +1,23 @@
+body{overflow:auto}
+.guide{max-width:950px;margin:0 auto;padding:45px 25px 80px}
+.guide h1{font-size:clamp(38px,6vw,64px);letter-spacing:-2px;line-height:1.18;margin:18px 0 25px}
+.guide-intro,.guide section>p{color:var(--premium-muted);line-height:1.7;max-width:600px}
+.guide-tabs{display:flex;gap:14px;margin:30px 0}
+.guide-tabs a{padding:12px 17px;border:1px solid var(--premium-line);border-radius:7px;text-decoration:none;font-size:14px}
+.guide section{scroll-margin-top:25px;margin:48px 0}
+.guide h2{font-size:30px;letter-spacing:-.5px;margin:12px 0}
+.guide h3{font-size:17px;margin:18px 0 12px}
+.guide .tutorial-grid{margin-top:24px}
+.guide .button{display:inline-flex;margin-top:24px}
+.guide a{color:var(--premium-gold)}
+.guide details{margin-top:28px;padding:18px;border:1px solid var(--premium-line);border-radius:8px}
+.guide summary{cursor:pointer;font-size:14px;line-height:1.6;min-height:44px;align-content:center;color:var(--premium-gold)}
+.guide details p,.guide li{font-size:13px;line-height:1.8;color:var(--premium-muted)}
+.guide li{padding:5px 0}.guide ol{padding-left:24px}
+.guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.guide-box{padding:16px;background:var(--premium-panel);border:1px solid var(--premium-line);border-radius:8px}
+.guide table{width:100%;border-collapse:collapse;background:var(--premium-panel);font-size:12px;margin:20px 0;table-layout:fixed}
+.guide td,.guide th{padding:10px;border:1px solid var(--premium-line);text-align:left;line-height:1.6;overflow-wrap:anywhere;color:var(--premium-muted)}
+.guide-note{border-left:2px solid var(--premium-gold);padding:12px}
+.guide :focus-visible{outline:3px solid var(--premium-gold);outline-offset:4px}
+@media(max-width:600px){.guide{padding:28px 16px 60px}.guide h2{font-size:26px}.guide-grid{grid-template-columns:1fr}.guide details{padding:12px}.guide td,.guide th{padding:7px;font-size:11px}}

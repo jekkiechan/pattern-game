@@ -1,0 +1,82 @@
+/* Four-second examples: cue, action, result, then a quiet reset. */
+move-demo{display:block;min-width:0;--demo-blue:#a6dfe6;--demo-orange:#ffb184;--demo-gold:#efd294}
+.move-demo{margin:0;padding:18px;background:#172e34;border:1px solid #54706b;border-radius:8px;color:#f3eedf;height:100%;box-sizing:border-box}
+.move-demo figcaption{display:flex;flex-direction:column;gap:6px;min-height:62px}
+.move-demo figcaption b{font:500 23px var(--font-display,serif);color:#f3eedf}
+.move-demo figcaption span{font:13px/1.5 var(--font-body,sans-serif);color:#c5d6cf}
+.move-demo svg{display:block;width:100%;height:auto;max-height:165px;overflow:hidden}
+.move-demo svg text{fill:#d7e6de;font:700 11px var(--font-body,sans-serif);letter-spacing:.5px}
+.demo-arena{fill:#0e2229;stroke:#658481;stroke-width:2}
+.demo-path{fill:none;stroke:#71918c;stroke-width:2;stroke-dasharray:4 6}
+.demo-player{color:var(--demo-blue)}.demo-rival{color:var(--demo-orange)}
+.demo-spin>path:first-child{fill:currentColor;stroke:#f0eee0;stroke-width:1.5}
+.demo-spin circle{fill:#19313c;stroke:currentColor;stroke-width:3}
+.demo-spin>path:last-child{fill:currentColor}
+.demo-spin{animation:demo-spin 1.8s linear infinite}
+.demo-hit{fill:var(--demo-gold);opacity:0;animation:demo-hit 4s infinite}
+.demo-shield{fill:#a6dfe622;stroke:var(--demo-blue);stroke-width:5;stroke-dasharray:9 4;opacity:0;animation:demo-shield 4s infinite}
+.demo-warning{fill:var(--demo-orange)!important;opacity:0;animation:demo-warning 4s infinite}
+.demo-track{fill:#081d24;stroke:#658481}
+.demo-blue{fill:#6299c5}
+.demo-marker{stroke:#fff7df;stroke-width:5;animation:demo-marker 4s infinite}
+.demo-energy{fill:none;stroke:var(--demo-gold);stroke-width:8;stroke-dasharray:208;stroke-dashoffset:208;animation:demo-energy 4s infinite}
+.demo-wave{fill:#efd29422;stroke:var(--demo-gold);stroke-width:4;opacity:0;animation:demo-wave 4s infinite}
+.demo-success{fill:var(--demo-gold)!important;opacity:0;animation:demo-success 4s infinite}
+.demo-platform{fill:none;stroke:#84bbb0;stroke-width:8;stroke-linecap:round}
+.demo-centers{fill:none;stroke:var(--demo-gold);stroke-width:8}
+.demo-tap{opacity:0;animation:demo-tap 4s infinite}.demo-tap circle{fill:#f0e8d7;stroke:#0b2028;stroke-width:2}.demo-tap path{fill:none;stroke:#0b2028;stroke-width:2}
+.demo-dash .demo-player{animation:demo-dash 4s infinite}
+.demo-guard .demo-rival{animation:demo-rush 4s infinite}
+.demo-guard .demo-hit{animation-delay:.45s}
+.demo-guard .demo-tap,.demo-special .demo-tap,.demo-launch .demo-tap{animation-delay:.75s}
+.demo-steer .demo-player,.demo-charge .demo-player{animation:demo-hop 4s infinite}
+.demo-burst .demo-player{animation:demo-burst 4s infinite}
+.demo-burst .demo-energy{stroke-dasharray:130;stroke-dashoffset:0;animation:demo-spend 4s infinite}
+.demo-charge .demo-energy{stroke-dasharray:130;animation:demo-charge 4s infinite}
+.demo-drop .demo-player{animation:demo-drop 4s infinite}
+.demo-footer{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:8px}
+.demo-footer>span{font:11px/1.4 var(--font-body,sans-serif);color:#c4d7d2;flex:1 0 auto}
+.demo-footer button{min-height:44px;padding:6px 8px;border:1px solid #69817b;border-radius:5px;color:#f3eedf;background:#203c42;font:12px var(--font-body,sans-serif);cursor:pointer}
+.demo-footer button:focus-visible{outline:3px solid var(--demo-gold);outline-offset:3px}
+.demo-paused .move-demo *{animation-play-state:paused!important}
+.demo-restarting .move-demo *{animation:none!important}
+.tutorial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#help-dialog{max-width:720px}#help-dialog .tutorial-grid{margin:20px 0}#help-dialog h2{margin-bottom:10px}
+.tutorial-compact .move-demo{padding:6px 10px;border:0;background:none}
+.tutorial-compact figcaption{display:none}.tutorial-compact svg{height:64px;width:120px;max-height:none}
+.tutorial-compact .demo-footer{margin:0;justify-content:center}.tutorial-compact .demo-footer>span,.tutorial-compact .demo-replay{display:none}
+.tutorial-compact .demo-footer button{font-size:10px;min-height:44px;padding:2px 7px}
+.coach>div{min-width:0}.coach .tutorial-compact{flex-shrink:0}.coach .text-button{margin-left:auto}
+.how-demos{margin:32px 0 18px;grid-template-columns:repeat(3,minmax(0,1fr))}
+@keyframes demo-spin{to{transform:rotate(360deg)}}
+@keyframes demo-dash{0%,22%,90%,100%{transform:translateX(0)}42%,70%{transform:translateX(108px)}}
+@keyframes demo-rush{0%,27%,90%,100%{transform:translateX(0)}52%,68%{transform:translateX(-94px)}}
+@keyframes demo-hit{0%,40%,67%,100%{opacity:0;transform:scale(.6)}46%,57%{opacity:1;transform:scale(1)}}
+@keyframes demo-shield{0%,36%,82%,100%{opacity:0}44%,70%{opacity:1}}
+@keyframes demo-warning{0%,8%,65%,100%{opacity:0}15%,47%{opacity:1}}
+@keyframes demo-energy{0%,8%,100%{stroke-dashoffset:208}43%,73%{stroke-dashoffset:0}}
+@keyframes demo-wave{0%,44%,87%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}77%{opacity:0;transform:scale(5.5)}}
+@keyframes demo-marker{0%,100%{transform:translateX(0)}46%,69%{transform:translateX(114px)}90%{transform:translateX(228px)}}
+@keyframes demo-success{0%,46%,94%,100%{opacity:0}52%,82%{opacity:1}}
+@keyframes demo-tap{0%,20%,43%,100%{opacity:0}26%,36%{opacity:1}}
+@keyframes demo-hop{0%,5%,100%{transform:translate(0,0)}23%{transform:translate(44px,-85px)}42%{transform:translate(86px,-36px)}62%{transform:translate(132px,-86px)}80%,92%{transform:translate(178px,-62px)}}
+@keyframes demo-charge{0%,5%,100%{stroke-dashoffset:130}8%,35%{stroke-dashoffset:85}43%,73%{stroke-dashoffset:40}80%,94%{stroke-dashoffset:0}}
+@keyframes demo-burst{0%,100%{transform:translate(0,0)}20%{transform:translate(35px,-50px)}34%{transform:translate(66px,-25px)}55%{transform:translate(122px,-86px)}80%,92%{transform:translate(178px,-62px)}}
+@keyframes demo-spend{0%,34%,100%{stroke-dashoffset:0}40%,92%{stroke-dashoffset:130}}
+@keyframes demo-drop{0%,20%,100%{transform:translateY(0)}65%,90%{transform:translateY(73px)}}
+@media(max-width:600px){.tutorial-grid,.how-demos{grid-template-columns:1fr}.move-demo{padding:14px}.move-demo figcaption{min-height:0}.coach .tutorial-compact svg{width:94px;height:50px}.coach .tutorial-compact .move-demo{padding:0}.coach{gap:8px}}
+@media(max-height:540px) and (orientation:landscape){.coach{width:300px;display:flex;bottom:70px}.coach .tutorial-compact svg{width:90px;height:48px}.coach .tutorial-compact .demo-footer button{min-height:44px}.coach .text-button{display:block}}
+/* Static fallback positions also form the reduced-motion illustrations. */
+.demo-dash .demo-player{transform:translateX(108px)}
+.demo-guard .demo-rival{transform:translateX(-94px)}
+.demo-steer .demo-player,.demo-charge .demo-player,.demo-burst .demo-player{transform:translate(178px,-62px)}
+.demo-drop .demo-player{transform:translateY(73px)}
+.demo-marker{transform:translateX(114px)}
+.demo-hit,.demo-shield,.demo-warning,.demo-success,.demo-tap{opacity:1}
+.demo-wave{opacity:.65;transform:scale(3)}
+.demo-energy{stroke-dashoffset:0}
+.demo-burst .demo-energy{stroke-dashoffset:130}
+/* Freeze meaningful action poses instead of leaving empty first frames. */
+.reduced-motion .move-demo *{animation:none!important}
+.reduced-motion .demo-toggle,.reduced-motion .demo-replay{display:none}
+@media(prefers-reduced-motion:reduce){.move-demo *{animation:none!important}.demo-toggle,.demo-replay{display:none}}

@@ -22,6 +22,8 @@ Serve this directory with `python -m http.server 8000`. The committed bundle run
 
 ## Controls and mobile
 
+The **Watch & play** guide (`how-to-play.html`) teaches both games with short, animated examples. Beybattle's help and three-step Practice use the same demonstrations; Skybound's home screen shows steering, center-land charge and Burst. Each example has Pause/Play and Replay controls. Reduced motion (system preference or the game's setting) shows a labeled still illustration. Detailed rules stay in optional, collapsed reference sections. The demos use self-hosted SVG/CSS and no video downloads. Run `python tests/tutorial_check.py` against the local server to verify playback, stills, responsive help and the help-to-Practice flow.
+
 - Launch: press Launch in the blue zone / Space for 14 starting energy, or skip timing for a standard launch.
 - Dash: button / Q. Guard: button / E. A guard timed within 0.35 seconds of an incoming rush or special blocks 90% and opens a 1.8-second counter-dash window; a landed counter adds 3 damage. Special: one tap / Space when energy is full.
 - Blades move automatically. Optionally hold the stadium or use arrows / WASD to steer.

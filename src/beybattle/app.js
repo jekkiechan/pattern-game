@@ -115,11 +115,11 @@ function action(type){if(screen!=='battle'||!match||paused||match.state!=='playi
 }
 function coach(){
  const b=match.blades[0];
- if(practiceStep===0&&b.stats.dashes>0){practiceStep=1;toast('Nice dash. Now watch for the orange rush warning.');}
+ if(practiceStep===0&&b.stats.dashes>0){practiceStep=1;toast('Nice dash! Next: block a rush.');}
  if(practiceStep===1&&b.stats.guards>0){practiceStep=2;b.energy=100;toast('Blocked! Your special is ready.');}
  if(practiceStep===2&&b.stats.specials>0){practiceStep=3;finishDelay=.9;finishHandled=true;announce('YOU’VE GOT THIS!',.9);return;}
- const steps=[['Dash into your rival.','Tap Dash. Your blade aims at your rival automatically.'],['Guard the incoming rush.','Wait for “GUARD NOW”, then tap Guard to block the hit.'],['Unleash your signature move.','Tap the gold Special button. One tap is all it takes.']];
- if(practiceStep<3){$('coach-progress').textContent=`0${practiceStep+1} OF 03`;$('coach-title').textContent=steps[practiceStep][0];$('coach-copy').textContent=steps[practiceStep][1];}
+ const steps=[['Tap Dash!','Q / Dash'],['Orange rush? Tap Guard!','E / Guard'],['Gold bar full. Tap Special!','Space / Special']];
+ if(practiceStep<3){const move=['dash','guard','special'][practiceStep];if($('coach-demo').getAttribute('move')!==move)$('coach-demo').setAttribute('move',move);$('coach-progress').textContent=`0${practiceStep+1} OF 03`;$('coach-title').textContent=steps[practiceStep][0];$('coach-copy').textContent=steps[practiceStep][1];}
  ['dash','guard','special'].forEach((name,i)=>$(name+'-button').classList.toggle('coach-focus',i===practiceStep));
 }
 function updateHUD(){
