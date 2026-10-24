@@ -18,6 +18,7 @@ follow the current workflow for additional suites as the project evolves.
 | Skybound | `python tests/climber_check.py` |
 | Shared HTML/CSS/assets | Browser suites for every affected game/mode; review screenshots |
 | CI or merge policy | `node tests/auto-merge.mjs` and affected workflow checks |
+| Accounts/persistence | `npm run test:accounts`, then `node tests/account-server.mjs` and `python tests/accounts_check.py`; also Beybattle and journey suites |
 | Instruction-only documentation | Check paths, commands, scope and consistency; gameplay tests are unnecessary |
 
 `npm test` runs engine, journey, auto-merge policy and the default balance gate.

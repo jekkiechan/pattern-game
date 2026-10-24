@@ -8,16 +8,19 @@ import {TrainerJourney} from './journey-ui.js';
 import {CHAPTERS} from './journey.js';
 import {SpecialEffects} from './special-effects.js';
 import {VisualTutorial,LESSONS,moveScene} from './tutorial.js';
+import {createTrainerAccounts} from './accounts.js';
+async function main(){
+const accounts=await createTrainerAccounts();
 const $=id=>document.getElementById(id);
 const tutorial=new VisualTutorial($('help-dialog'));
 let shownPracticeStep=-1;
-function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
+function read(key,fallback){return accounts.read(key,fallback);}
 const saved=read('beybattleLeague',{}),old=read('beybattleSave',{}),oldSettings=read('patternSettings',{});
 const options={sound:saved.sound??oldSettings.sound??true,motion:saved.motion??!matchMedia('(prefers-reduced-motion: reduce)').matches,
  low:saved.low??false,difficulty:['rookie','challenger','expert'].includes(saved.difficulty)?saved.difficulty:'rookie',
  player:Number.isInteger(saved.player)&&ROSTER[saved.player]?saved.player:0,arena:ARENAS.some(a=>a.id===saved.arena)?saved.arena:'stadium',
  wins:Number(saved.wins)||0,trophies:Math.max(Number(saved.trophies)||0,Number(old.wins)||0),league:readLeague(saved.league),trained:!!saved.trained};
-function save(){try{localStorage.setItem('beybattleLeague',JSON.stringify(options));}catch{}}
+function save(){accounts.write('beybattleLeague',options);}
 const sound=new Sound(options.sound);
 let display;
 try{display=new Display($('scene'),{low:options.low,motion:options.motion});}catch(error){
@@ -29,7 +32,7 @@ const specialEffects=new SpecialEffects($('battle-view'),display,options);
 let screen='home',mode='duel',filter='starters',tierFilter='all',selected=options.player,arena=options.arena,rival=1,leagueTier=unlockedTier(options.league);
 let session=null,match=null,paused=false,acc=0,last=0,hudClock=0,launchClock=0,noticeTime=0,finishDelay=0,finishHandled=false,practiceStep=0;
 let pointerId=null,inspectX=0,keys=new Set(),practiceReturn='duel';
-const journey=new TrainerJourney($('journey-screen'),{battle:startJourneyBattle,home});
+const journey=new TrainerJourney($('journey-screen'),{battle:startJourneyBattle,home,storage:accounts});
 function openJourney(){closeDialogs();paused=false;match=null;session=null;mode='journey';show('journey');}
 function startJourneyBattle(chapter,starter){
  const c=CHAPTERS[chapter];mode='journey';selected=starter;arena=c.arena;rival=c.rival;sound.start();
@@ -166,7 +169,7 @@ function finishRound(){
  }else{
   const winner=match.winner;if(winner!==null)session.score[winner]++;addStats(session.stats,match.blades[0].stats);
   const done=session.score.some(s=>s>=2);session.duelComplete=done;session.won=session.score[0]>=2;
-  if(done&&session.won){options.wins++;if(mode==='championship'&&session.stage===2){options.trophies++;const legacy=read('beybattleSave',{});try{localStorage.setItem('beybattleSave',JSON.stringify({...legacy,wins:options.trophies,lastWinChar:ROSTER[selected].name}));}catch{}}save();}
+  if(done&&session.won){options.wins++;if(mode==='championship'&&session.stage===2){options.trophies++;const legacy=read('beybattleSave',{});accounts.write('beybattleSave',{...legacy,wins:options.trophies,lastWinChar:ROSTER[selected].name});}save();}
   $('result-eyebrow').textContent=done?(mode==='championship'&&session.won&&session.stage===2?'CHAMPIONSHIP COMPLETE':'DUEL COMPLETE'):match.reason.toUpperCase();
   $('result-title').textContent=done?(session.won?(mode==='championship'&&session.stage===2?'Champion!':'Duel won!'):'Good battle.'):(winner===null?'Evenly matched.':winner===0?'Round won.':'Rival takes the round.');
   $('result-description').textContent=done?(session.won?'You read the battle and made your moves count.':'Your next attempt starts fresh. Every round is a chance to find your timing.'):(winner===null?'Both blades finished together. Replay this round.':`First to two wins. ${winner===0?'Keep your momentum.':'You can turn this around.'}`);
@@ -278,3 +281,6 @@ $('featured-switches').onclick=e=>{const b=e.target.closest('[data-id]');if(b){s
 applyOptions();show('home');display.render(0);$('loading-note').hidden=true;requestAnimationFrame(frame);
 // Inspection surface for reproducible browser regression tests.
 window.__bey={get match(){return match;},get screen(){return screen;},get session(){return session;},get paused(){return paused;},get league(){return options.league;},get journey(){return structuredClone(journey.state);},display,roster:ROSTER,setup};
+
+}
+main().catch(error=>{console.error('Game startup failed',error);document.getElementById('loading-note').textContent='Could not start the game. Please reload.';});

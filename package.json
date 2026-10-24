@@ -5,12 +5,19 @@
   "scripts": {
     "build": "esbuild src/beybattle/app.js --bundle --minify --format=esm --target=es2020 --outfile=assets/beybattle.js",
     "test": "node tests/engine.mjs && node tests/journey.mjs && node tests/auto-merge.mjs && node tests/balance.mjs --gate",
-    "test:balance": "node tests/balance.mjs"
+    "test:balance": "node tests/balance.mjs",
+    "build:site": "npm run build && node scripts/build-site.mjs",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "test:accounts": "node tests/accounts.mjs"
   },
   "dependencies": {
+    "better-auth": "^1.7.12",
+    "pg": "^8.23.1",
     "three": "0.180.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
+    "@electric-sql/pglite-socket": "^0.2.14",
     "esbuild": "0.25.11"
   }
 }

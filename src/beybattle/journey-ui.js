@@ -6,14 +6,14 @@ const PORTRAITS={sora:[0,0],ren:[1,0],mio:[2,0],aki:[3,0],yuki:[0,1],kaede:[1,1]
 const title=value=>value.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
 
 export class TrainerJourney {
- constructor(root,{battle,home}){
-  this.root=root;this.battle=battle;this.home=home;this.storageOK=true;
-  try{this.state=readJourney(JSON.parse(localStorage.getItem(JOURNEY_KEY)));}catch{this.state=freshJourney();this.storageOK=false;}
+ constructor(root,{battle,home,storage}){
+  this.root=root;this.battle=battle;this.home=home;this.storage=storage;this.storageOK=storage.storageOK;
+  this.state=readJourney(storage.read(JOURNEY_KEY,null));
   this.tab='map';this.starter=0;this.resetPending=false;
   root.addEventListener('click',e=>this.click(e));
   root.addEventListener('submit',e=>{if(e.target.id!=='trainer-form')return;e.preventDefault();this.state=beginJourney(new FormData(e.target).get('trainer-name'),this.starter);this.save();this.render(true);});
  }
- save(){try{localStorage.setItem(JOURNEY_KEY,JSON.stringify(this.state));this.storageOK=true;}catch{this.storageOK=false;}}
+ save(){this.storageOK=this.storage.write(JOURNEY_KEY,this.state);}
  text(text){return escape(storyText(text,this.state,title(ROSTER[this.state.starter??0].name)));}
  portrait(id,classes=''){
   const cell=PORTRAITS[id];if(!cell)return '';
@@ -22,7 +22,7 @@ export class TrainerJourney {
  open(){this.resetPending=false;this.render();}
  render(focus=false){
   const s=this.state,active=s.starter!==null,finished=s.completed===CHAPTERS.length;
-  this.root.innerHTML=`<div class="journey-top"><button class="text-button" data-journey="home">← Beybattle</button><span class="journey-label">A trainer’s tale</span><span class="journey-save" role="status">${this.storageOK?'Progress saves on this device':'Storage unavailable · progress lasts this visit'}</span></div>
+  this.root.innerHTML=`<div class="journey-top"><button class="text-button" data-journey="home">← Beybattle</button><span class="journey-label">A trainer’s tale</span><span class="journey-save" role="status">${this.storage.user?'Saved for '+escape(this.storage.user.name)+' · see Trainer for sync status':this.storageOK?'Progress saves on this device':'Storage unavailable · progress lasts this visit'}</span></div>
    ${active?`<div class="traveler-strip">${this.portrait('trainer','traveler-avatar')}<img src="assets/blades/${s.starter}.webp" alt=""><div><b>${escape(s.name)}</b><span>${title(ROSTER[s.starter].name)} · ${finished?'Wind Road champion':'Bey trainer'}</span></div><div class="seal-count"><b>${s.completed}<small> / 6</small></b><span>Wind seals</span></div></div>`:''}
    ${!active?this.starters():s.scene?this.dialogue():this.map()}`;
   if(focus){const heading=this.root.querySelector('[data-story-focus]');heading?.focus({preventScroll:true});}
