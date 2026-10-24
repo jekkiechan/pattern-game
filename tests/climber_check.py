@@ -12,7 +12,7 @@ with sync_playwright() as p:
  assert page.locator('[data-stage]:not([disabled])').count()==1
  page.click('[data-blade="nimbus"]');page.reload();assert page.locator('[data-blade="nimbus"]').get_attribute('aria-pressed')=='true'
  page.screenshot(path=str(OUT/'home-desktop.png'),full_page=True)
- page.click('#continue-button');page.keyboard.press('Space');assert page.evaluate('run.bursts')==1
+ page.click('#continue-button');page.keyboard.press('Space');page.wait_for_function('run.bursts===1')
  page.click('#climber-pause');before=page.evaluate('run.frames');page.wait_for_timeout(150);assert before==page.evaluate('run.frames')
  page.click('#climber-paused');page.evaluate("window.dispatchEvent(new Event('blur'))");assert page.evaluate('paused');page.click('#climber-paused')
  # A miss is a recoverable gameplay event: checkpoint, stars and burst survive it.
