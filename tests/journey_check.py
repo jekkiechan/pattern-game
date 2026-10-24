@@ -9,10 +9,19 @@ OUT=Path(os.environ.get('QA_OUTPUT','/tmp/pattern-journey-qa'));OUT.mkdir(parent
 errors=[];bad=[]
 def load(page):
  page.goto(BASE+'/beybattle.html');page.wait_for_function('window.__bey');page.click('#play-journey')
+def portraits(page):
+ scene=page.evaluate('__bey.journey.scene')
+ # Check the visible portrait against the authored speaker, including reply switches.
+ expected=page.evaluate("""async()=>{const {CHAPTERS}=await import('./src/beybattle/journey.js');const s=__bey.journey,c=CHAPTERS[s.scene.chapter],e=c[s.scene.part][s.scene.line];return e.replySpeaker&&s.choices[s.scene.chapter]?e.replySpeaker:e.speaker==='narrator'?c.character:e.speaker;}""")
+ assert page.locator('.scene-avatar').get_attribute('data-portrait')==expected,(scene,expected)
+ assert page.locator('.scene-avatar').is_visible()
+ assert page.locator('.traveler-avatar[data-portrait="trainer"]').is_visible()
+
 def talk(page):
  for _ in range(12):
   if page.evaluate('__bey.screen')!='journey':return
   if not page.locator('.dialogue-panel').count():return
+  portraits(page)
   choices=page.locator('[data-choice]')
   if choices.count():choices.first.click()
   else:page.click('[data-journey="next"]')
@@ -34,6 +43,8 @@ with sync_playwright() as p:
  assert page.locator('[data-choice]').count()==2
  page.click('[data-choice="wonder"]');assert page.locator('.dialogue-reply').is_visible()
  load(page);assert page.evaluate('__bey.journey.scene.line')==2;assert page.locator('.dialogue-reply').is_visible()
+ portraits(page)
+ assert page.evaluate("async()=>{const img=new Image();img.src='assets/trainers/wind-road-cast.webp';await img.decode();return img.naturalWidth>0&&img.naturalHeight>0;}")
  page.screenshot(path=str(OUT/'dialogue-desktop.png'),full_page=True)
  for chapter in range(6):
   if chapter:page.locator('.region-card[data-chapter="'+str(chapter)+'"]').click()
