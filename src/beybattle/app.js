@@ -6,6 +6,7 @@ import {Sound} from './audio.js';
 import {CanvasDisplay} from './fallback.js';
 import {TrainerJourney} from './journey-ui.js';
 import {CHAPTERS} from './journey.js';
+import {SpecialEffects} from './special-effects.js';
 const $=id=>document.getElementById(id);
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
 const saved=read('beybattleLeague',{}),old=read('beybattleSave',{}),oldSettings=read('patternSettings',{});
@@ -21,6 +22,7 @@ try{display=new Display($('scene'),{low:options.low,motion:options.motion});}cat
  display=new CanvasDisplay(fresh,{low:options.low,motion:options.motion});
  console.info('Using the Canvas compatibility renderer.');
 }
+const specialEffects=new SpecialEffects($('battle-view'),display,options);
 let screen='home',mode='duel',filter='starters',tierFilter='all',selected=options.player,arena=options.arena,rival=1,leagueTier=unlockedTier(options.league);
 let session=null,match=null,paused=false,acc=0,last=0,hudClock=0,launchClock=0,noticeTime=0,finishDelay=0,finishHandled=false,practiceStep=0;
 let pointerId=null,inspectX=0,keys=new Set(),practiceReturn='duel';
@@ -36,13 +38,14 @@ function portrait(id){return `assets/blades/${id}.webp`;}
 function chooseRival(){if(mode==='league'){rival=LEAGUE[leagueTier].rival;}else{const pool=ROSTER.filter(c=>c.id!==selected&&c.id!==rival);rival=pool[Math.floor(Math.random()*pool.length)].id;}updateRival();}
 function updateRival(){if(rival===selected&&mode!=='league')rival=(selected+1)%ROSTER.length;$('rival-name').textContent=ROSTER[rival].name;$('rival-portrait').src=portrait(rival);$('rival-caption').textContent=mode==='league'?LEAGUE[leagueTier].name.toUpperCase()+' TIER RIVAL':mode==='championship'?'FIRST CHALLENGER':'YOUR RIVAL';}
 function show(next){
+ specialEffects.clear();
  screen=next;document.querySelectorAll('main>.screen').forEach(el=>el.hidden=el.id!==next+'-screen');
  document.body.classList.toggle('in-battle',next==='battle');keys.clear();cancelPointer();
  if(next==='home'){$('home-view').append($('scene'));display.select(selected);updateFeatured();updateRecord();}
  if(next==='league')renderLeague();
  if(next==='journey')journey.open();
  if(next==='setup'){$('setup-view').append($('scene'));display.select(selected);renderCollection();updateInspector();updateRival();updateSettings();}
- if(next==='battle'){$('battle-view').prepend($('scene'));display.battle(match);updateHUD();}
+ if(next==='battle'){$('battle-view').prepend($('scene'));display.battle(match);specialEffects.battle(match);updateHUD();}
  display.resize();acc=0;last=performance.now();window.scrollTo(0,0);
 }
 function updateRecord(){
@@ -246,14 +249,14 @@ function frame(ts){
   if(screen==='battle'&&!paused){
    if(match.state==='ready'){launchClock+=dt;$('launch-marker').style.left=`${(Math.sin(launchClock*2.7)+1)*49}%`;}
    if(match.state==='playing'&&practiceStep<3){keyboardSteer();acc+=dt;let n=0;while(acc>=STEP&&n<10){match.step(STEP);acc-=STEP;n++;}if(n===10)acc=0;
-    for(const e of match.events.splice(0)){display.event(e);sound.play(e.type);if(e.type==='special')announce(e.i===0?e.name.toUpperCase():`RIVAL · ${e.name.toUpperCase()}`,1.2);if(e.type==='block'&&e.i===0&&match.blades[0].counterReady<=0)announce('NICE GUARD!',.7);if(e.type==='perfect'&&e.i===0)announce('PERFECT GUARD · COUNTER!',1);if(e.type==='counter'&&e.i===0)announce('COUNTER STRIKE! +3',.8);if(e.type==='rail'&&e.i===0)announce('RAIL RUSH!',.7);if(e.type==='finalspin')announce('FINAL SPIN · RING CLOSING',1.5);}
+    for(const e of match.events.splice(0)){display.event(e);specialEffects.event(e);sound.play(e.type);if(e.type==='block'&&e.i===0&&match.blades[0].counterReady<=0)announce('NICE GUARD!',.7);if(e.type==='perfect'&&e.i===0)announce('PERFECT GUARD · COUNTER!',1);if(e.type==='counter'&&e.i===0)announce('COUNTER STRIKE! +3',.8);if(e.type==='rail'&&e.i===0)announce('RAIL RUSH!',.7);if(e.type==='finalspin')announce('FINAL SPIN · RING CLOSING',1.5);}
     if(mode==='practice')coach();
    }
    if(match.state==='over'&&!finishHandled){finishHandled=true;finishDelay=1;announce(match.winner===null?'DOUBLE FINISH':match.winner===0?'ROUND WON':'SPIN OUT',1);}
    if(finishDelay>0){finishDelay-=dt;if(finishDelay<=0){finishRound();}}
    noticeTime-=dt;if(noticeTime<=0)$('battle-announcement').textContent='';
    hudClock+=dt;if(hudClock>.08){updateHUD();hudClock=0;}
-   if(screen==='battle'){display.render(dt,match.state==='playing'?acc/STEP:1);const pos=display.project(match.blades[0].x,match.blades[0].z);$('you-label').style.left=pos.x+'px';$('you-label').style.top=(pos.y-18)+'px';}
+   if(screen==='battle'){display.render(dt,match.state==='playing'?acc/STEP:1);specialEffects.render(dt);const pos=display.project(match.blades[0].x,match.blades[0].z);$('you-label').style.left=pos.x+'px';$('you-label').style.top=(pos.y-18)+'px';}
   }else if((screen==='home'||screen==='setup')&&frameCount%2===0){display.render(dt*2);}
  }
  requestAnimationFrame(frame);
