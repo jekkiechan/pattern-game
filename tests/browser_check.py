@@ -77,6 +77,11 @@ with sync_playwright() as p:
  # All models build, thumbnails and GPU model cache remain bounded.
  page.evaluate("__bey.setup('duel')");page.evaluate('for(let i=0;i<33;i++)__bey.display.snapshot(i)')
  render=page.evaluate('__bey.display.stats()');assert render['models']<=8
+ # Ditto matches need a separate scene object for each fighter.
+ page.click('#start-match')
+ separate=page.evaluate("""()=>{const match=__bey.match,id=match.blades[0].id;match.blades[1].id=id;__bey.display.battle(match);const [player,rival]=__bey.display.fighters;const ok=player.model!==rival.model&&player.model.parent===player.root&&rival.model.parent===rival.root;__bey.display.select(id);return ok;}""")
+ assert separate,'Identical blades must render independently for both fighters'
+ page.evaluate("__bey.setup('duel')")
  print('Championship',flush=True)
  page.locator('#setup-screen .back-home').click();page.click('#play-championship');page.click('#start-match')
  assert page.locator('.bracket-rival').count()==3

@@ -56,7 +56,7 @@ export class Display {
   if(this.fighters)this.fighters.forEach(f=>{this.world.remove(f.root);f.ring.geometry.dispose();f.ring.material.dispose();f.shadow.geometry.dispose();f.shadow.material.dispose();this.world.remove(f.trail);f.trail.geometry.dispose();f.trail.material.dispose();});
   this.arena(ARENAS.find(a=>a.id===match.arena));this.match=match;
   this.fighters=match.blades.map((b,i)=>{
-   const root=new T.Group(),model=this.model(b.id);model.position.set(0,.36,0);model.scale.setScalar(.64);model.rotation.set(0,0,0);root.add(model);
+   const root=new T.Group(),model=this.model(b.id).clone(true);model.position.set(0,.36,0);model.scale.setScalar(.64);model.rotation.set(0,0,0);root.add(model);
    const ring=new T.Mesh(new T.RingGeometry(.86,.88,64),new T.MeshBasicMaterial({color:i?'#ff9b75':'#82caff',transparent:true,opacity:.7,side:T.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=-.01;root.add(ring);
    const shadow=new T.Mesh(new T.PlaneGeometry(2.1,2.1),new T.MeshBasicMaterial({map:this.shadowTexture,transparent:true,opacity:.8,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=-.035;root.add(shadow);this.world.add(root);
    const trailGeo=new T.BufferGeometry(),trailPositions=new Float32Array(24*3),trailColors=new Float32Array(24*3),tint=new T.Color(i?'#ffb17e':'#98d9ff');
